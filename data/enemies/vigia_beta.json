@@ -1,0 +1,56 @@
+{
+	"id": "vigia_beta",
+	"name": "Vigia Beta",
+	"title": "Centinela del eco",
+	"genre": "Sobrenatural",
+	"rarity": "SR",
+	"type": "INT",
+	"art": {},
+	"portrait_style": "long",
+	"roles": ["Support", "Healer"],
+	"stats": {
+		"max_hp": 3400,
+		"atk": 175,
+		"def": 95,
+		"speed": 118,
+		"crit_rate": 0.08,
+		"dodge_rate": 0.05
+	},
+	"categories": ["Villains", "Supernatural"],
+	"links": [],
+	"passive": {
+		"id": "pas_beta_eco",
+		"name": "Eco del umbral",
+		"description": "Al empezar su turno cura un 6% del HP maximo a su companero mas herido.",
+		"trigger": "turn_start",
+		"condition": {},
+		"effects": [
+			{ "type": "heal", "target": "ally_lowest", "amount": 0.06, "of": "max_hp" }
+		]
+	},
+	"skills": [
+		{
+			"id": "sk_beta_01",
+			"name": "Toque del eco",
+			"kind": "basic",
+			"power": 100,
+			"cost": 0,
+			"target": "enemy",
+			"effects": []
+		},
+		{
+			"id": "sk_beta_02",
+			"name": "Bendicion del vacio",
+			"description": "Cura un 15% del HP maximo a todos sus aliados y les sube un 20% el ataque durante 2 turnos.",
+			"kind": "special",
+			"power": 0,
+			"cost": 2,
+			"target": "ally_all",
+			"effects": [
+				{ "type": "heal", "target": "ally_all", "amount": 0.15, "of": "max_hp" },
+				{ "type": "stat_mod", "target": "ally_all", "stat": "atk", "kind": "mult", "value": 0.2, "turns": 2 }
+			]
+		}
+	],
+	"transformations": []
+}

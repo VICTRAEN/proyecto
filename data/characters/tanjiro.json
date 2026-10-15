@@ -1,0 +1,85 @@
+{
+	"id": "tanjiro",
+	"name": "Tanjiro Kamado",
+	"title": "El cazador de demonios",
+	"genre": "Sobrenatural",
+	"rarity": "SSR",
+	"type": "TEQ",
+	"portrait_style": "spiky",
+	"art": {
+		"front": "res://art/characters/tanjiro/front.png",
+		"back": "res://art/characters/tanjiro/back.png",
+		"icon": "res://art/characters/tanjiro/icon.png"
+	},
+	"roles": ["Damage Dealer", "Support"],
+	"stats": {
+		"max_hp": 1360,
+		"atk": 216,
+		"def": 90,
+		"speed": 116,
+		"crit_rate": 0.13,
+		"dodge_rate": 0.08
+	},
+	"categories": ["supernatural", "protagonists", "determination", "heroes"],
+	"links": ["heroes", "inquebrantables"],
+	"passive": {
+		"id": "pas_tanjiro_respiracion",
+		"name": "Respiracion del agua",
+		"description": "Respira hondo y aguanta: al comenzar su turno sube un 25% su defensa.",
+		"trigger": "turn_start",
+		"condition": {},
+		"effects": [
+			{ "type": "stat_mod", "target": "self", "stat": "def", "kind": "mult", "value": 0.25, "turns": 1 }
+		]
+	},
+	"skills": [
+		{
+			"id": "sk_tanjiro_01",
+			"name": "Corte de agua",
+			"kind": "basic",
+			"power": 105,
+			"cost": 0,
+			"target": "enemy",
+			"description": "Tajo fluido y preciso.",
+			"effects": []
+		},
+		{
+			"id": "sk_tanjiro_02",
+			"name": "Decima forma",
+			"kind": "special",
+			"power": 230,
+			"cost": 3,
+			"target": "enemy",
+			"description": "Corte cruzado que le devuelve un 8% de su vida maxima.",
+			"effects": [
+				{ "type": "heal", "target": "self", "amount": 0.08, "of": "max_hp" }
+			]
+		}
+	],
+	"transformations": [],
+	"evolution": {
+		"passive": {
+			"id": "pas_tanjiro_ur_respiracion",
+			"name": "Respiracion del sol",
+			"description": "Al comenzar su turno sube un 35% su defensa y un 10% su ataque.",
+			"trigger": "turn_start",
+			"condition": {},
+			"effects": [
+				{ "type": "stat_mod", "target": "self", "stat": "def", "kind": "mult", "value": 0.35, "turns": 1 },
+				{ "type": "stat_mod", "target": "self", "stat": "atk", "kind": "mult", "value": 0.1, "turns": 1 }
+			]
+		},
+		"passive_extra": {
+			"id": "pas_tanjiro_ur_marca",
+			"name": "Marca del cazador",
+			"description": "Al comenzar el combate sube un 25% su vida maxima.",
+			"trigger": "battle_start",
+			"condition": {},
+			"effects": [
+				{ "type": "stat_mod", "target": "self", "stat": "max_hp", "kind": "mult", "value": 0.25, "turns": 0 }
+			]
+		},
+		"links": ["mentores", "energia-oculta"],
+		"categories": ["despertados", "guardianes"]
+	}
+}

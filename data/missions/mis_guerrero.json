@@ -1,0 +1,10 @@
+{
+	"id": "mis_guerrero",
+	"name": "GUERRERO",
+	"description": "Gana 3 combates.",
+	"stat": "victorias",
+	"target": 3,
+	"reward_coins": 250,
+	"reward_gems": 0,
+	"category": "COMBATE"
+}

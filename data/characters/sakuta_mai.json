@@ -1,0 +1,88 @@
+{
+	"id": "sakuta_mai",
+	"name": "Sakuta y Mai",
+	"title": "Sindrome compartido",
+	"genre": "Romance",
+	"rarity": "SSR",
+	"type": "PHY",
+	"gacha": false,
+	"portrait_style": "short",
+	"art": {
+		"front": "res://art/characters/sakuta_mai/front.png",
+		"back": "res://art/characters/sakuta_mai/back.png",
+		"icon": "res://art/characters/sakuta_mai/icon.png"
+	},
+	"roles": ["Damage Dealer", "Support"],
+	"stats": {
+		"max_hp": 1820,
+		"atk": 238,
+		"def": 112,
+		"speed": 152,
+		"crit_rate": 0.15,
+		"dodge_rate": 0.09
+	},
+	"categories": ["romance", "school", "determination", "protagonists"],
+	"links": ["romanticos", "inquebrantables"],
+	"evolved_from": "",
+	"evolves_to": ["sakuta"],
+	"passive": {
+		"id": "pas_sakuta_mai_promesa",
+		"name": "Dos personas, una promesa",
+		"description": "Al empezar el combate gana un 15% de velocidad y 4 puntos de critico de forma permanente.",
+		"trigger": "battle_start",
+		"condition": {},
+		"effects": [
+			{ "type": "stat_mod", "target": "self", "stat": "speed", "kind": "mult", "value": 0.15, "turns": 0 },
+			{ "type": "stat_mod", "target": "self", "stat": "crit_rate", "kind": "flat", "value": 0.04, "turns": 0 }
+		]
+	},
+	"skills": [
+		{
+			"id": "sk_sakuta_mai_01",
+			"name": "Patada de Mai",
+			"kind": "basic",
+			"power": 110,
+			"cost": 0,
+			"target": "enemy",
+			"effects": []
+		},
+		{
+			"id": "sk_sakuta_mai_02",
+			"name": "Promesa de pubertad",
+			"description": "Golpe a un rival que le baja un 25% la defensa durante 2 turnos: nadie le pone la mano encima a Mai.",
+			"kind": "special",
+			"power": 180,
+			"cost": 3,
+			"target": "enemy",
+			"effects": [
+				{ "type": "stat_mod", "target": "enemy", "stat": "def", "kind": "mult", "value": -0.25, "turns": 2 }
+			]
+		}
+	],
+	"transformations": [],
+	"evolution": {
+		"passive": {
+			"id": "pas_sakuta_mai_ur_promesa",
+			"name": "Dos personas, una promesa (despierta)",
+			"description": "Al empezar el combate gana un 20% de velocidad y 5 puntos de critico de forma permanente.",
+			"trigger": "battle_start",
+			"condition": {},
+			"effects": [
+				{ "type": "stat_mod", "target": "self", "stat": "speed", "kind": "mult", "value": 0.2, "turns": 0 },
+				{ "type": "stat_mod", "target": "self", "stat": "crit_rate", "kind": "flat", "value": 0.05, "turns": 0 }
+			]
+		},
+		"passive_extra": {
+			"id": "pas_sakuta_mai_ur_sindrome",
+			"name": "Sindrome que no se rompe",
+			"description": "Con la vida por debajo de la mitad, su ataque sube un 35%.",
+			"trigger": "turn_start",
+			"condition": { "type": "hp_below", "who": "self", "value": 0.5 },
+			"effects": [
+				{ "type": "stat_mod", "target": "self", "stat": "atk", "kind": "mult", "value": 0.35, "turns": 1 }
+			]
+		},
+		"links": ["estrategas"],
+		"categories": ["despertados", "tacticos"]
+	}
+}

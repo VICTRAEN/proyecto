@@ -1,0 +1,32 @@
+{
+	"id": "dlg_event_sdp_001",
+	"name": "Sindromes de la pubertad: el primer sintoma",
+	"skippable": true,
+	"skip_label": "SALTAR",
+	"lines": [
+		{
+			"speaker": "Mai",
+			"portrait": "mai",
+			"text": "Nadie me ve. Puedo estar en mitad del pasillo y la gente camina a traves de mi.",
+			"background": "battle_plain"
+		},
+		{
+			"speaker": "Sakuta",
+			"portrait": "mai",
+			"text": "Yo si te veo. Y no pienso dejar de mirarte hasta que te vuelvan a ver.",
+			"background": "battle_plain"
+		},
+		{
+			"speaker": "Sakuta",
+			"portrait": "mai",
+			"text": "Los celadores llegan cuando el sindrome aprieta. Si los paramos, el sindrome se rompe.",
+			"background": "battle_plain"
+		},
+		{
+			"speaker": "Mai",
+			"portrait": "mai",
+			"text": "Entonces no me sueltes. Pase lo que pase, no me sueltes.",
+			"background": "battle_plain"
+		}
+	]
+}

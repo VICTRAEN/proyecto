@@ -1,0 +1,26 @@
+{
+	"id": "dlg_evo_sakuta",
+	"name": "El despertar de los dos",
+	"skippable": true,
+	"skip_label": "SALTAR",
+	"lines": [
+		{
+			"speaker": "Sakuta",
+			"portrait": "sakuta_mai",
+			"text": "El celador dice que nadie puede sostener dos sinderomas a la vez.",
+			"background": "battle_plain"
+		},
+		{
+			"speaker": "Mai",
+			"portrait": "sakuta_mai",
+			"text": "Entonces le demostramos que esta equivocado. Tu y yo somos uno.",
+			"background": "battle_plain"
+		},
+		{
+			"speaker": "Sakuta",
+			"portrait": "sakuta_mai",
+			"text": "Comamos. Que hoy no pienso perder a nadie.",
+			"background": "battle_plain"
+		}
+	]
+}

@@ -1,0 +1,10 @@
+{
+	"id": "mis_primera_victoria",
+	"name": "PRIMERA VICTORIA",
+	"description": "Gana 1 combate.",
+	"stat": "victorias",
+	"target": 1,
+	"reward_coins": 100,
+	"reward_gems": 0,
+	"category": "COMBATE"
+}

@@ -1,0 +1,9 @@
+{
+	"id": "mentores",
+	"name": "Mentores",
+	"description": "El que ensena y el que aprende. Uno cubre al otro y los dos aguantan mas.",
+	"effects": [
+		{ "type": "stat_mod", "stat": "def", "kind": "mult", "value": 0.06 },
+		{ "type": "stat_mod", "stat": "speed", "kind": "mult", "value": 0.03 }
+	]
+}

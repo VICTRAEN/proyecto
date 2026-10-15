@@ -1,0 +1,59 @@
+{
+	"id": "megumi",
+	"name": "Megumi Fushiguro",
+	"title": "Portador de las sombras",
+	"genre": "Sobrenatural",
+	"rarity": "SR",
+	"type": "INT",
+	"portrait_style": "spiky",
+	"art": {
+		"front": "res://art/characters/megumi/front.png",
+		"back": "res://art/characters/megumi/back.png",
+		"icon": "res://art/characters/megumi/icon.png"
+	},
+	"roles": ["Damage Dealer", "Utility"],
+	"stats": {
+		"max_hp": 1700,
+		"atk": 220,
+		"def": 115,
+		"speed": 140,
+		"crit_rate": 0.12,
+		"dodge_rate": 0.06
+	},
+	"categories": ["shonen", "supernatural", "school", "tacticos"],
+	"links": ["energia-oculta", "estrategas", "heroes"],
+	"passive": {
+		"id": "pas_megumi_guardia",
+		"name": "Guardia de shikigami",
+		"description": "Sus sombras le cubren al entrar en combate: gana un 25% de defensa de forma permanente.",
+		"trigger": "battle_start",
+		"condition": {},
+		"effects": [
+			{ "type": "stat_mod", "target": "self", "stat": "def", "kind": "mult", "value": 0.25, "turns": 0 }
+		]
+	},
+	"skills": [
+		{
+			"id": "sk_megumi_01",
+			"name": "Zarpazo de shikigami",
+			"kind": "basic",
+			"power": 110,
+			"cost": 0,
+			"target": "enemy",
+			"effects": []
+		},
+		{
+			"id": "sk_megumi_02",
+			"name": "Jardin de sombras",
+			"description": "Encierra a todo el bando rival y les baja un 20% el ataque durante 2 turnos.",
+			"kind": "special",
+			"power": 175,
+			"cost": 3,
+			"target": "enemy_all",
+			"effects": [
+				{ "type": "stat_mod", "target": "enemy_all", "stat": "atk", "kind": "mult", "value": -0.2, "turns": 2 }
+			]
+		}
+	],
+	"transformations": []
+}

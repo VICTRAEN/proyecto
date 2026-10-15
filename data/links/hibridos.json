@@ -1,0 +1,9 @@
+{
+	"id": "hibridos",
+	"name": "Hibridos",
+	"description": "Cuerpos que aguantan mas de lo humano. Se curten los unos a los otros.",
+	"effects": [
+		{ "type": "stat_mod", "stat": "max_hp", "kind": "mult", "value": 0.05 },
+		{ "type": "stat_mod", "stat": "atk", "kind": "mult", "value": 0.04 }
+	]
+}

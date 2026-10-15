@@ -1,0 +1,9 @@
+{
+	"id": "hermanas",
+	"name": "Hermanas",
+	"description": "Se conocen de memoria y se protegen sin hablar. Nadie las mueve de ahi.",
+	"effects": [
+		{ "type": "stat_mod", "stat": "def", "kind": "mult", "value": 0.06 },
+		{ "type": "stat_mod", "stat": "max_hp", "kind": "mult", "value": 0.03 }
+	]
+}

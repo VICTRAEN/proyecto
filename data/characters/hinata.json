@@ -1,0 +1,85 @@
+{
+	"id": "hinata",
+	"name": "Shoyo Hinata",
+	"title": "El pequeno gigante",
+	"genre": "Spokon",
+	"rarity": "SR",
+	"type": "AGL",
+	"portrait_style": "spiky",
+	"art": {
+		"front": "res://art/characters/hinata/front.png",
+		"back": "res://art/characters/hinata/back.png",
+		"icon": "res://art/characters/hinata/icon.png"
+	},
+	"roles": ["Damage Dealer"],
+	"stats": {
+		"max_hp": 1140,
+		"atk": 210,
+		"def": 72,
+		"speed": 132,
+		"crit_rate": 0.14,
+		"dodge_rate": 0.12
+	},
+	"categories": ["spokon", "protagonists", "teamwork", "determination"],
+	"links": ["spokon", "inquebrantables"],
+	"passive": {
+		"id": "pas_hinata_salto",
+		"name": "Salto imposible",
+		"description": "No deja de saltar: al comenzar su turno sube un 20% su velocidad.",
+		"trigger": "turn_start",
+		"condition": {},
+		"effects": [
+			{ "type": "stat_mod", "target": "self", "stat": "speed", "kind": "mult", "value": 0.2, "turns": 1 }
+		]
+	},
+	"skills": [
+		{
+			"id": "sk_hinata_01",
+			"name": "Remate",
+			"kind": "basic",
+			"power": 105,
+			"cost": 0,
+			"target": "enemy",
+			"description": "Salta y golpea desde arriba.",
+			"effects": []
+		},
+		{
+			"id": "sk_hinata_02",
+			"name": "Remate con los ojos cerrados",
+			"kind": "special",
+			"power": 225,
+			"cost": 3,
+			"target": "enemy",
+			"description": "Se fia del instante: +15 puntos de critico durante 2 turnos.",
+			"effects": [
+				{ "type": "stat_mod", "target": "self", "stat": "crit_rate", "kind": "flat", "value": 0.15, "turns": 2 }
+			]
+		}
+	],
+	"transformations": [],
+	"evolution": {
+		"passive": {
+			"id": "pas_hinata_ev_salto",
+			"name": "Salto del pequeño gigante",
+			"description": "Sube un 35% su velocidad y 5 puntos su esquiva al comenzar su turno.",
+			"trigger": "turn_start",
+			"condition": {},
+			"effects": [
+				{ "type": "stat_mod", "target": "self", "stat": "speed", "kind": "mult", "value": 0.35, "turns": 1 },
+				{ "type": "stat_mod", "target": "self", "stat": "dodge_rate", "kind": "flat", "value": 0.05, "turns": 1 }
+			]
+		},
+		"passive_extra": {
+			"id": "pas_hinata_ev_instinto",
+			"name": "Instinto en la red",
+			"description": "Gana 10 puntos de critico al comenzar su turno.",
+			"trigger": "turn_start",
+			"condition": {},
+			"effects": [
+				{ "type": "stat_mod", "target": "self", "stat": "crit_rate", "kind": "flat", "value": 0.1, "turns": 1 }
+			]
+		},
+		"links": ["mentores", "veteranos"],
+		"categories": ["despertados", "leyendas"]
+	}
+}

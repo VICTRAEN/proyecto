@@ -1,0 +1,60 @@
+{
+	"id": "bachira",
+	"name": "Meguru Bachira",
+	"title": "Monstruo jugueton",
+	"genre": "Deportes",
+	"rarity": "SR",
+	"type": "AGL",
+	"portrait_style": "short",
+	"art": {
+		"front": "res://art/characters/bachira/front.png",
+		"back": "res://art/characters/bachira/back.png",
+		"icon": "res://art/characters/bachira/icon.png"
+	},
+	"roles": ["Damage Dealer", "Utility"],
+	"stats": {
+		"max_hp": 1500,
+		"atk": 215,
+		"def": 88,
+		"speed": 158,
+		"crit_rate": 0.15,
+		"dodge_rate": 0.10
+	},
+	"categories": ["spokon", "school", "protagonists", "teamwork"],
+	"links": ["spokon", "inquebrantables", "rivales"],
+	"passive": {
+		"id": "pas_bachira_monstruo",
+		"name": "El monstruo despierta",
+		"description": "Al comenzar su turno su velocidad sube un 30%: juega porque se divierte.",
+		"trigger": "turn_start",
+		"condition": {},
+		"effects": [
+			{ "type": "stat_mod", "target": "self", "stat": "speed", "kind": "mult", "value": 0.3, "turns": 1 }
+		]
+	},
+	"skills": [
+		{
+			"id": "sk_bachira_01",
+			"name": "Regate del monstruo",
+			"kind": "basic",
+			"power": 110,
+			"cost": 0,
+			"target": "enemy",
+			"effects": []
+		},
+		{
+			"id": "sk_bachira_02",
+			"name": "Pase imposible",
+			"description": "Rompe la defensa rival y se crece: baja un 20% la defensa del enemigo y gana 5 puntos de critico.",
+			"kind": "special",
+			"power": 170,
+			"cost": 3,
+			"target": "enemy",
+			"effects": [
+				{ "type": "stat_mod", "target": "enemy", "stat": "def", "kind": "mult", "value": -0.2, "turns": 2 },
+				{ "type": "stat_mod", "target": "self", "stat": "crit_rate", "kind": "flat", "value": 0.05, "turns": 2 }
+			]
+		}
+	],
+	"transformations": []
+}

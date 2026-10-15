@@ -1,0 +1,8 @@
+{
+	"id": "shop_recluta_hinata",
+	"name": "Reclutar a Shoyo Hinata",
+	"description": "Ficha directa: si ya lo tienes, la copia cuenta como duplicado.",
+	"cost_coins": 0,
+	"cost_gems": 400,
+	"grant": { "type": "character", "character_id": "hinata", "amount": 1 }
+}

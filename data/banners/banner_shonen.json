@@ -1,0 +1,27 @@
+{
+	"id": "banner_shonen",
+	"name": "Shonen y Spokon",
+	"description": "Solo salen personajes de las categorias shonen y spokon. 15% de SSR y 1% de UR por tirada.",
+	"cost_gems": 10,
+	"multi_pulls": 10,
+	"multi_cost_gems": 90,
+	"rates": {
+		"SR": 0.84,
+		"SSR": 0.15,
+		"UR": 0.01
+	},
+	"pool_categories": [
+		"shonen",
+		"spokon"
+	],
+	"featured": [
+		"isagi",
+		"hinata"
+	],
+	"featured_bonus": 0.0,
+	"pity": {
+		"pulls": 0,
+		"rarity": ""
+	},
+	"notes": "Probabilidades POR TIRADA, explicitas y sumando 1 (sin renormalizar). Una x10 son 10 tiradas independientes. No hay pity ni bonus de destacados: los destacados solo se muestran en el banner. Las formas UR/LR de evolucion y las unidades F2P no entran en el gacha."
+}

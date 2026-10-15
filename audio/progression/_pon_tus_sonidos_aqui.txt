@@ -1,0 +1,10 @@
+Pon aqui los sonidos de la categoria 'progression', con estos nombres EXACTOS
+(formato recomendado .ogg; tambien valen .wav y .mp3):
+
+  summon.ogg   ->  invocar personajes
+  evolution.ogg   ->  evolucionar
+  level_up.ogg   ->  subir de nivel (si falta, suena claim)
+  mutation.ogg   ->  tirar una mutacion
+
+Si falta un archivo NO hay error: ese evento simplemente no suena (o usa su
+sustituto, si se indica arriba). Guia completa en res://audio/README.md

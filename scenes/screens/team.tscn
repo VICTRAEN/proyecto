@@ -1,0 +1,144 @@
+[gd_scene format=3 uid="uid://dcfv5i05h1km1"]
+
+[ext_resource type="Script" uid="uid://bg6klsouo28rg" path="res://scenes/screens/team.gd" id="1_team"]
+[ext_resource type="Theme" uid="uid://ctdecel0skgic" path="res://ui/theme.tres" id="2_theme"]
+[ext_resource type="Script" uid="uid://cv2l11vt51fns" path="res://ui/portrait.gd" id="3_portrait"]
+[ext_resource type="Script" uid="uid://cad8adpc83a5y" path="res://ui/background.gd" id="4_bg"]
+
+[node name="Team" type="Control" unique_id=2051404813]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("2_theme")
+script = ExtResource("1_team")
+
+[node name="Background" type="Control" parent="." unique_id=304181932]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("4_bg")
+slot = "team"
+
+[node name="Margin" type="MarginContainer" parent="." unique_id=1970229661]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 18
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 18
+
+[node name="Main" type="VBoxContainer" parent="Margin" unique_id=1383280923]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Title" type="Label" parent="Margin/Main" unique_id=1996011109]
+layout_mode = 2
+theme_override_font_sizes/font_size = 40
+text = "EQUIPO"
+horizontal_alignment = 1
+
+[node name="LineupTitle" type="Label" parent="Margin/Main" unique_id=2058423273]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "TU EQUIPO"
+
+[node name="Lineup" type="GridContainer" parent="Margin/Main" unique_id=1854158522]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/h_separation = 8
+theme_override_constants/v_separation = 8
+columns = 4
+
+[node name="LinksNote" type="Label" parent="Margin/Main" unique_id=1427926196]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="SlotHint" type="Label" parent="Margin/Main" unique_id=1602343082]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="InfoPanel" type="PanelContainer" parent="Margin/Main" unique_id=175975695]
+layout_mode = 2
+
+[node name="InfoRow" type="HBoxContainer" parent="Margin/Main/InfoPanel" unique_id=892132733]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="InfoPortrait" type="Control" parent="Margin/Main/InfoPanel/InfoRow" unique_id=1352359390]
+custom_minimum_size = Vector2(104, 104)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+script = ExtResource("3_portrait")
+
+[node name="InfoBox" type="VBoxContainer" parent="Margin/Main/InfoPanel/InfoRow" unique_id=1948659752]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+theme_override_constants/separation = 2
+
+[node name="InfoName" type="Label" parent="Margin/Main/InfoPanel/InfoRow/InfoBox" unique_id=563305791]
+layout_mode = 2
+theme_override_font_sizes/font_size = 26
+text = "Sin personaje"
+
+[node name="InfoMeta" type="Label" parent="Margin/Main/InfoPanel/InfoRow/InfoBox" unique_id=565310598]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+
+[node name="InfoStats" type="Label" parent="Margin/Main/InfoPanel/InfoRow/InfoBox" unique_id=103345930]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+
+[node name="PoolTitle" type="Label" parent="Margin/Main" unique_id=2107101730]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "SELECCIONA UN PERSONAJE"
+
+[node name="Scroll" type="ScrollContainer" parent="Margin/Main" unique_id=1899254545]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Pool" type="GridContainer" parent="Margin/Main/Scroll" unique_id=1461468194]
+layout_mode = 2
+size_flags_horizontal = 3
+columns = 4
+theme_override_constants/h_separation = 8
+theme_override_constants/v_separation = 8
+
+[node name="Buttons" type="HBoxContainer" parent="Margin/Main" unique_id=1652950898]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="BackButton" type="Button" parent="Margin/Main/Buttons" unique_id=485586079]
+custom_minimum_size = Vector2(0, 104)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "VOLVER"
+
+[node name="PlayButton" type="Button" parent="Margin/Main/Buttons" unique_id=853783200]
+custom_minimum_size = Vector2(0, 104)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "COMBATIR"
+
+[node name="RemoveButton" type="Button" parent="Margin/Main/Buttons" unique_id=1622721768]
+custom_minimum_size = Vector2(0, 104)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "QUITAR POS. 1"

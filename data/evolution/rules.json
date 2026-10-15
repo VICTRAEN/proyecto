@@ -1,0 +1,20 @@
+{
+	"routes": [
+		{
+			"from": "SSR",
+			"to": "UR",
+			"level_required": 100,
+			"coin_cost": 100000,
+			"stat_multiplier": 1.25,
+			"description": "Al nivel maximo, un SSR puede despertar como UR. Vuelve al nivel 1 con sus estadisticas multiplicadas y su pasiva mejorada."
+		},
+		{
+			"from": "UR",
+			"to": "LR",
+			"level_required": 100,
+			"coin_cost": 250000,
+			"stat_multiplier": 1.5,
+			"description": "Al nivel maximo, un UR con forma LR puede despertar como LR. Vuelve al nivel 1 con sus estadisticas multiplicadas y su pasiva definitiva."
+		}
+	]
+}

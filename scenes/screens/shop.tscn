@@ -1,0 +1,89 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scenes/screens/shop.gd" id="1_shop"]
+[ext_resource type="Theme" path="res://ui/theme.tres" id="2_theme"]
+[ext_resource type="Script" path="res://ui/background.gd" id="3_bg"]
+
+[node name="Shop" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("2_theme")
+script = ExtResource("1_shop")
+
+[node name="Background" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("3_bg")
+slot = "shop"
+
+[node name="Margin" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 28
+theme_override_constants/margin_top = 30
+theme_override_constants/margin_right = 28
+theme_override_constants/margin_bottom = 26
+
+[node name="Main" type="VBoxContainer" parent="Margin"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Header" type="HBoxContainer" parent="Margin/Main"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Title" type="Label" parent="Margin/Main/Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 40
+text = "TIENDA"
+
+[node name="Wallet" type="Label" parent="Margin/Main/Header"]
+layout_mode = 2
+size_flags_vertical = 8
+theme_override_colors/font_color = Color(1, 0.784, 0.337, 1)
+theme_override_font_sizes/font_size = 24
+text = "0 MONEDAS    0 GEMAS"
+horizontal_alignment = 2
+
+[node name="Subtitle" type="Label" parent="Margin/Main"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+autowrap_mode = 2
+
+[node name="Scroll" type="ScrollContainer" parent="Margin/Main"]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="Shelves" type="VBoxContainer" parent="Margin/Main/Scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 16
+
+[node name="BackButton" type="Button" parent="Margin/Main"]
+custom_minimum_size = Vector2(0, 104)
+layout_mode = 2
+text = "VOLVER"
+
+[node name="ConfirmLayer" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+visible = false

@@ -1,0 +1,10 @@
+{
+	"id": "mis_gran_coleccion",
+	"name": "GRAN COLECCION",
+	"description": "Obten 20 personajes.",
+	"stat": "personajes_obtenidos",
+	"target": 20,
+	"reward_coins": 800,
+	"reward_gems": 0,
+	"category": "COLECCION"
+}

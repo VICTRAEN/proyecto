@@ -1,0 +1,9 @@
+{
+	"id": "spokon",
+	"name": "Spokon",
+	"description": "Entrenamiento compartido: los reflejos y la velocidad suben solos.",
+	"effects": [
+		{ "type": "stat_mod", "stat": "speed", "kind": "mult", "value": 0.07 },
+		{ "type": "stat_mod", "stat": "dodge_rate", "kind": "flat", "value": 0.02 }
+	]
+}

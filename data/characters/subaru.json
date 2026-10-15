@@ -1,0 +1,86 @@
+{
+	"id": "subaru",
+	"name": "Subaru Natsuki",
+	"title": "El que vuelve a empezar",
+	"genre": "Fantasia",
+	"rarity": "SR",
+	"type": "INT",
+	"portrait_style": "short",
+	"art": {
+		"front": "res://art/characters/subaru/front.png",
+		"back": "res://art/characters/subaru/back.png",
+		"icon": "res://art/characters/subaru/icon.png"
+	},
+	"roles": ["Support", "Utility"],
+	"stats": {
+		"max_hp": 1240,
+		"atk": 172,
+		"def": 82,
+		"speed": 112,
+		"crit_rate": 0.10,
+		"dodge_rate": 0.12
+	},
+	"categories": ["fantasy", "protagonists", "determination"],
+	"links": ["inquebrantables"],
+	"passive": {
+		"id": "pas_subaru_regreso",
+		"name": "Regreso por la muerte",
+		"description": "Ya ha vivido esto antes: cuando esta por debajo de la mitad de su vida, sube un 40% su velocidad.",
+		"trigger": "turn_start",
+		"condition": { "type": "hp_below", "who": "self", "value": 0.5 },
+		"effects": [
+			{ "type": "stat_mod", "target": "self", "stat": "speed", "kind": "mult", "value": 0.4, "turns": 1 }
+		]
+	},
+	"skills": [
+		{
+			"id": "sk_subaru_01",
+			"name": "Improvisar",
+			"kind": "basic",
+			"power": 105,
+			"cost": 0,
+			"target": "enemy",
+			"description": "Golpe torpe pero inesperado.",
+			"effects": []
+		},
+		{
+			"id": "sk_subaru_02",
+			"name": "Otra oportunidad",
+			"kind": "special",
+			"power": 0,
+			"cost": 3,
+			"target": "ally_all",
+			"description": "Reune al equipo: cura un 18% de la vida maxima a todos y da +15% de defensa durante 2 turnos.",
+			"effects": [
+				{ "type": "heal", "target": "ally_all", "amount": 0.18, "of": "max_hp" },
+				{ "type": "stat_mod", "target": "ally_all", "stat": "def", "kind": "mult", "value": 0.15, "turns": 2 }
+			]
+		}
+	],
+	"transformations": [],
+	"evolution": {
+		"passive": {
+			"id": "pas_subaru_ev_regreso",
+			"name": "Regreso sin fin",
+			"description": "Cuando esta por debajo de la mitad de su vida, sube un 60% su velocidad y un 15% su ataque.",
+			"trigger": "turn_start",
+			"condition": { "type": "hp_below", "who": "self", "value": 0.5 },
+			"effects": [
+				{ "type": "stat_mod", "target": "self", "stat": "speed", "kind": "mult", "value": 0.6, "turns": 1 },
+				{ "type": "stat_mod", "target": "self", "stat": "atk", "kind": "mult", "value": 0.15, "turns": 1 }
+			]
+		},
+		"passive_extra": {
+			"id": "pas_subaru_ev_momento_clave",
+			"name": "El momento clave",
+			"description": "Cura un 8% de la vida maxima al aliado mas tocado al comenzar su turno.",
+			"trigger": "turn_start",
+			"condition": {},
+			"effects": [
+				{ "type": "heal", "target": "ally_lowest", "amount": 0.08, "of": "max_hp" }
+			]
+		},
+		"links": ["energia-oculta", "veteranos"],
+		"categories": ["despertados", "tacticos"]
+	}
+}

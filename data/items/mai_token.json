@@ -1,0 +1,10 @@
+{
+	"id": "mai_token",
+	"name": "Ficha dorada de Mai",
+	"description": "Una ficha de casino que Mai dejo caer en el bolsillo de Sakuta. Con ella, la promesa no se puede romper.",
+	"type": "evolution_material",
+	"icon": "res://art/items/mai_token.png",
+	"rarity": "UR",
+	"usable": false,
+	"obtained_from": "Recompensa de la evolucion especial de Sakuta y Mai"
+}

@@ -1,0 +1,85 @@
+{
+	"id": "kageyama",
+	"name": "Tobio Kageyama",
+	"title": "El rey de la cancha",
+	"genre": "Spokon",
+	"rarity": "SR",
+	"type": "TEQ",
+	"portrait_style": "short",
+	"art": {
+		"front": "res://art/characters/kageyama/front.png",
+		"back": "res://art/characters/kageyama/back.png",
+		"icon": "res://art/characters/kageyama/icon.png"
+	},
+	"roles": ["Support", "Utility"],
+	"stats": {
+		"max_hp": 1210,
+		"atk": 186,
+		"def": 82,
+		"speed": 110,
+		"crit_rate": 0.12,
+		"dodge_rate": 0.08
+	},
+	"categories": ["spokon", "geniuses", "teamwork"],
+	"links": ["spokon"],
+	"passive": {
+		"id": "pas_kageyama_colocacion",
+		"name": "Colocacion perfecta",
+		"description": "Pone el balon donde hace dano: al comenzar su turno el equipo gana 10 puntos de critico.",
+		"trigger": "turn_start",
+		"condition": {},
+		"effects": [
+			{ "type": "stat_mod", "target": "ally_all", "stat": "crit_rate", "kind": "flat", "value": 0.1, "turns": 1 }
+		]
+	},
+	"skills": [
+		{
+			"id": "sk_kageyama_01",
+			"name": "Saque potente",
+			"kind": "basic",
+			"power": 105,
+			"cost": 0,
+			"target": "enemy",
+			"description": "Saque seco y colocado.",
+			"effects": []
+		},
+		{
+			"id": "sk_kageyama_02",
+			"name": "Juego ensayado",
+			"kind": "special",
+			"power": 0,
+			"cost": 3,
+			"target": "ally_all",
+			"description": "Ordena el ataque del equipo: +20% de ataque y +15 puntos de critico durante 2 turnos.",
+			"effects": [
+				{ "type": "stat_mod", "target": "ally_all", "stat": "atk", "kind": "mult", "value": 0.2, "turns": 2 },
+				{ "type": "stat_mod", "target": "ally_all", "stat": "crit_rate", "kind": "flat", "value": 0.15, "turns": 2 }
+			]
+		}
+	],
+	"transformations": [],
+	"evolution": {
+		"passive": {
+			"id": "pas_kageyama_ev_colocacion",
+			"name": "Colocacion del rey",
+			"description": "El equipo gana 20 puntos de critico al comenzar su turno.",
+			"trigger": "turn_start",
+			"condition": {},
+			"effects": [
+				{ "type": "stat_mod", "target": "ally_all", "stat": "crit_rate", "kind": "flat", "value": 0.2, "turns": 1 }
+			]
+		},
+		"passive_extra": {
+			"id": "pas_kageyama_ev_ritmo",
+			"name": "Ritmo de juego",
+			"description": "Al comenzar el combate sube un 15% la velocidad de todo el equipo.",
+			"trigger": "battle_start",
+			"condition": {},
+			"effects": [
+				{ "type": "stat_mod", "target": "ally_all", "stat": "speed", "kind": "mult", "value": 0.15, "turns": 0 }
+			]
+		},
+		"links": ["estrategas", "veteranos"],
+		"categories": ["despertados", "tacticos"]
+	}
+}

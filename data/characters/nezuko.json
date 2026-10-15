@@ -1,0 +1,59 @@
+{
+	"id": "nezuko",
+	"name": "Nezuko Kamado",
+	"title": "Demonio que protege",
+	"genre": "Sobrenatural",
+	"rarity": "SR",
+	"type": "PHY",
+	"portrait_style": "long",
+	"art": {
+		"front": "res://art/characters/nezuko/front.png",
+		"back": "res://art/characters/nezuko/back.png",
+		"icon": "res://art/characters/nezuko/icon.png"
+	},
+	"roles": ["Tank", "Support"],
+	"stats": {
+		"max_hp": 1940,
+		"atk": 200,
+		"def": 135,
+		"speed": 134,
+		"crit_rate": 0.10,
+		"dodge_rate": 0.06
+	},
+	"categories": ["supernatural", "shonen", "historico", "guardianes"],
+	"links": ["hermanas", "energia-oculta", "heroes"],
+	"passive": {
+		"id": "pas_nezuko_cura",
+		"name": "Sangre que sana",
+		"description": "Al empezar el combate su defensa sube un 45% de forma permanente.",
+		"trigger": "battle_start",
+		"condition": {},
+		"effects": [
+			{ "type": "stat_mod", "target": "self", "stat": "def", "kind": "mult", "value": 0.45, "turns": 0 }
+		]
+	},
+	"skills": [
+		{
+			"id": "sk_nezuko_01",
+			"name": "Patada de demonio",
+			"kind": "basic",
+			"power": 105,
+			"cost": 0,
+			"target": "enemy",
+			"effects": []
+		},
+		{
+			"id": "sk_nezuko_02",
+			"name": "Fuego de sangre",
+			"description": "Su sangre arde y debilita al rival: le baja un 25% el ataque durante 2 turnos.",
+			"kind": "special",
+			"power": 170,
+			"cost": 3,
+			"target": "enemy",
+			"effects": [
+				{ "type": "stat_mod", "target": "enemy", "stat": "atk", "kind": "mult", "value": -0.25, "turns": 2 }
+			]
+		}
+	],
+	"transformations": []
+}

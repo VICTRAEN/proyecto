@@ -1,0 +1,10 @@
+{
+	"id": "mis_veterano",
+	"name": "VETERANO",
+	"description": "Gana 10 combates.",
+	"stat": "victorias",
+	"target": 10,
+	"reward_coins": 400,
+	"reward_gems": 0,
+	"category": "COMBATE"
+}

@@ -1,0 +1,59 @@
+{
+	"id": "sunraku",
+	"name": "Sunraku",
+	"title": "Jugador de basura legendaria",
+	"genre": "Videojuego",
+	"rarity": "SSR",
+	"type": "TEQ",
+	"portrait_style": "spiky",
+	"art": {
+		"front": "res://art/characters/sunraku/front.png",
+		"back": "res://art/characters/sunraku/back.png",
+		"icon": "res://art/characters/sunraku/icon.png"
+	},
+	"roles": ["Damage Dealer", "Utility"],
+	"stats": {
+		"max_hp": 1950,
+		"atk": 268,
+		"def": 118,
+		"speed": 182,
+		"crit_rate": 0.19,
+		"dodge_rate": 0.11
+	},
+	"categories": ["fantasy", "geniuses", "tacticos", "protagonists"],
+	"links": ["rivales", "estrategas", "inquebrantables"],
+	"passive": {
+		"id": "pas_sunraku_lee",
+		"name": "Lectura de patrones",
+		"description": "Al empezar el combate gana 8 puntos de critico: conoce el juego mejor que nadie.",
+		"trigger": "battle_start",
+		"condition": {},
+		"effects": [
+			{ "type": "stat_mod", "target": "self", "stat": "crit_rate", "kind": "flat", "value": 0.08, "turns": 0 }
+		]
+	},
+	"skills": [
+		{
+			"id": "sk_sunraku_01",
+			"name": "Tajo del ave",
+			"kind": "basic",
+			"power": 118,
+			"cost": 0,
+			"target": "enemy",
+			"effects": []
+		},
+		{
+			"id": "sk_sunraku_02",
+			"name": "Combo de mazo basura",
+			"description": "Combo encadenado: baja un 25% la defensa del rival durante 2 turnos.",
+			"kind": "special",
+			"power": 195,
+			"cost": 3,
+			"target": "enemy",
+			"effects": [
+				{ "type": "stat_mod", "target": "enemy", "stat": "def", "kind": "mult", "value": -0.25, "turns": 2 }
+			]
+		}
+	],
+	"transformations": []
+}

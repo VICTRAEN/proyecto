@@ -1,0 +1,8 @@
+{
+	"id": "shop_monedas_1000",
+	"name": "Bolsa de monedas",
+	"description": "1000 monedas para subir niveles y evolucionar.",
+	"cost_coins": 0,
+	"cost_gems": 50,
+	"grant": { "type": "coins", "amount": 1000 }
+}

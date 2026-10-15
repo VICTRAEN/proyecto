@@ -1,0 +1,9 @@
+{
+	"id": "inquebrantables",
+	"name": "Inquebrantables",
+	"description": "Se caen y se levantan. Al lado de otro igual, aguantan el doble.",
+	"effects": [
+		{ "type": "stat_mod", "stat": "atk", "kind": "mult", "value": 0.05 },
+		{ "type": "stat_mod", "stat": "max_hp", "kind": "mult", "value": 0.04 }
+	]
+}

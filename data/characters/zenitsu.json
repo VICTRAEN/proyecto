@@ -1,0 +1,59 @@
+{
+	"id": "zenitsu",
+	"name": "Zenitsu Agatsuma",
+	"title": "Trueno dormido",
+	"genre": "Shonen",
+	"rarity": "SR",
+	"type": "AGL",
+	"portrait_style": "short",
+	"art": {
+		"front": "res://art/characters/zenitsu/front.png",
+		"back": "res://art/characters/zenitsu/back.png",
+		"icon": "res://art/characters/zenitsu/icon.png"
+	},
+	"roles": ["Damage Dealer"],
+	"stats": {
+		"max_hp": 1560,
+		"atk": 245,
+		"def": 90,
+		"speed": 163,
+		"crit_rate": 0.16,
+		"dodge_rate": 0.10
+	},
+	"categories": ["shonen", "historico", "protagonists", "guardianes"],
+	"links": ["energia-oculta", "heroes", "inquebrantables"],
+	"passive": {
+		"id": "pas_zenitsu_sono",
+		"name": "Dormido es invencible",
+		"description": "Al comenzar su turno su velocidad sube un 35%: dormido no tiene miedo.",
+		"trigger": "turn_start",
+		"condition": {},
+		"effects": [
+			{ "type": "stat_mod", "target": "self", "stat": "speed", "kind": "mult", "value": 0.35, "turns": 1 }
+		]
+	},
+	"skills": [
+		{
+			"id": "sk_zenitsu_01",
+			"name": "Corte fugaz",
+			"kind": "basic",
+			"power": 118,
+			"cost": 0,
+			"target": "enemy",
+			"effects": []
+		},
+		{
+			"id": "sk_zenitsu_02",
+			"name": "Destello del trueno",
+			"description": "Una sola tecnica a toda velocidad: gana 6 puntos de critico durante 2 turnos.",
+			"kind": "special",
+			"power": 190,
+			"cost": 3,
+			"target": "enemy",
+			"effects": [
+				{ "type": "stat_mod", "target": "self", "stat": "crit_rate", "kind": "flat", "value": 0.06, "turns": 2 }
+			]
+		}
+	],
+	"transformations": []
+}

@@ -1,0 +1,8 @@
+{
+	"id": "shop_gemas_100",
+	"name": "Cambio de gemas",
+	"description": "Convierte monedas sobrantes en 100 gemas para invocar.",
+	"cost_coins": 5000,
+	"cost_gems": 0,
+	"grant": { "type": "gems", "amount": 100 }
+}

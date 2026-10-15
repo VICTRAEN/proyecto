@@ -1,0 +1,88 @@
+{
+	"id": "UID",
+	"name": "NOMBRE VISIBLE",
+	"title": "Titulo",
+	"genre": "Shonen",
+	"rarity": "SSR",
+	"type": "STR",
+	"portrait_style": "spiky",
+	"art": {},
+	"roles": [
+		"Damage Dealer"
+	],
+	"stats": {
+		"max_hp": 2200,
+		"atk": 288,
+		"def": 150,
+		"speed": 175,
+		"crit_rate": 0.17,
+		"dodge_rate": 0.09
+	},
+	"categories": [
+		"shonen",
+		"protagonists",
+		"despertados",
+		"heroes"
+	],
+	"links": [
+		"energia-oculta",
+		"heroes",
+		"mentores"
+	],
+	"passive": {
+		"id": "pas_UID",
+		"name": "Pasiva de ejemplo",
+		"description": "Al empezar el combate gana un 20% de velocidad y 5 puntos de critico de forma permanente.",
+		"trigger": "battle_start",
+		"condition": {},
+		"effects": [
+			{
+				"type": "stat_mod",
+				"target": "self",
+				"stat": "speed",
+				"kind": "mult",
+				"value": 0.2,
+				"turns": 0
+			},
+			{
+				"type": "stat_mod",
+				"target": "self",
+				"stat": "crit_rate",
+				"kind": "flat",
+				"value": 0.05,
+				"turns": 0
+			}
+		]
+	},
+	"skills": [
+		{
+			"id": "sk_UID_01",
+			"name": "Piedra papel tijera",
+			"kind": "basic",
+			"power": 130,
+			"cost": 0,
+			"target": "enemy",
+			"effects": []
+		},
+		{
+			"id": "sk_UID_02",
+			"name": "Jan ken gu: piedra",
+			"description": "Concentra todo su aura en un puñetazo: baja un 30% la defensa del rival durante 2 turnos.",
+			"kind": "special",
+			"power": 210,
+			"cost": 3,
+			"target": "enemy",
+			"effects": [
+				{
+					"type": "stat_mod",
+					"target": "enemy",
+					"stat": "def",
+					"kind": "mult",
+					"value": -0.3,
+					"turns": 2
+				}
+			]
+		}
+	],
+	"transformations": []
+}

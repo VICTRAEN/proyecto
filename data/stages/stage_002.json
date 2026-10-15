@@ -1,0 +1,10 @@
+{
+	"id": "stage_002",
+	"name": "Los Vigias",
+	"difficulty": "NORMAL",
+	"background": "battle_forest",
+	"enemies": ["void_warden", "vigia_alfa"],
+	"xp_reward": 350,
+	"coin_reward": 150,
+	"energy_cost": 0
+}

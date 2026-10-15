@@ -1,0 +1,84 @@
+{
+	"id": "makima",
+	"name": "Makima",
+	"title": "La mujer que lo controla todo",
+	"genre": "Sobrenatural",
+	"rarity": "UR",
+	"type": "INT",
+	"portrait_style": "long",
+	"art": {
+		"front": "res://art/characters/makima/front.png",
+		"back": "res://art/characters/makima/back.png",
+		"icon": "res://art/characters/makima/icon.png"
+	},
+	"roles": ["Utility", "Support"],
+	"stats": {
+		"max_hp": 1420,
+		"atk": 218,
+		"def": 88,
+		"speed": 110,
+		"crit_rate": 0.12,
+		"dodge_rate": 0.06
+	},
+	"categories": ["supernatural", "villains", "geniuses"],
+	"links": ["villanos", "energia-oculta"],
+	"passive": {
+		"id": "pas_makima_control",
+		"name": "Control absoluto",
+		"description": "Domina la voluntad del rival: al comenzar su turno le baja un 18% el ataque.",
+		"trigger": "turn_start",
+		"condition": {},
+		"effects": [
+			{ "type": "stat_mod", "target": "enemy", "stat": "atk", "kind": "mult", "value": -0.18, "turns": 1 }
+		]
+	},
+	"skills": [
+		{
+			"id": "sk_makima_01",
+			"name": "Gestos",
+			"kind": "basic",
+			"power": 105,
+			"cost": 0,
+			"target": "enemy",
+			"description": "Un gesto que el rival no puede ignorar.",
+			"effects": []
+		},
+		{
+			"id": "sk_makima_02",
+			"name": "Orden vinculante",
+			"kind": "special",
+			"power": 120,
+			"cost": 3,
+			"target": "enemy_all",
+			"description": "Somete a todos los rivales: -20% de ataque durante 2 turnos.",
+			"effects": [
+				{ "type": "stat_mod", "target": "enemy_all", "stat": "atk", "kind": "mult", "value": -0.2, "turns": 2 }
+			]
+		}
+	],
+	"transformations": [],
+	"evolution": {
+		"passive": {
+			"id": "pas_makima_lr_control",
+			"name": "Control total",
+			"description": "Les baja un 30% el ataque a los rivales al comenzar su turno.",
+			"trigger": "turn_start",
+			"condition": {},
+			"effects": [
+				{ "type": "stat_mod", "target": "enemy", "stat": "atk", "kind": "mult", "value": -0.3, "turns": 1 }
+			]
+		},
+		"passive_extra": {
+			"id": "pas_makima_lr_contratos",
+			"name": "Contratos",
+			"description": "Al comenzar el combate sube un 15% el ataque de todo el equipo.",
+			"trigger": "battle_start",
+			"condition": {},
+			"effects": [
+				{ "type": "stat_mod", "target": "ally_all", "stat": "atk", "kind": "mult", "value": 0.15, "turns": 0 }
+			]
+		},
+		"links": ["estrategas", "veteranos"],
+		"categories": ["despertados", "leyendas"]
+	}
+}

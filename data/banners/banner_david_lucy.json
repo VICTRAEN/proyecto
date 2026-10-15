@@ -1,0 +1,31 @@
+{
+	"id": "banner_david_lucy",
+	"name": "Edgerunners",
+	"description": "Banner del duo David Martinez & Lucy: sale SIEMPRE como SSR (7% por tirada) y despues evoluciona a UR y LR con las reglas normales.",
+	"enabled": true,
+	"cost_gems": 10,
+	"multi_pulls": 10,
+	"multi_cost_gems": 90,
+	"rates": {
+		"SR": 0.85,
+		"SSR": 0.15
+	},
+	"pool_categories": [],
+	"exclusive_ids": ["david_lucy_duo"],
+	"featured_rates": {
+		"david_lucy_duo": 0.07
+	},
+	"featured": ["david_lucy_duo"],
+	"featured_bonus": 0.0,
+	"theme": {
+		"accent": "#f5e642",
+		"accent2": "#27e6d6",
+		"tagline": "UNIDAD INSIGNIA  -  DUO",
+		"hero": "david_lucy_duo"
+	},
+	"pity": {
+		"pulls": 0,
+		"rarity": ""
+	},
+	"notes": "Probabilidades POR TIRADA, explicitas y sumando 1 (sin renormalizar): SR 85%, SSR 15%. Dentro del SSR, el duo tiene tasa propia del 7% por tirada (featured_rates) y el 8% restante se reparte a partes iguales entre los demas SSR del pool. El duo SOLO existe como SSR: UR y LR se consiguen evolucionando. 'enabled': false apaga el banner. El duo no entra en ningun otro banner (banner_only + exclusive_ids)."
+}

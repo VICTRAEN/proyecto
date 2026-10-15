@@ -1,0 +1,23 @@
+{
+	"id": "banner_apertura",
+	"name": "Apertura",
+	"description": "El banner de siempre: puede salir cualquier personaje del pool, con un 15% de SSR en CADA tirada.",
+	"cost_gems": 10,
+	"multi_pulls": 10,
+	"multi_cost_gems": 90,
+	"rates": {
+		"SR": 0.85,
+		"SSR": 0.15
+	},
+	"pool_categories": [],
+	"featured": [
+		"gojo",
+		"yuno"
+	],
+	"featured_bonus": 0.0,
+	"pity": {
+		"pulls": 0,
+		"rarity": ""
+	},
+	"notes": "Probabilidades POR TIRADA, explicitas y sumando 1 (sin renormalizar). Una x10 son 10 tiradas independientes. No hay pity ni bonus de destacados: los destacados solo se muestran en el banner. Las formas UR/LR de evolucion y las unidades F2P no entran en el gacha."
+}

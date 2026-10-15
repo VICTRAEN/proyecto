@@ -1,0 +1,68 @@
+[gd_scene format=3 uid="uid://dfi2ub5o52wgi"]
+
+[ext_resource type="Script" uid="uid://b5xyvvbr8jpcm" path="res://scenes/screens/history.gd" id="1_history"]
+[ext_resource type="Theme" uid="uid://ctdecel0skgic" path="res://ui/theme.tres" id="2_theme"]
+[ext_resource type="Script" uid="uid://cad8adpc83a5y" path="res://ui/background.gd" id="3_bg"]
+
+[node name="History" type="Control" unique_id=212562843]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("2_theme")
+script = ExtResource("1_history")
+
+[node name="Background" type="Control" parent="." unique_id=81620444]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("3_bg")
+slot = "history"
+
+[node name="Margin" type="MarginContainer" parent="." unique_id=1972443276]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 22
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 22
+
+[node name="Main" type="VBoxContainer" parent="Margin" unique_id=1353082853]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Title" type="Label" parent="Margin/Main" unique_id=624320140]
+layout_mode = 2
+theme_override_font_sizes/font_size = 40
+text = "HISTORIA"
+horizontal_alignment = 1
+
+[node name="Subtitle" type="Label" parent="Margin/Main" unique_id=1716292063]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="Scroll" type="ScrollContainer" parent="Margin/Main" unique_id=453220942]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="List" type="VBoxContainer" parent="Margin/Main/Scroll" unique_id=654958744]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 14
+
+[node name="BackButton" type="Button" parent="Margin/Main" unique_id=136004098]
+custom_minimum_size = Vector2(0, 104)
+layout_mode = 2
+text = "VOLVER"

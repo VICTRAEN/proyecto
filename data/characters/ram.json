@@ -1,0 +1,59 @@
+{
+	"id": "ram",
+	"name": "Ram",
+	"title": "Doncella de la tormenta",
+	"genre": "Fantasia",
+	"rarity": "SR",
+	"type": "TEQ",
+	"portrait_style": "long",
+	"art": {
+		"front": "res://art/characters/ram/front.png",
+		"back": "res://art/characters/ram/back.png",
+		"icon": "res://art/characters/ram/icon.png"
+	},
+	"roles": ["Damage Dealer", "Support"],
+	"stats": {
+		"max_hp": 1540,
+		"atk": 222,
+		"def": 94,
+		"speed": 152,
+		"crit_rate": 0.14,
+		"dodge_rate": 0.07
+	},
+	"categories": ["fantasy", "teamwork", "protagonists", "romance"],
+	"links": ["hermanas", "estrategas", "inquebrantables"],
+	"passive": {
+		"id": "pas_ram_viento",
+		"name": "Filo de viento",
+		"description": "Su defensa sube un 20% al empezar el combate de forma permanente.",
+		"trigger": "battle_start",
+		"condition": {},
+		"effects": [
+			{ "type": "stat_mod", "target": "self", "stat": "def", "kind": "mult", "value": 0.2, "turns": 0 }
+		]
+	},
+	"skills": [
+		{
+			"id": "sk_ram_01",
+			"name": "Cuchilla de viento",
+			"kind": "basic",
+			"power": 112,
+			"cost": 0,
+			"target": "enemy",
+			"effects": []
+		},
+		{
+			"id": "sk_ram_02",
+			"name": "Tormenta de la doncella",
+			"description": "Rafaga cortante: baja un 20% la defensa del rival durante 2 turnos.",
+			"kind": "special",
+			"power": 182,
+			"cost": 3,
+			"target": "enemy",
+			"effects": [
+				{ "type": "stat_mod", "target": "enemy", "stat": "def", "kind": "mult", "value": -0.2, "turns": 2 }
+			]
+		}
+	],
+	"transformations": []
+}

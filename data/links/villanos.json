@@ -1,0 +1,8 @@
+{
+	"id": "villanos",
+	"name": "Villanos",
+	"description": "Poderes que nadie queria tener cerca. Compiten por ver quien intimida mas.",
+	"effects": [
+		{ "type": "stat_mod", "stat": "atk", "kind": "mult", "value": 0.07 }
+	]
+}

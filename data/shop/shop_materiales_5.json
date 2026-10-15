@@ -1,0 +1,8 @@
+{
+	"id": "shop_materiales_5",
+	"name": "Lote de materiales",
+	"description": "5 materiales de mejora.",
+	"cost_coins": 800,
+	"cost_gems": 0,
+	"grant": { "type": "materials", "amount": 5 }
+}

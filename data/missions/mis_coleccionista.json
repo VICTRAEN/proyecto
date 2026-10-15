@@ -1,0 +1,10 @@
+{
+	"id": "mis_coleccionista",
+	"name": "COLECCIONISTA",
+	"description": "Obten 10 personajes.",
+	"stat": "personajes_obtenidos",
+	"target": 10,
+	"reward_coins": 500,
+	"reward_gems": 0,
+	"category": "COLECCION"
+}

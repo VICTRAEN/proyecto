@@ -1,0 +1,8 @@
+{
+	"id": "shop_monedas_5000",
+	"name": "Cofre de monedas",
+	"description": "5000 monedas de golpe.",
+	"cost_coins": 0,
+	"cost_gems": 200,
+	"grant": { "type": "coins", "amount": 5000 }
+}

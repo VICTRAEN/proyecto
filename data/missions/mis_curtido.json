@@ -1,0 +1,10 @@
+{
+	"id": "mis_curtido",
+	"name": "CURTIDO",
+	"description": "Juega 10 combates.",
+	"stat": "combates_jugados",
+	"target": 10,
+	"reward_coins": 200,
+	"reward_gems": 0,
+	"category": "COMBATE"
+}

@@ -1,0 +1,63 @@
+{
+	"id": "world_001",
+	"name": "DRAGON BALL",
+	"genre": "Shonen",
+	"description": "El mundo de las siete bolas de dragon. Los celadores del umbral han empezado a aparecer entre los torneos.",
+	"background": "stages",
+	"position": { "x": 0.18, "y": 0.20 },
+	"unlock": { "requires_world": "", "requires_levels_completed": 0 },
+	"levels": [
+		{
+			"id": "world_001_01",
+			"name": "El torneo de artes marciales",
+			"position": { "x": 0.2, "y": 0.12 },
+			"next": "world_001_02",
+			"background": "battle_plain",
+			"dialogue": "dlg_world_001_001",
+			"difficulties": {
+				"normal": { "order": 0, "name": "NORMAL", "enemies": ["vigia_alfa"], "xp_reward": 200, "coin_reward": 80 },
+				"hard": { "order": 1, "name": "DIFICIL", "enemies": ["vigia_beta"], "xp_reward": 320, "coin_reward": 130 },
+				"extreme": { "order": 2, "name": "EXTREMO", "enemies": ["vigia_alfa", "vigia_beta"], "xp_reward": 520, "coin_reward": 220 }
+			}
+		},
+		{
+			"id": "world_001_02",
+			"name": "Entrenamiento de gravedad",
+			"position": { "x": 0.5, "y": 0.22 },
+			"next": "world_001_03",
+			"background": "battle_plain",
+			"dialogue": "",
+			"difficulties": {
+				"normal": { "order": 0, "name": "NORMAL", "enemies": ["vigia_beta"], "xp_reward": 240, "coin_reward": 95 },
+				"hard": { "order": 1, "name": "DIFICIL", "enemies": ["vigia_alfa", "vigia_beta"], "xp_reward": 380, "coin_reward": 150 },
+				"extreme": { "order": 2, "name": "EXTREMO", "enemies": ["vigia_beta", "void_warden"], "xp_reward": 620, "coin_reward": 260 }
+			}
+		},
+		{
+			"id": "world_001_03",
+			"name": "La llegada de los saiyans",
+			"position": { "x": 0.28, "y": 0.44 },
+			"next": "world_001_04",
+			"background": "battle_plain",
+			"dialogue": "",
+			"difficulties": {
+				"normal": { "order": 0, "name": "NORMAL", "enemies": ["vigia_alfa", "vigia_beta"], "xp_reward": 280, "coin_reward": 110 },
+				"hard": { "order": 1, "name": "DIFICIL", "enemies": ["void_warden"], "xp_reward": 420, "coin_reward": 170 },
+				"extreme": { "order": 2, "name": "EXTREMO", "enemies": ["vigia_alfa", "void_warden"], "xp_reward": 700, "coin_reward": 300 }
+			}
+		},
+		{
+			"id": "world_001_04",
+			"name": "El guardian del dragon",
+			"position": { "x": 0.62, "y": 0.56 },
+			"next": "",
+			"background": "battle_plain",
+			"dialogue": "",
+			"difficulties": {
+				"normal": { "order": 0, "name": "NORMAL", "enemies": ["void_warden"], "xp_reward": 350, "coin_reward": 140 },
+				"hard": { "order": 1, "name": "DIFICIL", "enemies": ["void_warden", "vigia_beta"], "xp_reward": 520, "coin_reward": 210 },
+				"extreme": { "order": 2, "name": "EXTREMO", "enemies": ["void_warden", "vigia_alfa", "vigia_beta"], "xp_reward": 900, "coin_reward": 400 }
+			}
+		}
+	]
+}

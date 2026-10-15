@@ -1,0 +1,13 @@
+{
+	"id": "sdp_todo",
+	"based_on": "todo",
+	"_note": "Enemigo de evento: el personaje 'todo' del roster con las estadisticas del antiguo 'vigia_alfa'. Se puede cambiar 'stats' (o cualquier otro campo) sin tocar al personaje.",
+	"stats": {
+		"max_hp": 4200,
+		"atk": 205,
+		"def": 140,
+		"speed": 96,
+		"crit_rate": 0.06,
+		"dodge_rate": 0.02
+	}
+}

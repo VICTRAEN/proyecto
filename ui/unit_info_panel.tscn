@@ -1,0 +1,180 @@
+[gd_scene format=3 uid="uid://dxu8mel62k63a"]
+
+[ext_resource type="Script" uid="uid://dbjq5e4ui8pew" path="res://ui/unit_info_panel.gd" id="1_panel"]
+[ext_resource type="Script" uid="uid://cv2l11vt51fns" path="res://ui/portrait.gd" id="2_portrait"]
+
+[node name="UnitInfoPanel" type="Control" unique_id=494096870]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_panel")
+
+[node name="Dim" type="ColorRect" parent="." unique_id=528727238]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.62)
+
+[node name="Center" type="CenterContainer" parent="." unique_id=985465568]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Panel" type="PanelContainer" parent="Center" unique_id=103634470]
+custom_minimum_size = Vector2(620, 900)
+layout_mode = 2
+
+[node name="Margin" type="MarginContainer" parent="Center/Panel" unique_id=1296024936]
+layout_mode = 2
+theme_override_constants/margin_left = 6
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 6
+theme_override_constants/margin_bottom = 6
+
+[node name="VBox" type="VBoxContainer" parent="Center/Panel/Margin" unique_id=1983249711]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Header" type="HBoxContainer" parent="Center/Panel/Margin/VBox" unique_id=2026168445]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="Icon" type="Control" parent="Center/Panel/Margin/VBox/Header" unique_id=846377837]
+custom_minimum_size = Vector2(132, 132)
+layout_mode = 2
+size_flags_vertical = 4
+script = ExtResource("2_portrait")
+
+[node name="HeaderInfo" type="VBoxContainer" parent="Center/Panel/Margin/VBox/Header" unique_id=1188072962]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+theme_override_constants/separation = 2
+
+[node name="Kind" type="Label" parent="Center/Panel/Margin/VBox/Header/HeaderInfo" unique_id=1797918575]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.62, 0.66, 0.8, 1)
+theme_override_font_sizes/font_size = 18
+text = "ALIADO"
+
+[node name="NameLabel" type="Label" parent="Center/Panel/Margin/VBox/Header/HeaderInfo" unique_id=1295167615]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.82, 0.36, 1)
+theme_override_font_sizes/font_size = 34
+text = "Nombre"
+autowrap_mode = 2
+
+[node name="TypeLabel" type="Label" parent="Center/Panel/Margin/VBox/Header/HeaderInfo" unique_id=2143750977]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "STR"
+
+[node name="HpText" type="Label" parent="Center/Panel/Margin/VBox/Header/HeaderInfo" unique_id=1515353280]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.78, 0.82, 0.96, 1)
+theme_override_font_sizes/font_size = 20
+text = "HP 0 / 0"
+
+[node name="HpBar" type="ProgressBar" parent="Center/Panel/Margin/VBox" unique_id=81449793]
+custom_minimum_size = Vector2(0, 30)
+layout_mode = 2
+value = 100.0
+show_percentage = false
+
+[node name="LevelText" type="Label" parent="Center/Panel/Margin/VBox" unique_id=1279491189]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.82, 0.36, 1)
+theme_override_font_sizes/font_size = 24
+text = "NIVEL 1"
+horizontal_alignment = 1
+
+[node name="XpBar" type="ProgressBar" parent="Center/Panel/Margin/VBox" unique_id=761697109]
+custom_minimum_size = Vector2(0, 24)
+layout_mode = 2
+show_percentage = false
+
+[node name="Scroll" type="ScrollContainer" parent="Center/Panel/Margin/VBox" unique_id=263339128]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="Tabs" type="TabContainer" parent="Center/Panel/Margin/VBox/Scroll" unique_id=5927222]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_font_sizes/font_size = 20
+current_tab = 0
+
+[node name="TabDatos" type="VBoxContainer" parent="Center/Panel/Margin/VBox/Scroll/Tabs" unique_id=1966120624]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+metadata/_tab_index = 0
+
+[node name="TabHabilidades" type="VBoxContainer" parent="Center/Panel/Margin/VBox/Scroll/Tabs" unique_id=1745460746]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+metadata/_tab_index = 1
+
+[node name="TabLinks" type="VBoxContainer" parent="Center/Panel/Margin/VBox/Scroll/Tabs" unique_id=1129588611]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+metadata/_tab_index = 2
+
+[node name="TabCategorias" type="VBoxContainer" parent="Center/Panel/Margin/VBox/Scroll/Tabs" unique_id=1577875078]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+metadata/_tab_index = 3
+
+[node name="TabBatalla" type="VBoxContainer" parent="Center/Panel/Margin/VBox/Scroll/Tabs" unique_id=24730784]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+metadata/_tab_index = 4
+
+[node name="StatsTitle" type="Label" parent="Center/Panel/Margin/VBox/Scroll/Tabs/TabBatalla" unique_id=672665508]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.82, 0.36, 1)
+theme_override_font_sizes/font_size = 20
+text = "ESTADISTICAS DE COMBATE"
+
+[node name="StatsList" type="VBoxContainer" parent="Center/Panel/Margin/VBox/Scroll/Tabs/TabBatalla" unique_id=121186261]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="DevRow" type="HBoxContainer" parent="Center/Panel/Margin/VBox" unique_id=61257407]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="LevelButton" type="Button" parent="Center/Panel/Margin/VBox/DevRow" unique_id=479798472]
+custom_minimum_size = Vector2(0, 88)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "SUBIR NIVEL"
+
+[node name="XpButton" type="Button" parent="Center/Panel/Margin/VBox/DevRow" unique_id=281125681]
+custom_minimum_size = Vector2(0, 88)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "ANADIR XP"
+
+[node name="CloseButton" type="Button" parent="Center/Panel/Margin/VBox" unique_id=22463679]
+custom_minimum_size = Vector2(0, 96)
+layout_mode = 2
+text = "CERRAR"

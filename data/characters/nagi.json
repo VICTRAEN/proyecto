@@ -1,0 +1,59 @@
+{
+	"id": "nagi",
+	"name": "Nagi Seishiro",
+	"title": "Genio de la pereza",
+	"genre": "Deportes",
+	"rarity": "SR",
+	"type": "TEQ",
+	"portrait_style": "spiky",
+	"art": {
+		"front": "res://art/characters/nagi/front.png",
+		"back": "res://art/characters/nagi/back.png",
+		"icon": "res://art/characters/nagi/icon.png"
+	},
+	"roles": ["Utility", "Support"],
+	"stats": {
+		"max_hp": 1480,
+		"atk": 200,
+		"def": 90,
+		"speed": 132,
+		"crit_rate": 0.12,
+		"dodge_rate": 0.08
+	},
+	"categories": ["spokon", "geniuses", "school"],
+	"links": ["spokon", "rivales", "mentores"],
+	"passive": {
+		"id": "pas_nagi_talento",
+		"name": "Talento dormido",
+		"description": "Al empezar el combate gana 6 puntos de critico de forma permanente.",
+		"trigger": "battle_start",
+		"condition": {},
+		"effects": [
+			{ "type": "stat_mod", "target": "self", "stat": "crit_rate", "kind": "flat", "value": 0.06, "turns": 0 }
+		]
+	},
+	"skills": [
+		{
+			"id": "sk_nagi_01",
+			"name": "Control perfecto",
+			"kind": "basic",
+			"power": 105,
+			"cost": 0,
+			"target": "enemy",
+			"effects": []
+		},
+		{
+			"id": "sk_nagi_02",
+			"name": "Trampa de genio",
+			"description": "Lee la jugada del rival: le baja un 25% la velocidad durante 2 turnos.",
+			"kind": "special",
+			"power": 165,
+			"cost": 3,
+			"target": "enemy",
+			"effects": [
+				{ "type": "stat_mod", "target": "enemy", "stat": "speed", "kind": "mult", "value": -0.25, "turns": 2 }
+			]
+		}
+	],
+	"transformations": []
+}

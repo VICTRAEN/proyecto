@@ -1,0 +1,9 @@
+{
+	"id": "heroes",
+	"name": "Heroes",
+	"description": "Los que se ponen delante por los demas. Ninguno deja caer al otro.",
+	"effects": [
+		{ "type": "stat_mod", "stat": "max_hp", "kind": "mult", "value": 0.05 },
+		{ "type": "stat_mod", "stat": "def", "kind": "mult", "value": 0.04 }
+	]
+}

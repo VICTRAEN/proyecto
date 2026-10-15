@@ -1,0 +1,60 @@
+{
+	"id": "ai_hoshino",
+	"name": "Ai Hoshino",
+	"title": "Idol absoluta",
+	"genre": "Musica",
+	"rarity": "SSR",
+	"type": "TEQ",
+	"portrait_style": "long",
+	"art": {
+		"front": "res://art/characters/ai_hoshino/front.png",
+		"back": "res://art/characters/ai_hoshino/back.png",
+		"icon": "res://art/characters/ai_hoshino/icon.png"
+	},
+	"roles": ["Support", "Utility"],
+	"stats": {
+		"max_hp": 1850,
+		"atk": 240,
+		"def": 112,
+		"speed": 172,
+		"crit_rate": 0.17,
+		"dodge_rate": 0.11
+	},
+	"categories": ["protagonists", "school", "leyendas", "romance"],
+	"links": ["hermanas", "romanticos", "heroes"],
+	"passive": {
+		"id": "pas_ai_hoshino_mentira",
+		"name": "Mentira que es amor",
+		"description": "Al empezar el combate gana un 20% de velocidad y 6 puntos de critico de forma permanente.",
+		"trigger": "battle_start",
+		"condition": {},
+		"effects": [
+			{ "type": "stat_mod", "target": "self", "stat": "speed", "kind": "mult", "value": 0.2, "turns": 0 },
+			{ "type": "stat_mod", "target": "self", "stat": "crit_rate", "kind": "flat", "value": 0.06, "turns": 0 }
+		]
+	},
+	"skills": [
+		{
+			"id": "sk_ai_hoshino_01",
+			"name": "Guiño de idol",
+			"kind": "basic",
+			"power": 118,
+			"cost": 0,
+			"target": "enemy",
+			"effects": []
+		},
+		{
+			"id": "sk_ai_hoshino_02",
+			"name": "Escenario de B-Komachi",
+			"description": "Deslumbra a todo el bando rival y les baja un 20% el ataque durante 2 turnos.",
+			"kind": "special",
+			"power": 175,
+			"cost": 3,
+			"target": "enemy_all",
+			"effects": [
+				{ "type": "stat_mod", "target": "enemy_all", "stat": "atk", "kind": "mult", "value": -0.2, "turns": 2 }
+			]
+		}
+	],
+	"transformations": []
+}

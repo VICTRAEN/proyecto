@@ -1,0 +1,957 @@
+{
+	"id": "leaders",
+	"name": "LEADER SKILLS",
+	"description": "Solo funciona la Leader Skill del personaje que ocupa la POSICION 1 del equipo. La condicion dice a QUE aliados afecta (por tipo o por categoria) y los efectos se aplican a esos aliados al empezar la batalla, igual que los links. Cada personaje puede declarar su propia Leader Skill en su JSON con un bloque \"leader\"; si no lo hace, se usa la de esta tabla y, si tampoco aparece, la de por defecto.",
+	"default_leader": "lead_estandar",
+	"leaders": [
+		{
+			"id": "lead_estandar",
+			"name": "Voluntad de equipo",
+			"description": "Todo el equipo: +25% ATQ, DEF y VIDA.",
+			"condition": {
+				"field": "all",
+				"value": ""
+			},
+			"effects": [
+				{
+					"type": "stat_mod",
+					"stat": "atk",
+					"kind": "mult",
+					"value": 0.25
+				},
+				{
+					"type": "stat_mod",
+					"stat": "def",
+					"kind": "mult",
+					"value": 0.25
+				},
+				{
+					"type": "stat_mod",
+					"stat": "max_hp",
+					"kind": "mult",
+					"value": 0.25
+				}
+			]
+		},
+		{
+			"id": "lead_gojo",
+			"name": "El hechicero mas fuerte",
+			"description": "Aliados de tipo INT: +70% ATAQUE, DEFENSA y VIDA.",
+			"condition": {
+				"field": "type",
+				"value": "INT"
+			},
+			"effects": [
+				{
+					"type": "stat_mod",
+					"stat": "atk",
+					"kind": "mult",
+					"value": 0.7
+				},
+				{
+					"type": "stat_mod",
+					"stat": "def",
+					"kind": "mult",
+					"value": 0.7
+				},
+				{
+					"type": "stat_mod",
+					"stat": "max_hp",
+					"kind": "mult",
+					"value": 0.7
+				}
+			]
+		},
+		{
+			"id": "lead_frieren",
+			"name": "Magia de la era antigua",
+			"description": "Aliados de tipo TEQ: +65% VIDA y DEFENSA, +20% VELOCIDAD.",
+			"condition": {
+				"field": "type",
+				"value": "TEQ"
+			},
+			"effects": [
+				{
+					"type": "stat_mod",
+					"stat": "max_hp",
+					"kind": "mult",
+					"value": 0.65
+				},
+				{
+					"type": "stat_mod",
+					"stat": "def",
+					"kind": "mult",
+					"value": 0.65
+				},
+				{
+					"type": "stat_mod",
+					"stat": "speed",
+					"kind": "mult",
+					"value": 0.2
+				}
+			]
+		},
+		{
+			"id": "lead_isagi",
+			"name": "Vision de campo",
+			"description": "Aliados de categoria Spokon: +60% ATAQUE, DEFENSA y VIDA.",
+			"condition": {
+				"field": "category",
+				"value": "spokon"
+			},
+			"effects": [
+				{
+					"type": "stat_mod",
+					"stat": "atk",
+					"kind": "mult",
+					"value": 0.6
+				},
+				{
+					"type": "stat_mod",
+					"stat": "def",
+					"kind": "mult",
+					"value": 0.6
+				},
+				{
+					"type": "stat_mod",
+					"stat": "max_hp",
+					"kind": "mult",
+					"value": 0.6
+				}
+			]
+		},
+		{
+			"id": "lead_hinata",
+			"name": "El pequeno gigante",
+			"description": "Aliados de categoria Spokon: +55% ATAQUE y VIDA, +15% VELOCIDAD.",
+			"condition": {
+				"field": "category",
+				"value": "spokon"
+			},
+			"effects": [
+				{
+					"type": "stat_mod",
+					"stat": "atk",
+					"kind": "mult",
+					"value": 0.55
+				},
+				{
+					"type": "stat_mod",
+					"stat": "max_hp",
+					"kind": "mult",
+					"value": 0.55
+				},
+				{
+					"type": "stat_mod",
+					"stat": "speed",
+					"kind": "mult",
+					"value": 0.15
+				}
+			]
+		},
+		{
+			"id": "lead_kageyama",
+			"name": "El rey de la cancha",
+			"description": "Aliados de categoria Spokon: +60% ATAQUE, +30% DEFENSA.",
+			"condition": {
+				"field": "category",
+				"value": "spokon"
+			},
+			"effects": [
+				{
+					"type": "stat_mod",
+					"stat": "atk",
+					"kind": "mult",
+					"value": 0.6
+				},
+				{
+					"type": "stat_mod",
+					"stat": "def",
+					"kind": "mult",
+					"value": 0.3
+				}
+			]
+		},
+		{
+			"id": "lead_deku",
+			"name": "Simbolo de la paz",
+			"description": "Aliados de categoria Heroes: +65% ATAQUE, DEFENSA y VIDA.",
+			"condition": {
+				"field": "category",
+				"value": "heroes"
+			},
+			"effects": [
+				{
+					"type": "stat_mod",
+					"stat": "atk",
+					"kind": "mult",
+					"value": 0.65
+				},
+				{
+					"type": "stat_mod",
+					"stat": "def",
+					"kind": "mult",
+					"value": 0.65
+				},
+				{
+					"type": "stat_mod",
+					"stat": "max_hp",
+					"kind": "mult",
+					"value": 0.65
+				}
+			]
+		},
+		{
+			"id": "lead_asta",
+			"name": "Nunca me rindo",
+			"description": "Aliados de tipo STR: +60% ATAQUE, DEFENSA y VIDA.",
+			"condition": {
+				"field": "type",
+				"value": "STR"
+			},
+			"effects": [
+				{
+					"type": "stat_mod",
+					"stat": "atk",
+					"kind": "mult",
+					"value": 0.6
+				},
+				{
+					"type": "stat_mod",
+					"stat": "def",
+					"kind": "mult",
+					"value": 0.6
+				},
+				{
+					"type": "stat_mod",
+					"stat": "max_hp",
+					"kind": "mult",
+					"value": 0.6
+				}
+			]
+		},
+		{
+			"id": "lead_yuno",
+			"name": "Elegido por la mana",
+			"description": "Aliados de categoria Fantasy: +60% ATAQUE y VIDA, +20% VELOCIDAD.",
+			"condition": {
+				"field": "category",
+				"value": "fantasy"
+			},
+			"effects": [
+				{
+					"type": "stat_mod",
+					"stat": "atk",
+					"kind": "mult",
+					"value": 0.6
+				},
+				{
+					"type": "stat_mod",
+					"stat": "max_hp",
+					"kind": "mult",
+					"value": 0.6
+				},
+				{
+					"type": "stat_mod",
+					"stat": "speed",
+					"kind": "mult",
+					"value": 0.2
+				}
+			]
+		},
+		{
+			"id": "lead_yami",
+			"name": "Capitan del toro negro",
+			"description": "Aliados de categoria Veteranos: +55% ATAQUE y DEFENSA.",
+			"condition": {
+				"field": "category",
+				"value": "veterans"
+			},
+			"effects": [
+				{
+					"type": "stat_mod",
+					"stat": "atk",
+					"kind": "mult",
+					"value": 0.55
+				},
+				{
+					"type": "stat_mod",
+					"stat": "def",
+					"kind": "mult",
+					"value": 0.55
+				}
+			]
+		},
+		{
+			"id": "lead_goku",
+			"name": "El guerrero mas fuerte",
+			"description": "Aliados de categoria Shonen: +65% ATAQUE y VIDA.",
+			"condition": {
+				"field": "category",
+				"value": "shonen"
+			},
+			"effects": [
+				{
+					"type": "stat_mod",
+					"stat": "atk",
+					"kind": "mult",
+					"value": 0.65
+				},
+				{
+					"type": "stat_mod",
+					"stat": "max_hp",
+					"kind": "mult",
+					"value": 0.65
+				}
+			]
+		},
+		{
+			"id": "lead_vegeta",
+			"name": "Orgullo saiyan",
+			"description": "Aliados de categoria Rivals: +60% ATAQUE, +25% VELOCIDAD.",
+			"condition": {
+				"field": "category",
+				"value": "rivals"
+			},
+			"effects": [
+				{
+					"type": "stat_mod",
+					"stat": "atk",
+					"kind": "mult",
+					"value": 0.6
+				},
+				{
+					"type": "stat_mod",
+					"stat": "speed",
+					"kind": "mult",
+					"value": 0.25
+				}
+			]
+		},
+		{
+			"id": "lead_lucy",
+			"name": "Netrunner de Night City",
+			"description": "Aliados de categoria Cyberpunk: +55% ATAQUE, +30% VELOCIDAD.",
+			"condition": {
+				"field": "category",
+				"value": "cyberpunk"
+			},
+			"effects": [
+				{
+					"type": "stat_mod",
+					"stat": "atk",
+					"kind": "mult",
+					"value": 0.55
+				},
+				{
+					"type": "stat_mod",
+					"stat": "speed",
+					"kind": "mult",
+					"value": 0.3
+				}
+			]
+		},
+		{
+			"id": "lead_david",
+			"name": "Sandevistan",
+			"description": "Aliados de categoria Cyberpunk: +40% ATAQUE y VIDA, +35% VELOCIDAD.",
+			"condition": {
+				"field": "category",
+				"value": "cyberpunk"
+			},
+			"effects": [
+				{
+					"type": "stat_mod",
+					"stat": "atk",
+					"kind": "mult",
+					"value": 0.4
+				},
+				{
+					"type": "stat_mod",
+					"stat": "max_hp",
+					"kind": "mult",
+					"value": 0.4
+				},
+				{
+					"type": "stat_mod",
+					"stat": "speed",
+					"kind": "mult",
+					"value": 0.35
+				}
+			]
+		},
+		{
+			"id": "lead_denji",
+			"name": "El motosierra",
+			"description": "Aliados de categoria Outlaws: +50% ATAQUE y VIDA, +15% VELOCIDAD.",
+			"condition": {
+				"field": "category",
+				"value": "outlaws"
+			},
+			"effects": [
+				{
+					"type": "stat_mod",
+					"stat": "atk",
+					"kind": "mult",
+					"value": 0.5
+				},
+				{
+					"type": "stat_mod",
+					"stat": "max_hp",
+					"kind": "mult",
+					"value": 0.5
+				},
+				{
+					"type": "stat_mod",
+					"stat": "speed",
+					"kind": "mult",
+					"value": 0.15
+				}
+			]
+		},
+		{
+			"id": "lead_makima",
+			"name": "Control",
+			"description": "Aliados de categoria Supernatural: +50% ATAQUE, DEFENSA y VIDA.",
+			"condition": {
+				"field": "category",
+				"value": "supernatural"
+			},
+			"effects": [
+				{
+					"type": "stat_mod",
+					"stat": "atk",
+					"kind": "mult",
+					"value": 0.5
+				},
+				{
+					"type": "stat_mod",
+					"stat": "def",
+					"kind": "mult",
+					"value": 0.5
+				},
+				{
+					"type": "stat_mod",
+					"stat": "max_hp",
+					"kind": "mult",
+					"value": 0.5
+				}
+			]
+		},
+		{
+			"id": "lead_reze",
+			"name": "Bomba andante",
+			"description": "Aliados de tipo PHY: +55% ATAQUE y VELOCIDAD.",
+			"condition": {
+				"field": "type",
+				"value": "PHY"
+			},
+			"effects": [
+				{
+					"type": "stat_mod",
+					"stat": "atk",
+					"kind": "mult",
+					"value": 0.55
+				},
+				{
+					"type": "stat_mod",
+					"stat": "speed",
+					"kind": "mult",
+					"value": 0.2
+				}
+			]
+		},
+		{
+			"id": "lead_maomao",
+			"name": "La boticaria",
+			"description": "Todo el equipo: +30% VIDA y DEFENSA, +15% ATAQUE.",
+			"condition": {
+				"field": "all",
+				"value": ""
+			},
+			"effects": [
+				{
+					"type": "stat_mod",
+					"stat": "max_hp",
+					"kind": "mult",
+					"value": 0.3
+				},
+				{
+					"type": "stat_mod",
+					"stat": "def",
+					"kind": "mult",
+					"value": 0.3
+				},
+				{
+					"type": "stat_mod",
+					"stat": "atk",
+					"kind": "mult",
+					"value": 0.15
+				}
+			]
+		},
+		{
+			"id": "lead_senku",
+			"name": "La ciencia lo puede todo",
+			"description": "Todo el equipo: +35% DEFENSA y VIDA, +20% VELOCIDAD.",
+			"condition": {
+				"field": "all",
+				"value": ""
+			},
+			"effects": [
+				{
+					"type": "stat_mod",
+					"stat": "def",
+					"kind": "mult",
+					"value": 0.35
+				},
+				{
+					"type": "stat_mod",
+					"stat": "max_hp",
+					"kind": "mult",
+					"value": 0.35
+				},
+				{
+					"type": "stat_mod",
+					"stat": "speed",
+					"kind": "mult",
+					"value": 0.2
+				}
+			]
+		},
+		{
+			"id": "lead_marin",
+			"name": "Cosplayer de moda",
+			"description": "Aliados de categoria Romance: +55% ATAQUE y VIDA.",
+			"condition": {
+				"field": "category",
+				"value": "romance"
+			},
+			"effects": [
+				{
+					"type": "stat_mod",
+					"stat": "atk",
+					"kind": "mult",
+					"value": 0.55
+				},
+				{
+					"type": "stat_mod",
+					"stat": "max_hp",
+					"kind": "mult",
+					"value": 0.55
+				}
+			]
+		},
+		{
+			"id": "lead_mai",
+			"name": "Conejita con caracter",
+			"description": "Aliados de categoria Romance: +60% ATAQUE y VIDA, +10% VELOCIDAD.",
+			"condition": {
+				"field": "category",
+				"value": "romance"
+			},
+			"effects": [
+				{
+					"type": "stat_mod",
+					"stat": "atk",
+					"kind": "mult",
+					"value": 0.6
+				},
+				{
+					"type": "stat_mod",
+					"stat": "max_hp",
+					"kind": "mult",
+					"value": 0.6
+				},
+				{
+					"type": "stat_mod",
+					"stat": "speed",
+					"kind": "mult",
+					"value": 0.1
+				}
+			]
+		},
+		{
+			"id": "lead_sakuta_mai",
+			"name": "Sindrome de la pubertad",
+			"description": "Aliados de categoria Romance: +65% ATAQUE y VIDA, +10 puntos de ESQUIVA.",
+			"condition": {
+				"field": "category",
+				"value": "romance"
+			},
+			"effects": [
+				{
+					"type": "stat_mod",
+					"stat": "atk",
+					"kind": "mult",
+					"value": 0.65
+				},
+				{
+					"type": "stat_mod",
+					"stat": "max_hp",
+					"kind": "mult",
+					"value": 0.65
+				},
+				{
+					"type": "stat_mod",
+					"stat": "dodge_rate",
+					"kind": "flat",
+					"value": 0.1
+				}
+			]
+		},
+		{
+			"id": "lead_sakuta",
+			"name": "El que si la ve",
+			"description": "Aliados de categoria Romance: +70% ATAQUE y VIDA, +10 puntos de ESQUIVA.",
+			"condition": {
+				"field": "category",
+				"value": "romance"
+			},
+			"effects": [
+				{
+					"type": "stat_mod",
+					"stat": "atk",
+					"kind": "mult",
+					"value": 0.7
+				},
+				{
+					"type": "stat_mod",
+					"stat": "max_hp",
+					"kind": "mult",
+					"value": 0.7
+				},
+				{
+					"type": "stat_mod",
+					"stat": "dodge_rate",
+					"kind": "flat",
+					"value": 0.1
+				}
+			]
+		},
+		{
+			"id": "lead_sakuta_mai_lr",
+			"name": "Nunca te olvidare",
+			"description": "Todo el equipo: +60% ATAQUE, DEFENSA y VIDA, +10% VELOCIDAD.",
+			"condition": {
+				"field": "all",
+				"value": ""
+			},
+			"effects": [
+				{
+					"type": "stat_mod",
+					"stat": "atk",
+					"kind": "mult",
+					"value": 0.6
+				},
+				{
+					"type": "stat_mod",
+					"stat": "def",
+					"kind": "mult",
+					"value": 0.6
+				},
+				{
+					"type": "stat_mod",
+					"stat": "max_hp",
+					"kind": "mult",
+					"value": 0.6
+				},
+				{
+					"type": "stat_mod",
+					"stat": "speed",
+					"kind": "mult",
+					"value": 0.1
+				}
+			]
+		},
+		{
+			"id": "lead_itadori",
+			"name": "Cuerpo compartido",
+			"description": "Aliados de tipo INT: +45% VIDA y DEFENSA, +20% ATAQUE.",
+			"condition": {
+				"field": "type",
+				"value": "INT"
+			},
+			"effects": [
+				{
+					"type": "stat_mod",
+					"stat": "max_hp",
+					"kind": "mult",
+					"value": 0.45
+				},
+				{
+					"type": "stat_mod",
+					"stat": "def",
+					"kind": "mult",
+					"value": 0.45
+				},
+				{
+					"type": "stat_mod",
+					"stat": "atk",
+					"kind": "mult",
+					"value": 0.2
+				}
+			]
+		},
+		{
+			"id": "lead_sukuna",
+			"name": "Rey de las maldiciones",
+			"description": "Aliados de categoria Villanos: +60% ATAQUE, +20% VELOCIDAD.",
+			"condition": {
+				"field": "category",
+				"value": "villains"
+			},
+			"effects": [
+				{
+					"type": "stat_mod",
+					"stat": "atk",
+					"kind": "mult",
+					"value": 0.6
+				},
+				{
+					"type": "stat_mod",
+					"stat": "speed",
+					"kind": "mult",
+					"value": 0.2
+				}
+			]
+		},
+		{
+			"id": "lead_tanjiro",
+			"name": "Respiracion del agua",
+			"description": "Aliados de categoria Determination: +50% ATAQUE, +20% VELOCIDAD.",
+			"condition": {
+				"field": "category",
+				"value": "determination"
+			},
+			"effects": [
+				{
+					"type": "stat_mod",
+					"stat": "atk",
+					"kind": "mult",
+					"value": 0.5
+				},
+				{
+					"type": "stat_mod",
+					"stat": "speed",
+					"kind": "mult",
+					"value": 0.2
+				}
+			]
+		},
+		{
+			"id": "lead_akaza",
+			"name": "Instinto de combate",
+			"description": "Aliados de categoria Villanos: +55% ATAQUE y VIDA.",
+			"condition": {
+				"field": "category",
+				"value": "villains"
+			},
+			"effects": [
+				{
+					"type": "stat_mod",
+					"stat": "atk",
+					"kind": "mult",
+					"value": 0.55
+				},
+				{
+					"type": "stat_mod",
+					"stat": "max_hp",
+					"kind": "mult",
+					"value": 0.55
+				}
+			]
+		},
+		{
+			"id": "lead_subaru",
+			"name": "Vuelve a intentarlo",
+			"description": "Todo el equipo: +30% ATAQUE y VIDA, +10 puntos de ESQUIVA.",
+			"condition": {
+				"field": "all",
+				"value": ""
+			},
+			"effects": [
+				{
+					"type": "stat_mod",
+					"stat": "atk",
+					"kind": "mult",
+					"value": 0.3
+				},
+				{
+					"type": "stat_mod",
+					"stat": "max_hp",
+					"kind": "mult",
+					"value": 0.3
+				},
+				{
+					"type": "stat_mod",
+					"stat": "dodge_rate",
+					"kind": "flat",
+					"value": 0.1
+				}
+			]
+		},
+		{
+			"id": "lead_itsuki",
+			"name": "La cabeza del grupo",
+			"description": "Aliados de categoria Romance: +45% DEFENSA y VIDA, +25% ATAQUE.",
+			"condition": {
+				"field": "category",
+				"value": "romance"
+			},
+			"effects": [
+				{
+					"type": "stat_mod",
+					"stat": "def",
+					"kind": "mult",
+					"value": 0.45
+				},
+				{
+					"type": "stat_mod",
+					"stat": "max_hp",
+					"kind": "mult",
+					"value": 0.45
+				},
+				{
+					"type": "stat_mod",
+					"stat": "atk",
+					"kind": "mult",
+					"value": 0.25
+				}
+			]
+		},
+		{
+			"id": "lead_miku",
+			"name": "La que se esfuerza",
+			"description": "Aliados de categoria School: +50% ATAQUE y VIDA.",
+			"condition": {
+				"field": "category",
+				"value": "school"
+			},
+			"effects": [
+				{
+					"type": "stat_mod",
+					"stat": "atk",
+					"kind": "mult",
+					"value": 0.5
+				},
+				{
+					"type": "stat_mod",
+					"stat": "max_hp",
+					"kind": "mult",
+					"value": 0.5
+				}
+			]
+		},
+		{
+			"id": "lead_nino",
+			"name": "Caracter fuerte",
+			"description": "Aliados de categoria School: +45% ATAQUE, +25% DEFENSA.",
+			"condition": {
+				"field": "category",
+				"value": "school"
+			},
+			"effects": [
+				{
+					"type": "stat_mod",
+					"stat": "atk",
+					"kind": "mult",
+					"value": 0.45
+				},
+				{
+					"type": "stat_mod",
+					"stat": "def",
+					"kind": "mult",
+					"value": 0.25
+				}
+			]
+		},
+		{
+			"id": "lead_goku_int",
+			"name": "Instinto superior",
+			"description": "Aliados de categoria Leyendas: +60% ATAQUE y VIDA.",
+			"condition": {
+				"field": "category",
+				"value": "leyendas"
+			},
+			"effects": [
+				{
+					"type": "stat_mod",
+					"stat": "atk",
+					"kind": "mult",
+					"value": 0.6
+				},
+				{
+					"type": "stat_mod",
+					"stat": "max_hp",
+					"kind": "mult",
+					"value": 0.6
+				}
+			]
+		},
+		{
+			"id": "lead_david_lucy_duo",
+			"name": "Hasta la luna",
+			"description": "Aliados de categoria Cyberpunk: +50% ATAQUE, +35% VIDA y +35% VELOCIDAD.",
+			"condition": {
+				"field": "category",
+				"value": "cyberpunk"
+			},
+			"effects": [
+				{
+					"type": "stat_mod",
+					"stat": "atk",
+					"kind": "mult",
+					"value": 0.5
+				},
+				{
+					"type": "stat_mod",
+					"stat": "max_hp",
+					"kind": "mult",
+					"value": 0.35
+				},
+				{
+					"type": "stat_mod",
+					"stat": "speed",
+					"kind": "mult",
+					"value": 0.35
+				}
+			]
+		}
+	],
+	"by_character": {
+		"gojo": "lead_gojo",
+		"frieren": "lead_frieren",
+		"itsuki": "lead_itsuki",
+		"isagi": "lead_isagi",
+		"hinata": "lead_hinata",
+		"kageyama": "lead_kageyama",
+		"deku": "lead_deku",
+		"asta": "lead_asta",
+		"yuno": "lead_yuno",
+		"yami": "lead_yami",
+		"goku": "lead_goku",
+		"vegeta": "lead_vegeta",
+		"lucy": "lead_lucy",
+		"david": "lead_david",
+		"denji": "lead_denji",
+		"makima": "lead_makima",
+		"reze": "lead_reze",
+		"maomao": "lead_maomao",
+		"senku": "lead_senku",
+		"marin": "lead_marin",
+		"mai": "lead_mai",
+		"miku": "lead_miku",
+		"nino": "lead_nino",
+		"itadori": "lead_itadori",
+		"sukuna": "lead_sukuna",
+		"tanjiro": "lead_tanjiro",
+		"akaza": "lead_akaza",
+		"subaru": "lead_subaru",
+		"reze_": "",
+		"sakuta_mai": "lead_sakuta_mai",
+		"sakuta": "lead_sakuta",
+		"sakuta_mai_lr": "lead_sakuta_mai_lr",
+		"david_lucy_duo": "lead_david_lucy_duo"
+	}
+}

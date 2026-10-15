@@ -1,0 +1,86 @@
+{
+	"id": "deku",
+	"name": "Izuku Midoriya",
+	"title": "Deku, el heredero de One For All",
+	"genre": "Shonen",
+	"rarity": "SSR",
+	"type": "STR",
+	"portrait_style": "spiky",
+	"art": {
+		"front": "res://art/characters/deku/front.png",
+		"back": "res://art/characters/deku/back.png",
+		"icon": "res://art/characters/deku/icon.png"
+	},
+	"roles": ["Damage Dealer"],
+	"stats": {
+		"max_hp": 1330,
+		"atk": 228,
+		"def": 80,
+		"speed": 120,
+		"crit_rate": 0.12,
+		"dodge_rate": 0.09
+	},
+	"categories": ["shonen", "heroes", "protagonists", "determination"],
+	"links": ["heroes", "inquebrantables"],
+	"passive": {
+		"id": "pas_deku_oneforall",
+		"name": "One For All",
+		"description": "El poder le desborda: +30% de ataque y -10% de defensa al comenzar su turno.",
+		"trigger": "turn_start",
+		"condition": {},
+		"effects": [
+			{ "type": "stat_mod", "target": "self", "stat": "atk", "kind": "mult", "value": 0.3, "turns": 1 },
+			{ "type": "stat_mod", "target": "self", "stat": "def", "kind": "mult", "value": -0.1, "turns": 1 }
+		]
+	},
+	"skills": [
+		{
+			"id": "sk_deku_01",
+			"name": "Puno directo",
+			"kind": "basic",
+			"power": 105,
+			"cost": 0,
+			"target": "enemy",
+			"description": "Golpe basico con el puño cargado.",
+			"effects": []
+		},
+		{
+			"id": "sk_deku_02",
+			"name": "Delaware Smash",
+			"kind": "special",
+			"power": 265,
+			"cost": 3,
+			"target": "enemy",
+			"description": "Golpe con el que se rompe el brazo: mucho dano, pero -20% de defensa durante 2 turnos.",
+			"effects": [
+				{ "type": "stat_mod", "target": "self", "stat": "def", "kind": "mult", "value": -0.2, "turns": 2 }
+			]
+		}
+	],
+	"transformations": [],
+	"evolution": {
+		"passive": {
+			"id": "pas_deku_ur_oneforall",
+			"name": "One For All al 100%",
+			"description": "Ya no se rompe: +45% de ataque y -5% de defensa al comenzar su turno.",
+			"trigger": "turn_start",
+			"condition": {},
+			"effects": [
+				{ "type": "stat_mod", "target": "self", "stat": "atk", "kind": "mult", "value": 0.45, "turns": 1 },
+				{ "type": "stat_mod", "target": "self", "stat": "def", "kind": "mult", "value": -0.05, "turns": 1 }
+			]
+		},
+		"passive_extra": {
+			"id": "pas_deku_ur_blackwhip",
+			"name": "Blackwhip",
+			"description": "El equipo se apoya en el: al comenzar su turno sube un 15% la defensa de todos los aliados.",
+			"trigger": "turn_start",
+			"condition": {},
+			"effects": [
+				{ "type": "stat_mod", "target": "ally_all", "stat": "def", "kind": "mult", "value": 0.15, "turns": 1 }
+			]
+		},
+		"links": ["mentores", "energia-oculta"],
+		"categories": ["despertados", "guardianes"]
+	}
+}

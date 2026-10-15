@@ -1,0 +1,35 @@
+[gd_scene format=3 uid="uid://dgy8rj00hc8i6"]
+
+[ext_resource type="Script" uid="uid://c2mjxtcjtrlhy" path="res://ui/order_chip.gd" id="1_chip"]
+[ext_resource type="Script" uid="uid://cv2l11vt51fns" path="res://ui/portrait.gd" id="2_portrait"]
+
+[node name="OrderChip" type="PanelContainer" unique_id=1765540513]
+custom_minimum_size = Vector2(128, 0)
+size_flags_horizontal = 3
+mouse_filter = 2
+script = ExtResource("1_chip")
+
+[node name="VBox" type="VBoxContainer" parent="." unique_id=2084607190]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 2
+
+[node name="Marker" type="Label" parent="VBox" unique_id=506817801]
+layout_mode = 2
+theme_override_font_sizes/font_size = 15
+text = "AHORA"
+horizontal_alignment = 1
+
+[node name="Portrait" type="Control" parent="VBox" unique_id=1641192307]
+custom_minimum_size = Vector2(58, 58)
+layout_mode = 2
+size_flags_horizontal = 4
+mouse_filter = 2
+script = ExtResource("2_portrait")
+
+[node name="NameLabel" type="Label" parent="VBox" unique_id=101076645]
+layout_mode = 2
+theme_override_font_sizes/font_size = 15
+text = "Nombre"
+horizontal_alignment = 1
+clip_text = true

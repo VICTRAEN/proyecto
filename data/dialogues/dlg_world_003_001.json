@@ -1,0 +1,26 @@
+{
+	"id": "dlg_world_003_001",
+	"name": "El examen de caballeros magicos",
+	"skippable": true,
+	"skip_label": "SALTAR",
+	"lines": [
+		{
+			"speaker": "Asta",
+			"portrait": "asta",
+			"text": "No tengo ni una pizca de magia, pero nunca me he quedado quieto mirando.",
+			"background": "battle_plain"
+		},
+		{
+			"speaker": "Yuno",
+			"portrait": "yuno",
+			"text": "El que venga detras de ese vigia no sera un rival para nosotros.",
+			"background": "battle_plain"
+		},
+		{
+			"speaker": "Asta",
+			"portrait": "asta",
+			"text": "Vamos. Si el umbral quiere un duelo, se lo damos.",
+			"background": "battle_plain"
+		}
+	]
+}

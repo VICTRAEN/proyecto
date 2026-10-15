@@ -1,0 +1,8 @@
+Pon aqui estos tres archivos PNG, con estos nombres exactos:
+
+  front.png   ->  Zenitsu Agatsuma DE FRENTE   (se usa cuando es el RIVAL)
+  back.png    ->  Zenitsu Agatsuma DE ESPALDAS (se usa cuando es del JUGADOR)
+  icon.png    ->  la CARA (coleccion, equipo, orden de ataque, ficha)
+
+Recomendado: front/back 1024x1536 vertical, icon 512x512 cuadrado, PNG con
+transparencia. Explicacion completa en ../README.md

@@ -1,0 +1,9 @@
+{
+	"id": "veteranos",
+	"name": "Veteranos",
+	"description": "Ya han visto de todo. Saber donde ponerse es media defensa.",
+	"effects": [
+		{ "type": "stat_mod", "stat": "def", "kind": "mult", "value": 0.05 },
+		{ "type": "stat_mod", "stat": "crit_rate", "kind": "flat", "value": 0.02 }
+	]
+}

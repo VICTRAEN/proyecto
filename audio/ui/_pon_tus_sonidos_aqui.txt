@@ -1,0 +1,16 @@
+Pon aqui los sonidos de la categoria 'ui', con estos nombres EXACTOS
+(formato recomendado .ogg; tambien valen .wav y .mp3):
+
+  click.ogg   ->  cualquier boton
+  select.ogg   ->  seleccionar un personaje, una posicion del equipo o una pestana
+  back.ogg   ->  volver / boton VOLVER
+  open.ogg   ->  abrir una ficha o un panel
+  close.ogg   ->  cerrar un panel o cancelar
+  equip.ogg   ->  colocar un personaje en el equipo
+  remove.ogg   ->  quitar un personaje del equipo
+  claim.ogg   ->  reclamar una mision o una recompensa
+  tab.ogg   ->  cambiar de pestana (si falta, suena select)
+  buy.ogg   ->  comprar (si falta, suena claim)
+
+Si falta un archivo NO hay error: ese evento simplemente no suena (o usa su
+sustituto, si se indica arriba). Guia completa en res://audio/README.md

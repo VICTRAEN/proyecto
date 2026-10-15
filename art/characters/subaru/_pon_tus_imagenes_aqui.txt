@@ -1,0 +1,12 @@
+SUBARU NATSUKI
+
+Mete en ESTA carpeta (res://art/characters/subaru/) tres archivos:
+
+  front.png  ->  el personaje de frente   (se usa cuando es el rival)
+  back.png   ->  el personaje de espaldas (se usa cuando es del jugador)
+  icon.png   ->  la cara                  (coleccion, equipo, orden, ficha)
+
+PNG con fondo transparente. No hace falta recortarlos: el juego los encuadra
+solo. Guia completa en res://art/README.md
+
+Puedes borrar este archivo cuando quieras.

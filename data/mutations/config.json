@@ -1,0 +1,39 @@
+{
+	"id": "mutations_config",
+	"name": "MUTACIONES",
+	"description": "Una tirada de mutacion mejora para siempre una estadistica BASE del personaje. Se puede repetir, pero solo una mutacion esta activa por personaje: una tirada nueva sustituye a la anterior.",
+	"cost": 150,
+	"currency": "coins",
+	"max_active_per_character": 1,
+	"chance_unit": "percent",
+	"bonus_unit": "percent",
+	"stat_kind": "mult",
+	"source_prefix": "mutation",
+	"ranks": [
+		{ "id": "D", "name": "D", "chance_percent": 50.0, "bonus_percent": 1.0 },
+		{ "id": "C", "name": "C", "chance_percent": 25.0, "bonus_percent": 2.5 },
+		{ "id": "B", "name": "B", "chance_percent": 13.0, "bonus_percent": 4.0 },
+		{ "id": "A", "name": "A", "chance_percent": 7.0, "bonus_percent": 6.0 },
+		{ "id": "S", "name": "S", "chance_percent": 3.5, "bonus_percent": 10.0 },
+		{ "id": "SS", "name": "SS", "chance_percent": 1.0, "bonus_percent": 15.0 },
+		{ "id": "Z", "name": "Z", "chance_percent": 0.5, "bonus_percent": 20.0 }
+	],
+	"effects": [
+		{ "id": "atk", "name": "Ataque", "stats": ["atk"], "chance_percent": 12.0 },
+		{ "id": "def", "name": "Defensa", "stats": ["def"], "chance_percent": 12.0 },
+		{ "id": "max_hp", "name": "Vida", "stats": ["max_hp"], "chance_percent": 20.0 },
+		{ "id": "speed", "name": "Velocidad", "stats": ["speed"], "chance_percent": 30.0 },
+		{ "id": "max_hp_speed", "name": "Vida y velocidad", "stats": ["max_hp", "speed"], "chance_percent": 6.0 },
+		{ "id": "atk_speed", "name": "Ataque y velocidad", "stats": ["atk", "speed"], "chance_percent": 5.0 },
+		{ "id": "def_max_hp", "name": "Defensa y vida", "stats": ["def", "max_hp"], "chance_percent": 5.0 },
+		{ "id": "speed_def", "name": "Velocidad y defensa", "stats": ["speed", "def"], "chance_percent": 5.0 },
+		{ "id": "atk_def", "name": "Ataque y defensa", "stats": ["atk", "def"], "chance_percent": 4.0 },
+		{ "id": "all_four", "name": "Ataque, vida, defensa y velocidad", "stats": ["atk", "max_hp", "def", "speed"], "chance_percent": 1.0 }
+	],
+	"special": {
+		"rank": "Z",
+		"sp_cost_reduction": 1,
+		"sp_cost_min": 1,
+		"description": "Ademas, con la mutacion Z la Super cuesta 1 punto de SP menos, nunca por debajo de 1."
+	}
+}

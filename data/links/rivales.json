@@ -1,0 +1,9 @@
+{
+	"id": "rivales",
+	"name": "Rivales",
+	"description": "Dos rivales empujandose hacia delante. Comparten banquillo y se exigen el maximo.",
+	"effects": [
+		{ "type": "stat_mod", "stat": "atk", "kind": "mult", "value": 0.05 },
+		{ "type": "stat_mod", "stat": "def", "kind": "mult", "value": 0.05 }
+	]
+}

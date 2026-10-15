@@ -1,0 +1,47 @@
+{
+	"id": "torre_verdugo",
+	"name": "Verdugo de la torre",
+	"title": "El que cobra la entrada",
+	"genre": "Sobrenatural",
+	"rarity": "SSR",
+	"type": "PHY",
+	"art": {},
+	"portrait_style": "spiky",
+	"roles": ["Damage Dealer"],
+	"stats": {
+		"max_hp": 4200,
+		"atk": 275,
+		"def": 132,
+		"speed": 142,
+		"crit_rate": 0.14,
+		"dodge_rate": 0.06
+	},
+	"categories": ["aniquiladores"],
+	"links": [],
+	"passive": {
+		"id": "pas_torre_verdugo_sed",
+		"name": "Sed de torre",
+		"description": "Al empezar el combate su ataque sube un 25%.",
+		"trigger": "battle_start",
+		"condition": {},
+		"effects": [
+			{ "type": "stat_mod", "target": "self", "stat": "atk", "kind": "mult", "value": 0.25, "turns": 0 }
+		]
+	},
+	"skills": [
+		{ "id": "sk_torre_verdugo_01", "name": "Tajo", "kind": "basic", "power": 120, "cost": 0, "target": "enemy", "effects": [] },
+		{
+			"id": "sk_torre_verdugo_02",
+			"name": "Sentencia",
+			"description": "Dano fuerte a un rival y su ataque baja un 20% durante 2 turnos.",
+			"kind": "special",
+			"power": 200,
+			"cost": 3,
+			"target": "enemy",
+			"effects": [
+				{ "type": "stat_mod", "target": "enemy", "stat": "atk", "kind": "mult", "value": -0.2, "turns": 2 }
+			]
+		}
+	],
+	"transformations": []
+}

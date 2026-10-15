@@ -1,0 +1,60 @@
+{
+	"id": "geto",
+	"name": "Suguru Geto",
+	"title": "Hechicero renegado",
+	"genre": "Sobrenatural",
+	"rarity": "SSR",
+	"type": "INT",
+	"portrait_style": "long",
+	"art": {
+		"front": "res://art/characters/geto/front.png",
+		"back": "res://art/characters/geto/back.png",
+		"icon": "res://art/characters/geto/icon.png"
+	},
+	"roles": ["Damage Dealer", "Utility"],
+	"stats": {
+		"max_hp": 2050,
+		"atk": 272,
+		"def": 138,
+		"speed": 170,
+		"crit_rate": 0.18,
+		"dodge_rate": 0.10
+	},
+	"categories": ["villains", "supernatural", "shonen", "rivals", "leyendas"],
+	"links": ["villanos", "rivales", "energia-oculta", "mentores"],
+	"passive": {
+		"id": "pas_geto_maldiciones",
+		"name": "Coleccion de maldiciones",
+		"description": "Al comenzar su turno su ataque sube un 35%: libera otra maldicion mas.",
+		"trigger": "turn_start",
+		"condition": {},
+		"effects": [
+			{ "type": "stat_mod", "target": "self", "stat": "atk", "kind": "mult", "value": 0.35, "turns": 1 }
+		]
+	},
+	"skills": [
+		{
+			"id": "sk_geto_01",
+			"name": "Golpe de maldicion",
+			"kind": "basic",
+			"power": 124,
+			"cost": 0,
+			"target": "enemy",
+			"effects": []
+		},
+		{
+			"id": "sk_geto_02",
+			"name": "Uzumaki oscuro",
+			"description": "Reune sus maldiciones en una sola: baja un 25% la defensa y un 20% el ataque del rival durante 2 turnos.",
+			"kind": "special",
+			"power": 210,
+			"cost": 3,
+			"target": "enemy",
+			"effects": [
+				{ "type": "stat_mod", "target": "enemy", "stat": "def", "kind": "mult", "value": -0.25, "turns": 2 },
+				{ "type": "stat_mod", "target": "enemy", "stat": "atk", "kind": "mult", "value": -0.2, "turns": 2 }
+			]
+		}
+	],
+	"transformations": []
+}

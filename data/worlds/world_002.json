@@ -1,0 +1,50 @@
+{
+	"id": "world_002",
+	"name": "JUJUTSU KAISEN",
+	"genre": "Sobrenatural",
+	"description": "Hechiceros contra maldiciones. Aqui el umbral se abre desde el otro lado.",
+	"background": "stages",
+	"position": { "x": 0.50, "y": 0.26 },
+	"unlock": { "requires_world": "world_001", "requires_levels_completed": 4 },
+	"levels": [
+		{
+			"id": "world_002_01",
+			"name": "La escuela de hechiceria",
+			"position": { "x": 0.16, "y": 0.14 },
+			"next": "world_002_02",
+			"background": "battle_plain",
+			"dialogue": "dlg_world_002_001",
+			"difficulties": {
+				"normal": { "order": 0, "name": "NORMAL", "enemies": ["vigia_alfa"], "xp_reward": 260, "coin_reward": 105 },
+				"hard": { "order": 1, "name": "DIFICIL", "enemies": ["vigia_alfa", "vigia_beta"], "xp_reward": 410, "coin_reward": 165 },
+				"extreme": { "order": 2, "name": "EXTREMO", "enemies": ["vigia_beta", "void_warden"], "xp_reward": 680, "coin_reward": 290 }
+			}
+		},
+		{
+			"id": "world_002_02",
+			"name": "Maldicion de grado especial",
+			"position": { "x": 0.46, "y": 0.30 },
+			"next": "world_002_03",
+			"background": "battle_plain",
+			"dialogue": "",
+			"difficulties": {
+				"normal": { "order": 0, "name": "NORMAL", "enemies": ["vigia_beta", "vigia_alfa"], "xp_reward": 300, "coin_reward": 120 },
+				"hard": { "order": 1, "name": "DIFICIL", "enemies": ["vigia_alfa", "void_warden"], "xp_reward": 460, "coin_reward": 190 },
+				"extreme": { "order": 2, "name": "EXTREMO", "enemies": ["void_warden", "vigia_beta", "vigia_alfa"], "xp_reward": 760, "coin_reward": 330 }
+			}
+		},
+		{
+			"id": "world_002_03",
+			"name": "El velo sobre la ciudad",
+			"position": { "x": 0.72, "y": 0.48 },
+			"next": "",
+			"background": "battle_plain",
+			"dialogue": "",
+			"difficulties": {
+				"normal": { "order": 0, "name": "NORMAL", "enemies": ["void_warden", "vigia_alfa"], "xp_reward": 380, "coin_reward": 150 },
+				"hard": { "order": 1, "name": "DIFICIL", "enemies": ["void_warden", "vigia_beta", "vigia_alfa"], "xp_reward": 560, "coin_reward": 230 },
+				"extreme": { "order": 2, "name": "EXTREMO", "enemies": ["void_warden", "vigia_alfa", "vigia_beta"], "xp_reward": 980, "coin_reward": 430 }
+			}
+		}
+	]
+}

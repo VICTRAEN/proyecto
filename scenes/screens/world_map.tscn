@@ -1,0 +1,148 @@
+[gd_scene format=3 uid="uid://74gg4eo2uh23"]
+
+[ext_resource type="Script" uid="uid://oanc40yweibo" path="res://scenes/screens/world_map.gd" id="1_map"]
+[ext_resource type="Theme" uid="uid://ctdecel0skgic" path="res://ui/theme.tres" id="2_theme"]
+[ext_resource type="Script" uid="uid://cad8adpc83a5y" path="res://ui/background.gd" id="3_bg"]
+[ext_resource type="Script" uid="uid://caobr2o0hbwie" path="res://ui/map_lines.gd" id="4_lines"]
+[ext_resource type="PackedScene" uid="uid://db65eak6agclw" path="res://ui/dialogue_overlay.tscn" id="5_dialogue"]
+
+[node name="WorldMap" type="Control" unique_id=1559680355]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("2_theme")
+script = ExtResource("1_map")
+
+[node name="Background" type="Control" parent="." unique_id=1246802062]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("3_bg")
+slot = "map"
+
+[node name="MapArea" type="Control" parent="." unique_id=1795966930]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 230.0
+offset_bottom = -150.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("4_lines")
+
+[node name="Margin" type="MarginContainer" parent="." unique_id=1720104105]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 22
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 22
+
+[node name="Main" type="VBoxContainer" parent="Margin" unique_id=30221464]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 10
+
+[node name="Title" type="Label" parent="Margin/Main" unique_id=1774164774]
+layout_mode = 2
+theme_override_font_sizes/font_size = 40
+text = "MAPA DE MUNDO"
+horizontal_alignment = 1
+
+[node name="Subtitle" type="Label" parent="Margin/Main" unique_id=420018459]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="Legend" type="HBoxContainer" parent="Margin/Main" unique_id=376520382]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 8
+
+[node name="Spacer" type="Control" parent="Margin/Main" unique_id=272782630]
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+
+[node name="BackButton" type="Button" parent="Margin/Main" unique_id=1977195199]
+custom_minimum_size = Vector2(0, 104)
+layout_mode = 2
+text = "VOLVER"
+
+[node name="PanelScrim" type="PanelContainer" parent="." unique_id=1255616901]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Center" type="MarginContainer" parent="PanelScrim" unique_id=1120847636]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 24
+
+[node name="LevelPanel" type="PanelContainer" parent="PanelScrim/Center" unique_id=1470093435]
+layout_mode = 2
+
+[node name="PanelBox" type="VBoxContainer" parent="PanelScrim/Center/LevelPanel" unique_id=106598913]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="PanelTitle" type="Label" parent="PanelScrim/Center/LevelPanel/PanelBox" unique_id=880057168]
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+autowrap_mode = 2
+
+[node name="PanelInfo" type="Label" parent="PanelScrim/Center/LevelPanel/PanelBox" unique_id=1008808351]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+autowrap_mode = 2
+
+[node name="DifficultyList" type="VBoxContainer" parent="PanelScrim/Center/LevelPanel/PanelBox" unique_id=1340373389]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="PanelFeedback" type="Label" parent="PanelScrim/Center/LevelPanel/PanelBox" unique_id=1128512117]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="PanelButtons" type="HBoxContainer" parent="PanelScrim/Center/LevelPanel/PanelBox" unique_id=1585768372]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="CloseButton" type="Button" parent="PanelScrim/Center/LevelPanel/PanelBox/PanelButtons" unique_id=1709380925]
+custom_minimum_size = Vector2(0, 104)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "CERRAR"
+
+[node name="StartButton" type="Button" parent="PanelScrim/Center/LevelPanel/PanelBox/PanelButtons" unique_id=2112474699]
+custom_minimum_size = Vector2(0, 104)
+layout_mode = 2
+size_flags_horizontal = 5
+text = "COMENZAR"
+
+[node name="DialogueOverlay" parent="." unique_id=930936197 instance=ExtResource("5_dialogue")]
+visible = false
+layout_mode = 1

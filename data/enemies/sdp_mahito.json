@@ -1,0 +1,13 @@
+{
+	"id": "sdp_mahito",
+	"based_on": "mahito",
+	"_note": "Enemigo de evento: el personaje 'mahito' del roster con las estadisticas del antiguo 'vigia_beta'. Se puede cambiar 'stats' (o cualquier otro campo) sin tocar al personaje.",
+	"stats": {
+		"max_hp": 3400,
+		"atk": 175,
+		"def": 95,
+		"speed": 118,
+		"crit_rate": 0.08,
+		"dodge_rate": 0.05
+	}
+}

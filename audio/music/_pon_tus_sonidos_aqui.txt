@@ -1,0 +1,11 @@
+Pon aqui los sonidos de la categoria 'music', con estos nombres EXACTOS
+(formato recomendado .ogg; tambien valen .wav y .mp3):
+
+  menu.ogg   ->  musica de menus, coleccion, equipo, invocar, misiones... (bucle)
+  battle.ogg   ->  musica de combate (bucle)
+  history.ogg   ->  musica de HISTORIA y del mapa de mundo (bucle). Si falta, suena menu
+  events.ogg   ->  musica de EVENTOS (bucle). Si falta, suena menu
+  results.ogg   ->  musica de la pantalla de resultados (bucle). Si falta, suena menu
+
+Si falta un archivo NO hay error: ese evento simplemente no suena (o usa su
+sustituto, si se indica arriba). Guia completa en res://audio/README.md

@@ -1,0 +1,58 @@
+[gd_scene format=3 uid="uid://coeq24ien0xk1"]
+
+[ext_resource type="Script" uid="uid://dopo4loi3o782" path="res://ui/roster_card.gd" id="1_card"]
+[ext_resource type="Script" uid="uid://cv2l11vt51fns" path="res://ui/portrait.gd" id="2_portrait"]
+
+[node name="RosterCard" type="PanelContainer" unique_id=186850569]
+size_flags_horizontal = 3
+script = ExtResource("1_card")
+
+[node name="HBox" type="HBoxContainer" parent="." unique_id=1516606636]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="RarityStripe" type="ColorRect" parent="HBox" unique_id=1446206406]
+visible = false
+custom_minimum_size = Vector2(8, 0)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Portrait" type="Control" parent="HBox" unique_id=174382377]
+custom_minimum_size = Vector2(112, 112)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+script = ExtResource("2_portrait")
+
+[node name="Info" type="VBoxContainer" parent="HBox" unique_id=1817870345]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+theme_override_constants/separation = 4
+
+[node name="TopRow" type="HBoxContainer" parent="HBox/Info" unique_id=1917465816]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="NameLabel" type="Label" parent="HBox/Info/TopRow" unique_id=329001581]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 25
+text = "Nombre"
+autowrap_mode = 2
+
+[node name="RarityChip" type="Label" parent="HBox/Info/TopRow" unique_id=579067828]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.64, 0.69, 0.8, 1)
+theme_override_font_sizes/font_size = 20
+text = "R"
+
+[node name="TypeLabel" type="Label" parent="HBox/Info" unique_id=1341741351]
+layout_mode = 2
+theme_override_font_sizes/font_size = 21
+text = "STR"
+
+[node name="MetaLabel" type="Label" parent="HBox/Info" unique_id=1253306953]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.68, 0.72, 0.88, 1)
+theme_override_font_sizes/font_size = 18

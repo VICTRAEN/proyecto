@@ -1,0 +1,60 @@
+{
+	"id": "edward_elric",
+	"name": "Edward Elric",
+	"title": "Alquimista de acero",
+	"genre": "Ciencia",
+	"rarity": "SSR",
+	"type": "TEQ",
+	"portrait_style": "spiky",
+	"art": {
+		"front": "res://art/characters/edward_elric/front.png",
+		"back": "res://art/characters/edward_elric/back.png",
+		"icon": "res://art/characters/edward_elric/icon.png"
+	},
+	"roles": ["Damage Dealer", "Utility"],
+	"stats": {
+		"max_hp": 2100,
+		"atk": 278,
+		"def": 142,
+		"speed": 168,
+		"crit_rate": 0.16,
+		"dodge_rate": 0.08
+	},
+	"categories": ["ciencia", "geniuses", "shonen", "heroes", "protagonists"],
+	"links": ["heroes", "estrategas", "inquebrantables"],
+	"passive": {
+		"id": "pas_edward_elric_transmutacion",
+		"name": "Transmutacion sin circulo",
+		"description": "Al empezar el combate su defensa sube un 25% y gana 5 puntos de critico de forma permanente.",
+		"trigger": "battle_start",
+		"condition": {},
+		"effects": [
+			{ "type": "stat_mod", "target": "self", "stat": "def", "kind": "mult", "value": 0.25, "turns": 0 },
+			{ "type": "stat_mod", "target": "self", "stat": "crit_rate", "kind": "flat", "value": 0.05, "turns": 0 }
+		]
+	},
+	"skills": [
+		{
+			"id": "sk_edward_elric_01",
+			"name": "Brazo de acero",
+			"kind": "basic",
+			"power": 126,
+			"cost": 0,
+			"target": "enemy",
+			"effects": []
+		},
+		{
+			"id": "sk_edward_elric_02",
+			"name": "Muro de piedra",
+			"description": "Transmuta el suelo y encierra al rival: le baja un 25% la defensa durante 2 turnos.",
+			"kind": "special",
+			"power": 200,
+			"cost": 3,
+			"target": "enemy",
+			"effects": [
+				{ "type": "stat_mod", "target": "enemy", "stat": "def", "kind": "mult", "value": -0.25, "turns": 2 }
+			]
+		}
+	],
+	"transformations": []
+}

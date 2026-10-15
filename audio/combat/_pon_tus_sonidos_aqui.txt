@@ -1,0 +1,12 @@
+Pon aqui los sonidos de la categoria 'combat', con estos nombres EXACTOS
+(formato recomendado .ogg; tambien valen .wav y .mp3):
+
+  attack.ogg   ->  golpe normal
+  special.ogg   ->  ataque especial / Super (si falta, suena attack)
+  critical.ogg   ->  golpe critico (si falta, suena attack)
+  heal.ogg   ->  curacion
+  victory.ogg   ->  victoria
+  defeat.ogg   ->  derrota
+
+Si falta un archivo NO hay error: ese evento simplemente no suena (o usa su
+sustituto, si se indica arriba). Guia completa en res://audio/README.md

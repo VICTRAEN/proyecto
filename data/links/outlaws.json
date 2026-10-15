@@ -1,0 +1,9 @@
+{
+	"id": "outlaws",
+	"name": "Proscritos",
+	"description": "Fuera de la ley se sobrevive esquivando. Se cubren las espaldas.",
+	"effects": [
+		{ "type": "stat_mod", "stat": "dodge_rate", "kind": "flat", "value": 0.05 },
+		{ "type": "stat_mod", "stat": "speed", "kind": "mult", "value": 0.04 }
+	]
+}

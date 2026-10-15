@@ -1,0 +1,54 @@
+[gd_scene format=3 uid="uid://csofxjaqfmcuf"]
+
+[ext_resource type="Script" uid="uid://chl5gmgsktv3" path="res://ui/result_panel.gd" id="1_result"]
+
+[node name="ResultPanel" type="PanelContainer" unique_id=1653962454]
+custom_minimum_size = Vector2(660, 0)
+script = ExtResource("1_result")
+
+[node name="VBox" type="VBoxContainer" parent="." unique_id=1819878891]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="ResultLabel" type="Label" parent="VBox" unique_id=1675231037]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.784, 0.337, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.9)
+theme_override_constants/outline_size = 10
+theme_override_font_sizes/font_size = 62
+text = "VICTORIA"
+horizontal_alignment = 1
+
+[node name="StageLabel" type="Label" parent="VBox" unique_id=752241186]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.502, 0.545, 0.694, 1)
+theme_override_font_sizes/font_size = 20
+horizontal_alignment = 1
+
+[node name="ResultInfo" type="Label" parent="VBox" unique_id=82851686]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.678, 0.722, 0.878, 1)
+theme_override_font_sizes/font_size = 20
+horizontal_alignment = 1
+
+[node name="Rewards" type="VBoxContainer" parent="VBox" unique_id=1060474116]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="ButtonsRow" type="HBoxContainer" parent="VBox" unique_id=1689588478]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="RestartButton" type="Button" parent="VBox/ButtonsRow" unique_id=1651757120]
+custom_minimum_size = Vector2(0, 112)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 30
+text = "REINTENTAR"
+
+[node name="ExitButton" type="Button" parent="VBox/ButtonsRow" unique_id=1686091058]
+custom_minimum_size = Vector2(0, 112)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 30
+text = "CONTINUAR"

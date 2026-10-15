@@ -1,0 +1,97 @@
+[gd_scene format=3 uid="uid://cjlx6lgl7yn4k"]
+
+[ext_resource type="Script" uid="uid://c4ehtix8uhcgj" path="res://scenes/screens/stage_select.gd" id="1_stage"]
+[ext_resource type="Theme" uid="uid://ctdecel0skgic" path="res://ui/theme.tres" id="2_theme"]
+[ext_resource type="Script" uid="uid://cad8adpc83a5y" path="res://ui/background.gd" id="3_bg"]
+
+[node name="StageSelect" type="Control" unique_id=1102696184]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("2_theme")
+script = ExtResource("1_stage")
+
+[node name="Background" type="Control" parent="." unique_id=848333952]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("3_bg")
+slot = "stages"
+
+[node name="Margin" type="MarginContainer" parent="." unique_id=232127718]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 22
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 22
+
+[node name="Main" type="VBoxContainer" parent="Margin" unique_id=1469910198]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Title" type="Label" parent="Margin/Main" unique_id=555789174]
+layout_mode = 2
+theme_override_font_sizes/font_size = 40
+text = "SELECCIONAR BATALLA"
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="Subtitle" type="Label" parent="Margin/Main" unique_id=1735090140]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Gana una batalla para abrir la siguiente. Las ganadas se pueden repetir."
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="Scroll" type="ScrollContainer" parent="Margin/Main" unique_id=1146833069]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="StageList" type="VBoxContainer" parent="Margin/Main/Scroll" unique_id=850670035]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+
+[node name="TeamHint" type="Label" parent="Margin/Main" unique_id=573946935]
+layout_mode = 2
+theme_override_font_sizes/font_size = 19
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="Lineup" type="HBoxContainer" parent="Margin/Main" unique_id=923514551]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Buttons" type="HBoxContainer" parent="Margin/Main" unique_id=115248484]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="BackButton" type="Button" parent="Margin/Main/Buttons" unique_id=75016083]
+custom_minimum_size = Vector2(0, 108)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "VOLVER"
+
+[node name="TeamButton" type="Button" parent="Margin/Main/Buttons" unique_id=352590329]
+custom_minimum_size = Vector2(0, 108)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "EQUIPO"
+
+[node name="StartButton" type="Button" parent="Margin/Main/Buttons" unique_id=1210484342]
+custom_minimum_size = Vector2(0, 108)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "COMENZAR"

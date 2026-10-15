@@ -1,0 +1,219 @@
+[gd_scene format=3 uid="uid://c7wii2uoltfud"]
+
+[ext_resource type="Script" uid="uid://b7tcndqg8o6je" path="res://scenes/screens/main_menu.gd" id="1_menu"]
+[ext_resource type="Theme" uid="uid://ctdecel0skgic" path="res://ui/theme.tres" id="2_theme"]
+[ext_resource type="Script" uid="uid://cad8adpc83a5y" path="res://ui/background.gd" id="3_bg"]
+
+[node name="MainMenu" type="Control" unique_id=540151]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("2_theme")
+script = ExtResource("1_menu")
+
+[node name="Background" type="Control" parent="." unique_id=57820068]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("3_bg")
+slot = "menu"
+
+[node name="Margin" type="MarginContainer" parent="." unique_id=1396903926]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 34
+theme_override_constants/margin_top = 44
+theme_override_constants/margin_right = 34
+theme_override_constants/margin_bottom = 34
+
+[node name="Main" type="VBoxContainer" parent="Margin" unique_id=802746313]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="Header" type="VBoxContainer" parent="Margin/Main" unique_id=498541040]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="Title" type="Label" parent="Margin/Main/Header" unique_id=1905744025]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.82, 0.36, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.88)
+theme_override_constants/outline_size = 12
+theme_override_font_sizes/font_size = 72
+text = "ANIME BATTLE"
+horizontal_alignment = 1
+
+[node name="Subtitle" type="Label" parent="Margin/Main/Header" unique_id=243517836]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.93, 0.78, 0.9)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.7)
+theme_override_constants/outline_size = 6
+theme_override_font_sizes/font_size = 24
+text = "RPG DE COLECCION POR TURNOS"
+horizontal_alignment = 1
+
+[node name="Wallet" type="PanelContainer" parent="Margin/Main" unique_id=648245388]
+layout_mode = 2
+
+[node name="WalletRow" type="HBoxContainer" parent="Margin/Main/Wallet" unique_id=1370847900]
+layout_mode = 2
+theme_override_constants/separation = 10
+alignment = 1
+
+[node name="Coins" type="Label" parent="Margin/Main/Wallet/WalletRow" unique_id=367957432]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(1, 0.85, 0.45, 1)
+theme_override_font_sizes/font_size = 28
+text = "MONEDAS 0"
+horizontal_alignment = 1
+
+[node name="Gems" type="Label" parent="Margin/Main/Wallet/WalletRow" unique_id=476674229]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.55, 0.9, 1, 1)
+theme_override_font_sizes/font_size = 28
+text = "GEMAS 0"
+horizontal_alignment = 1
+
+[node name="Status" type="Label" parent="Margin/Main" unique_id=1925891663]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.86, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.7)
+theme_override_constants/outline_size = 5
+theme_override_font_sizes/font_size = 22
+horizontal_alignment = 1
+
+[node name="Spacer" type="Control" parent="Margin/Main" unique_id=998820339]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Actions" type="VBoxContainer" parent="Margin/Main" unique_id=2091495759]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="PlayButton" type="Button" parent="Margin/Main/Actions" unique_id=1339619378]
+custom_minimum_size = Vector2(0, 148)
+layout_mode = 2
+theme_override_font_sizes/font_size = 46
+text = "JUGAR"
+
+[node name="MiddleRow" type="HBoxContainer" parent="Margin/Main/Actions" unique_id=916022355]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="TeamButton" type="Button" parent="Margin/Main/Actions/MiddleRow" unique_id=1927906634]
+custom_minimum_size = Vector2(0, 116)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 30
+text = "EQUIPO"
+
+[node name="CollectionButton" type="Button" parent="Margin/Main/Actions/MiddleRow" unique_id=1611639151]
+custom_minimum_size = Vector2(0, 116)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 30
+text = "COLECCION"
+
+[node name="LowerRow" type="HBoxContainer" parent="Margin/Main/Actions" unique_id=1807796322]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="SummonButton" type="Button" parent="Margin/Main/Actions/LowerRow" unique_id=66539479]
+custom_minimum_size = Vector2(0, 116)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 30
+text = "INVOCAR"
+
+[node name="MissionsButton" type="Button" parent="Margin/Main/Actions/LowerRow" unique_id=1356327884]
+custom_minimum_size = Vector2(0, 116)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 30
+text = "MISIONES"
+
+[node name="HistoryRow" type="HBoxContainer" parent="Margin/Main/Actions" unique_id=966371471]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="HistoryButton" type="Button" parent="Margin/Main/Actions/HistoryRow" unique_id=231155293]
+custom_minimum_size = Vector2(0, 116)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 30
+text = "HISTORIA"
+
+[node name="EventsRow" type="HBoxContainer" parent="Margin/Main/Actions" unique_id=1418389833]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="EventsButton" type="Button" parent="Margin/Main/Actions/EventsRow" unique_id=1178249892]
+custom_minimum_size = Vector2(0, 116)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 30
+text = "EVENTOS"
+
+[node name="ProgressRow" type="HBoxContainer" parent="Margin/Main/Actions" unique_id=454676424]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="EvolutionButton" type="Button" parent="Margin/Main/Actions/ProgressRow" unique_id=682816173]
+custom_minimum_size = Vector2(0, 116)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 30
+text = "EVOLUCION"
+
+[node name="InventoryButton" type="Button" parent="Margin/Main/Actions/ProgressRow" unique_id=216744994]
+custom_minimum_size = Vector2(0, 116)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 30
+text = "INVENTARIO"
+
+[node name="ExtraRow" type="HBoxContainer" parent="Margin/Main/Actions" unique_id=1245990303]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="MutationsButton" type="Button" parent="Margin/Main/Actions/ExtraRow" unique_id=103416411]
+custom_minimum_size = Vector2(0, 116)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 30
+text = "MUTACIONES"
+
+[node name="SettingsButton" type="Button" parent="Margin/Main/Actions/ExtraRow" unique_id=553479312]
+custom_minimum_size = Vector2(0, 116)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 30
+text = "AJUSTES"
+
+[node name="ShopButton" type="Button" parent="Margin/Main/Actions/ExtraRow" unique_id=1065419617]
+custom_minimum_size = Vector2(0, 116)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "TIENDA"
+
+[node name="Footer" type="Label" parent="Margin/Main" unique_id=804255489]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.78, 0.82, 0.95, 0.85)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.7)
+theme_override_constants/outline_size = 5
+theme_override_font_sizes/font_size = 18
+horizontal_alignment = 1

@@ -1,0 +1,9 @@
+{
+	"id": "estrategas",
+	"name": "Estrategas",
+	"description": "Dos cabezas leyendo el combate: encuentran el hueco antes que nadie.",
+	"effects": [
+		{ "type": "stat_mod", "stat": "crit_rate", "kind": "flat", "value": 0.04 },
+		{ "type": "stat_mod", "stat": "speed", "kind": "mult", "value": 0.03 }
+	]
+}

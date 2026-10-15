@@ -1,0 +1,59 @@
+{
+	"id": "sakamoto",
+	"name": "Taro Sakamoto",
+	"title": "Tendero invencible",
+	"genre": "Accion",
+	"rarity": "SR",
+	"type": "STR",
+	"portrait_style": "short",
+	"art": {
+		"front": "res://art/characters/sakamoto/front.png",
+		"back": "res://art/characters/sakamoto/back.png",
+		"icon": "res://art/characters/sakamoto/icon.png"
+	},
+	"roles": ["Tank", "Utility"],
+	"stats": {
+		"max_hp": 1880,
+		"atk": 210,
+		"def": 130,
+		"speed": 140,
+		"crit_rate": 0.12,
+		"dodge_rate": 0.06
+	},
+	"categories": ["outlaws", "veterans", "guardianes", "tacticos"],
+	"links": ["outlaws", "veteranos", "heroes"],
+	"passive": {
+		"id": "pas_sakamoto_reflejos",
+		"name": "Reflejos del pasado",
+		"description": "Al empezar el combate gana un 35% de defensa de forma permanente: nadie toca su tienda.",
+		"trigger": "battle_start",
+		"condition": {},
+		"effects": [
+			{ "type": "stat_mod", "target": "self", "stat": "def", "kind": "mult", "value": 0.35, "turns": 0 }
+		]
+	},
+	"skills": [
+		{
+			"id": "sk_sakamoto_01",
+			"name": "Golpe de bandeja",
+			"kind": "basic",
+			"power": 108,
+			"cost": 0,
+			"target": "enemy",
+			"effects": []
+		},
+		{
+			"id": "sk_sakamoto_02",
+			"name": "Modo tendero letal",
+			"description": "Le baja un 25% la defensa al rival durante 2 turnos sin dejar de sonreir.",
+			"kind": "special",
+			"power": 176,
+			"cost": 3,
+			"target": "enemy",
+			"effects": [
+				{ "type": "stat_mod", "target": "enemy", "stat": "def", "kind": "mult", "value": -0.25, "turns": 2 }
+			]
+		}
+	],
+	"transformations": []
+}

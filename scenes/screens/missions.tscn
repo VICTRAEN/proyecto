@@ -1,0 +1,82 @@
+[gd_scene format=3 uid="uid://c4nyiva5xcr60"]
+
+[ext_resource type="Script" uid="uid://br0vu3vq81uj4" path="res://scenes/screens/missions.gd" id="1_missions"]
+[ext_resource type="Theme" uid="uid://ctdecel0skgic" path="res://ui/theme.tres" id="2_theme"]
+[ext_resource type="Script" uid="uid://cad8adpc83a5y" path="res://ui/background.gd" id="3_bg"]
+
+[node name="Missions" type="Control" unique_id=1678575411]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("2_theme")
+script = ExtResource("1_missions")
+
+[node name="Background" type="Control" parent="." unique_id=26510112]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("3_bg")
+slot = "missions"
+
+[node name="Margin" type="MarginContainer" parent="." unique_id=7975488]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 22
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 22
+
+[node name="Main" type="VBoxContainer" parent="Margin" unique_id=1583018763]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Title" type="Label" parent="Margin/Main" unique_id=1761265858]
+layout_mode = 2
+theme_override_font_sizes/font_size = 40
+text = "MISIONES"
+horizontal_alignment = 1
+
+[node name="Subtitle" type="Label" parent="Margin/Main" unique_id=1636362578]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "El progreso sale de tus contadores. Cada recompensa se cobra una sola vez."
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="Counters" type="Label" parent="Margin/Main" unique_id=1553596687]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Cargando..."
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="Scroll" type="ScrollContainer" parent="Margin/Main" unique_id=1482645965]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="List" type="VBoxContainer" parent="Margin/Main/Scroll" unique_id=1237436711]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 12
+
+[node name="Feedback" type="Label" parent="Margin/Main" unique_id=2043321583]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="BackButton" type="Button" parent="Margin/Main" unique_id=1897867671]
+custom_minimum_size = Vector2(0, 104)
+layout_mode = 2
+text = "VOLVER"

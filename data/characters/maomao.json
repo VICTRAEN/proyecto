@@ -1,0 +1,86 @@
+{
+	"id": "maomao",
+	"name": "Maomao",
+	"title": "La boticaria del palacio",
+	"genre": "Historico",
+	"rarity": "SR",
+	"type": "TEQ",
+	"portrait_style": "ponytail",
+	"art": {
+		"front": "res://art/characters/maomao/front.png",
+		"back": "res://art/characters/maomao/back.png",
+		"icon": "res://art/characters/maomao/icon.png"
+	},
+	"roles": ["Utility", "Support"],
+	"stats": {
+		"max_hp": 1180,
+		"atk": 182,
+		"def": 84,
+		"speed": 108,
+		"crit_rate": 0.12,
+		"dodge_rate": 0.10
+	},
+	"categories": ["historico", "geniuses", "determination"],
+	"links": ["estrategas"],
+	"passive": {
+		"id": "pas_maomao_ojo",
+		"name": "Ojo clinico",
+		"description": "Ve la debilidad al instante: al comenzar su turno baja un 12% la defensa del rival.",
+		"trigger": "turn_start",
+		"condition": {},
+		"effects": [
+			{ "type": "stat_mod", "target": "enemy", "stat": "def", "kind": "mult", "value": -0.12, "turns": 1 }
+		]
+	},
+	"skills": [
+		{
+			"id": "sk_maomao_01",
+			"name": "Frasco",
+			"kind": "basic",
+			"power": 105,
+			"cost": 0,
+			"target": "enemy",
+			"description": "Lanza un preparado a la cara.",
+			"effects": []
+		},
+		{
+			"id": "sk_maomao_02",
+			"name": "Veneno sutil",
+			"kind": "special",
+			"power": 100,
+			"cost": 3,
+			"target": "enemy",
+			"description": "Dosis medida que no se nota: -25% de ataque durante 3 turnos y 1 turno aturdido.",
+			"effects": [
+				{ "type": "stat_mod", "target": "enemy", "stat": "atk", "kind": "mult", "value": -0.25, "turns": 3 },
+				{ "type": "status", "target": "enemy", "status": "stun", "turns": 1 }
+			]
+		}
+	],
+	"transformations": [],
+	"evolution": {
+		"passive": {
+			"id": "pas_maomao_ev_ojo",
+			"name": "Ojo clinico certero",
+			"description": "Al comenzar su turno baja un 20% la defensa y un 10% el ataque del rival.",
+			"trigger": "turn_start",
+			"condition": {},
+			"effects": [
+				{ "type": "stat_mod", "target": "enemy", "stat": "def", "kind": "mult", "value": -0.2, "turns": 1 },
+				{ "type": "stat_mod", "target": "enemy", "stat": "atk", "kind": "mult", "value": -0.1, "turns": 1 }
+			]
+		},
+		"passive_extra": {
+			"id": "pas_maomao_ev_antidoto",
+			"name": "Antidoto preparado",
+			"description": "Al comenzar el combate sube un 20% la defensa de todo el equipo.",
+			"trigger": "battle_start",
+			"condition": {},
+			"effects": [
+				{ "type": "stat_mod", "target": "ally_all", "stat": "def", "kind": "mult", "value": 0.2, "turns": 0 }
+			]
+		},
+		"links": ["veteranos"],
+		"categories": ["despertados", "tacticos"]
+	}
+}

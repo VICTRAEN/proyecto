@@ -1,0 +1,70 @@
+[gd_scene format=3 uid="uid://dekv2h3yjbcry"]
+
+[ext_resource type="Script" uid="uid://b77g2xgsqmk8i" path="res://ui/unit_card.gd" id="1_card"]
+[ext_resource type="Script" uid="uid://cv2l11vt51fns" path="res://ui/portrait.gd" id="2_portrait"]
+
+[node name="UnitCard" type="PanelContainer" unique_id=946188035]
+script = ExtResource("1_card")
+
+[node name="VBox" type="VBoxContainer" parent="." unique_id=492117049]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="Top" type="HBoxContainer" parent="VBox" unique_id=1308024335]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 10
+
+[node name="Portrait" type="Control" parent="VBox/Top" unique_id=652505664]
+custom_minimum_size = Vector2(104, 104)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+size_flags_stretch_ratio = 1.2
+script = ExtResource("2_portrait")
+
+[node name="Info" type="VBoxContainer" parent="VBox/Top" unique_id=1487937883]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+theme_override_constants/separation = 6
+
+[node name="NameLabel" type="Label" parent="VBox/Top/Info" unique_id=1516439255]
+layout_mode = 2
+theme_override_font_sizes/font_size = 25
+text = "Nombre"
+autowrap_mode = 2
+
+[node name="Chips" type="HBoxContainer" parent="VBox/Top/Info" unique_id=2020062837]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="TypeChip" type="Label" parent="VBox/Top/Info/Chips" unique_id=511290805]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "STR"
+
+[node name="RarityChip" type="Label" parent="VBox/Top/Info/Chips" unique_id=1373885828]
+layout_mode = 2
+theme_override_font_sizes/font_size = 17
+text = "R"
+
+[node name="LevelChip" type="Label" parent="VBox/Top/Info/Chips" unique_id=1675871426]
+layout_mode = 2
+theme_override_font_sizes/font_size = 17
+text = "Nv. 1"
+
+[node name="HpLabel" type="Label" parent="VBox/Top/Info" unique_id=1538842291]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.78, 0.82, 0.96, 1)
+theme_override_font_sizes/font_size = 22
+text = "0 / 0"
+
+[node name="SpRow" type="HBoxContainer" parent="VBox/Top/Info" unique_id=1242404806]
+layout_mode = 2
+
+[node name="HpBar" type="ProgressBar" parent="VBox" unique_id=1552872723]
+custom_minimum_size = Vector2(0, 26)
+layout_mode = 2
+value = 100.0
+show_percentage = false

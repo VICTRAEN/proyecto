@@ -1,0 +1,26 @@
+{
+	"id": "dlg_world_002_001",
+	"name": "La escuela de hechiceria",
+	"skippable": true,
+	"skip_label": "SALTAR",
+	"lines": [
+		{
+			"speaker": "Gojo",
+			"portrait": "gojo",
+			"text": "Bienvenidos a la escuela. Aqui se ensena a matar maldiciones, no a hacerse el heroe.",
+			"background": "battle_plain"
+		},
+		{
+			"speaker": "Gojo",
+			"portrait": "gojo",
+			"text": "Un vigia ha cruzado el umbral dentro del patio. Quien lo pare, aprueba.",
+			"background": "battle_plain"
+		},
+		{
+			"speaker": "Gojo",
+			"portrait": "gojo",
+			"text": "No me seais timidos. Si sobrevivis, os invito a algo.",
+			"background": "battle_plain"
+		}
+	]
+}

@@ -1,0 +1,13 @@
+{
+	"id": "sdp_akaza",
+	"based_on": "akaza",
+	"_note": "Enemigo de evento: el personaje 'akaza' del roster con las estadisticas del antiguo 'void_warden'. Se puede cambiar 'stats' (o cualquier otro campo) sin tocar al personaje.",
+	"stats": {
+		"max_hp": 5200,
+		"atk": 185,
+		"def": 120,
+		"speed": 104,
+		"crit_rate": 0.05,
+		"dodge_rate": 0.03
+	}
+}

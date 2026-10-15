@@ -1,0 +1,10 @@
+{
+	"id": "stage_001",
+	"name": "Vigia del Vacio",
+	"difficulty": "NORMAL",
+	"background": "battle_plain",
+	"enemies": ["void_warden"],
+	"xp_reward": 250,
+	"coin_reward": 100,
+	"energy_cost": 0
+}

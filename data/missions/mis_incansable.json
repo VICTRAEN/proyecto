@@ -1,0 +1,10 @@
+{
+	"id": "mis_incansable",
+	"name": "INCANSABLE",
+	"description": "Juega 30 combates.",
+	"stat": "combates_jugados",
+	"target": 30,
+	"reward_coins": 600,
+	"reward_gems": 0,
+	"category": "COMBATE"
+}

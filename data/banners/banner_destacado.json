@@ -1,0 +1,27 @@
+{
+	"id": "banner_destacado",
+	"name": "Destacados",
+	"description": "Banner con un 1% de UR por tirada y los mismos 15% de SSR que el resto.",
+	"cost_gems": 10,
+	"multi_pulls": 10,
+	"multi_cost_gems": 90,
+	"rates": {
+		"SR": 0.84,
+		"SSR": 0.15,
+		"UR": 0.01
+	},
+	"pool_categories": [],
+	"featured": [
+		"asta",
+		"deku",
+		"yami",
+		"vegeta",
+		"yuno"
+	],
+	"featured_bonus": 0.0,
+	"pity": {
+		"pulls": 0,
+		"rarity": ""
+	},
+	"notes": "Probabilidades POR TIRADA, explicitas y sumando 1 (sin renormalizar). Una x10 son 10 tiradas independientes. No hay pity ni bonus de destacados: los destacados solo se muestran en el banner. Las formas UR/LR de evolucion y las unidades F2P no entran en el gacha."
+}

@@ -1,0 +1,217 @@
+[gd_scene format=3 uid="uid://cqmr1cj4vpaco"]
+
+[ext_resource type="Script" uid="uid://dbv86c0uybfvx" path="res://scenes/battle/battle_ui.gd" id="1_ui"]
+[ext_resource type="Script" uid="uid://cad8adpc83a5y" path="res://ui/background.gd" id="2_bg"]
+[ext_resource type="Theme" uid="uid://ctdecel0skgic" path="res://ui/theme.tres" id="3_theme"]
+[ext_resource type="Script" uid="uid://cv2l11vt51fns" path="res://ui/portrait.gd" id="4_portrait"]
+[ext_resource type="Script" uid="uid://i0jgvfjkpyx" path="res://ui/order_strip.gd" id="5_order"]
+[ext_resource type="PackedScene" path="res://ui/unit_info_panel.tscn" id="6_info"]
+[ext_resource type="PackedScene" uid="uid://csofxjaqfmcuf" path="res://ui/result_panel.tscn" id="7_result"]
+
+[node name="Battle" type="Control" unique_id=1653995049]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("3_theme")
+script = ExtResource("1_ui")
+
+[node name="Background" type="Control" parent="." unique_id=1339633245]
+anchors_preset = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("2_bg")
+slot = "battle"
+
+[node name="Margin" type="MarginContainer" parent="." unique_id=1722954725]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 8
+
+[node name="Main" type="VBoxContainer" parent="Margin" unique_id=2102571922]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="TopBar" type="HBoxContainer" parent="Margin/Main" unique_id=1457723646]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Header" type="Label" parent="Margin/Main/TopBar" unique_id=1800928332]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.502, 0.545, 0.694, 1)
+theme_override_font_sizes/font_size = 20
+vertical_alignment = 1
+clip_text = true
+
+[node name="RoundLabel" type="Label" parent="Margin/Main/TopBar" unique_id=869075268]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.784, 0.337, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.85)
+theme_override_constants/outline_size = 8
+theme_override_font_sizes/font_size = 34
+text = "RONDA 1"
+horizontal_alignment = 2
+
+[node name="EnemyRow" type="HBoxContainer" parent="Margin/Main" unique_id=1145045480]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 12
+alignment = 1
+
+[node name="OrderPanel" type="PanelContainer" parent="Margin/Main" unique_id=196438713]
+custom_minimum_size = Vector2(0, 132)
+layout_mode = 2
+
+[node name="OrderBox" type="VBoxContainer" parent="Margin/Main/OrderPanel" unique_id=1502112359]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="OrderTitle" type="Label" parent="Margin/Main/OrderPanel/OrderBox" unique_id=1224107407]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.678, 0.722, 0.878, 1)
+theme_override_font_sizes/font_size = 18
+text = "ORDEN DE ATAQUE"
+horizontal_alignment = 1
+
+[node name="OrderRow" type="HBoxContainer" parent="Margin/Main/OrderPanel/OrderBox" unique_id=2145906627]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 3
+alignment = 1
+script = ExtResource("5_order")
+
+[node name="AllyGrid" type="GridContainer" parent="Margin/Main" unique_id=1648277719]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+theme_override_constants/h_separation = 10
+theme_override_constants/v_separation = 10
+columns = 2
+
+[node name="LogPanel" type="PanelContainer" parent="Margin/Main" unique_id=953680083]
+custom_minimum_size = Vector2(0, 96)
+layout_mode = 2
+
+[node name="Log" type="RichTextLabel" parent="Margin/Main/LogPanel" unique_id=337448925]
+layout_mode = 2
+theme_override_font_sizes/normal_font_size = 18
+scroll_following = true
+
+[node name="Bottom" type="VBoxContainer" parent="Margin/Main" unique_id=1657020875]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="ActiveBar" type="PanelContainer" parent="Margin/Main/Bottom" unique_id=2042019471]
+layout_mode = 2
+
+[node name="ActiveRow" type="HBoxContainer" parent="Margin/Main/Bottom/ActiveBar" unique_id=124246992]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="ActivePortrait" type="Control" parent="Margin/Main/Bottom/ActiveBar/ActiveRow" unique_id=124567221]
+custom_minimum_size = Vector2(300, 340)
+layout_mode = 2
+script = ExtResource("4_portrait")
+
+[node name="ActiveInfo" type="VBoxContainer" parent="Margin/Main/Bottom/ActiveBar/ActiveRow" unique_id=1263834689]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+theme_override_constants/separation = 6
+
+[node name="ActiveName" type="Label" parent="Margin/Main/Bottom/ActiveBar/ActiveRow/ActiveInfo" unique_id=644284211]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.941, 0.957, 1, 1)
+theme_override_font_sizes/font_size = 30
+text = "Preparando el combate..."
+autowrap_mode = 2
+
+[node name="ActiveHpBar" type="ProgressBar" parent="Margin/Main/Bottom/ActiveBar/ActiveRow/ActiveInfo" unique_id=899450446]
+custom_minimum_size = Vector2(0, 34)
+layout_mode = 2
+value = 100.0
+show_percentage = false
+
+[node name="ActiveSp" type="Label" parent="Margin/Main/Bottom/ActiveBar/ActiveRow/ActiveInfo" unique_id=35744786]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.678, 0.722, 0.878, 1)
+theme_override_font_sizes/font_size = 24
+text = "SP 0"
+
+[node name="ActionHint" type="Label" parent="Margin/Main/Bottom" unique_id=2110907811]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.678, 0.722, 0.878, 1)
+theme_override_font_sizes/font_size = 22
+horizontal_alignment = 1
+
+[node name="ActionRow" type="HBoxContainer" parent="Margin/Main/Bottom" unique_id=1866835006]
+layout_mode = 2
+theme_override_constants/separation = 12
+alignment = 1
+
+[node name="AttackButton" type="Button" parent="Margin/Main/Bottom/ActionRow" unique_id=261873035]
+custom_minimum_size = Vector2(0, 108)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 26
+text = "ATAQUE BASICO"
+
+[node name="SpecialButton" type="Button" parent="Margin/Main/Bottom/ActionRow" unique_id=1530277222]
+custom_minimum_size = Vector2(0, 108)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 26
+text = "HABILIDAD SP"
+
+[node name="CancelButton" type="Button" parent="Margin/Main/Bottom/ActionRow" unique_id=335982147]
+visible = false
+custom_minimum_size = Vector2(0, 108)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 26
+text = "CANCELAR"
+
+[node name="ResultOverlay" type="ColorRect" parent="." unique_id=1868359255]
+visible = false
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.74)
+
+[node name="Center" type="CenterContainer" parent="ResultOverlay" unique_id=820123622]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ResultPanel" parent="ResultOverlay/Center" unique_id=1725108112 instance=ExtResource("7_result")]
+layout_mode = 2
+
+[node name="UnitInfoPanel" parent="." unique_id=1119460381 instance=ExtResource("6_info")]
+layout_mode = 1
+
+[node name="ExitButton" type="Button" parent="." unique_id=251185164]
+custom_minimum_size = Vector2(150, 72)
+layout_mode = 0
+offset_left = 16.0
+offset_top = 16.0
+offset_right = 166.0
+offset_bottom = 88.0
+theme_override_font_sizes/font_size = 22
+text = "SALIR"

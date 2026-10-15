@@ -1,0 +1,60 @@
+{
+	"id": "reinhard",
+	"name": "Reinhard van Astrea",
+	"title": "Espadachin de la espada sagrada",
+	"genre": "Fantasia",
+	"rarity": "SSR",
+	"type": "STR",
+	"portrait_style": "short",
+	"art": {
+		"front": "res://art/characters/reinhard/front.png",
+		"back": "res://art/characters/reinhard/back.png",
+		"icon": "res://art/characters/reinhard/icon.png"
+	},
+	"roles": ["Damage Dealer", "Tank"],
+	"stats": {
+		"max_hp": 2350,
+		"atk": 300,
+		"def": 165,
+		"speed": 185,
+		"crit_rate": 0.18,
+		"dodge_rate": 0.10
+	},
+	"categories": ["fantasy", "leyendas", "heroes", "guardianes", "veterans"],
+	"links": ["heroes", "veteranos", "mentores"],
+	"passive": {
+		"id": "pas_reinhard_bendiciones",
+		"name": "Bendiciones del dragon",
+		"description": "Al empezar el combate gana 8 puntos de critico y un 20% de defensa de forma permanente.",
+		"trigger": "battle_start",
+		"condition": {},
+		"effects": [
+			{ "type": "stat_mod", "target": "self", "stat": "crit_rate", "kind": "flat", "value": 0.08, "turns": 0 },
+			{ "type": "stat_mod", "target": "self", "stat": "def", "kind": "mult", "value": 0.2, "turns": 0 }
+		]
+	},
+	"skills": [
+		{
+			"id": "sk_reinhard_01",
+			"name": "Corte del caballero",
+			"kind": "basic",
+			"power": 130,
+			"cost": 0,
+			"target": "enemy",
+			"effects": []
+		},
+		{
+			"id": "sk_reinhard_02",
+			"name": "Espada sagrada",
+			"description": "El golpe mas fuerte del reino: baja un 30% la defensa del rival durante 2 turnos.",
+			"kind": "special",
+			"power": 215,
+			"cost": 3,
+			"target": "enemy",
+			"effects": [
+				{ "type": "stat_mod", "target": "enemy", "stat": "def", "kind": "mult", "value": -0.3, "turns": 2 }
+			]
+		}
+	],
+	"transformations": []
+}

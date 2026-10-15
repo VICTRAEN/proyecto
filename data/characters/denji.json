@@ -1,0 +1,84 @@
+{
+	"id": "denji",
+	"name": "Denji",
+	"title": "El hombre motosierra",
+	"genre": "Sobrenatural",
+	"rarity": "SR",
+	"type": "PHY",
+	"portrait_style": "spiky",
+	"art": {
+		"front": "res://art/characters/denji/front.png",
+		"back": "res://art/characters/denji/back.png",
+		"icon": "res://art/characters/denji/icon.png"
+	},
+	"roles": ["Damage Dealer", "Tank"],
+	"stats": {
+		"max_hp": 1410,
+		"atk": 224,
+		"def": 82,
+		"speed": 112,
+		"crit_rate": 0.12,
+		"dodge_rate": 0.06
+	},
+	"categories": ["supernatural", "outlaws", "determination"],
+	"links": ["hibridos", "outlaws", "inquebrantables"],
+	"passive": {
+		"id": "pas_denji_motosierra",
+		"name": "Motosierra",
+		"description": "Siempre vuelve a levantarse: al comenzar su turno recupera un 7% de su vida maxima.",
+		"trigger": "turn_start",
+		"condition": {},
+		"effects": [
+			{ "type": "heal", "target": "self", "amount": 0.07, "of": "max_hp" }
+		]
+	},
+	"skills": [
+		{
+			"id": "sk_denji_01",
+			"name": "Tajo",
+			"kind": "basic",
+			"power": 105,
+			"cost": 0,
+			"target": "enemy",
+			"description": "Sierra de un brazo en movimiento.",
+			"effects": []
+		},
+		{
+			"id": "sk_denji_02",
+			"name": "Sierra brutal",
+			"kind": "special",
+			"power": 235,
+			"cost": 3,
+			"target": "enemy",
+			"description": "Se lanza sin pensar en el dano: recupera un 10% de su vida maxima.",
+			"effects": [
+				{ "type": "heal", "target": "self", "amount": 0.1, "of": "max_hp" }
+			]
+		}
+	],
+	"transformations": [],
+	"evolution": {
+		"passive": {
+			"id": "pas_denji_ev_motosierra",
+			"name": "Motosierra desatada",
+			"description": "Se remienda solo: al comenzar su turno recupera un 14% de su vida maxima.",
+			"trigger": "turn_start",
+			"condition": {},
+			"effects": [
+				{ "type": "heal", "target": "self", "amount": 0.14, "of": "max_hp" }
+			]
+		},
+		"passive_extra": {
+			"id": "pas_denji_ev_heroe",
+			"name": "El heroe del pueblo",
+			"description": "Cuando baja de la mitad de su vida, su ataque sube un 35%: le da igual el dano.",
+			"trigger": "turn_start",
+			"condition": { "type": "hp_below", "who": "self", "value": 0.5 },
+			"effects": [
+				{ "type": "stat_mod", "target": "self", "stat": "atk", "kind": "mult", "value": 0.35, "turns": 1 }
+			]
+		},
+		"links": ["villanos"],
+		"categories": ["despertados", "aniquiladores"]
+	}
+}

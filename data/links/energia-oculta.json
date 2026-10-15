@@ -1,0 +1,8 @@
+{
+	"id": "energia-oculta",
+	"name": "Energia oculta",
+	"description": "Poderes que no se ven a simple vista. Juntos se retroalimentan.",
+	"effects": [
+		{ "type": "stat_mod", "stat": "atk", "kind": "mult", "value": 0.06 }
+	]
+}

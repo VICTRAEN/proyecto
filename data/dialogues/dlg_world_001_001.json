@@ -1,0 +1,26 @@
+{
+	"id": "dlg_world_001_001",
+	"name": "Torneo de artes marciales",
+	"skippable": true,
+	"skip_label": "SALTAR",
+	"lines": [
+		{
+			"speaker": "Goku",
+			"portrait": "goku",
+			"text": "El ring esta raro hoy. Hay algo detras de las gradas que no es de este mundo.",
+			"background": "battle_plain"
+		},
+		{
+			"speaker": "Goku",
+			"portrait": "goku",
+			"text": "Vigias del umbral. Aparecen donde alguien esta a punto de superarse a si mismo.",
+			"background": "battle_plain"
+		},
+		{
+			"speaker": "Goku",
+			"portrait": "goku",
+			"text": "Pues mejor. Contra mas fuerte sea, mas ganas tengo de pelear.",
+			"background": "battle_plain"
+		}
+	]
+}

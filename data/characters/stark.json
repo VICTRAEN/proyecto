@@ -1,0 +1,59 @@
+{
+	"id": "stark",
+	"name": "Stark",
+	"title": "Guerrero del hacha",
+	"genre": "Fantasia",
+	"rarity": "SR",
+	"type": "STR",
+	"portrait_style": "spiky",
+	"art": {
+		"front": "res://art/characters/stark/front.png",
+		"back": "res://art/characters/stark/back.png",
+		"icon": "res://art/characters/stark/icon.png"
+	},
+	"roles": ["Damage Dealer", "Tank"],
+	"stats": {
+		"max_hp": 1920,
+		"atk": 250,
+		"def": 132,
+		"speed": 140,
+		"crit_rate": 0.13,
+		"dodge_rate": 0.05
+	},
+	"categories": ["fantasy", "guardianes", "heroes", "protagonists"],
+	"links": ["heroes", "inquebrantables", "mentores"],
+	"passive": {
+		"id": "pas_stark_valor",
+		"name": "Valor prestado",
+		"description": "Su defensa sube un 40% al comenzar su turno: protege a los suyos aunque le de miedo.",
+		"trigger": "turn_start",
+		"condition": {},
+		"effects": [
+			{ "type": "stat_mod", "target": "self", "stat": "def", "kind": "mult", "value": 0.4, "turns": 1 }
+		]
+	},
+	"skills": [
+		{
+			"id": "sk_stark_01",
+			"name": "Hachazo",
+			"kind": "basic",
+			"power": 126,
+			"cost": 0,
+			"target": "enemy",
+			"effects": []
+		},
+		{
+			"id": "sk_stark_02",
+			"name": "Corte del guerrero",
+			"description": "Descarga su hacha: baja un 25% la defensa del rival durante 2 turnos.",
+			"kind": "special",
+			"power": 205,
+			"cost": 3,
+			"target": "enemy",
+			"effects": [
+				{ "type": "stat_mod", "target": "enemy", "stat": "def", "kind": "mult", "value": -0.25, "turns": 2 }
+			]
+		}
+	],
+	"transformations": []
+}

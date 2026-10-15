@@ -1,0 +1,55 @@
+{
+	"id": "vigia_alfa",
+	"name": "Vigia Alfa",
+	"title": "Primer centinela",
+	"genre": "Sobrenatural",
+	"rarity": "SR",
+	"type": "STR",
+	"art": {},
+	"portrait_style": "spiky",
+	"roles": ["Damage Dealer", "Tank"],
+	"stats": {
+		"max_hp": 4200,
+		"atk": 205,
+		"def": 140,
+		"speed": 96,
+		"crit_rate": 0.06,
+		"dodge_rate": 0.02
+	},
+	"categories": ["Villains", "Supernatural"],
+	"links": [],
+	"passive": {
+		"id": "pas_alfa_guardia",
+		"name": "Guardia de acero",
+		"description": "Al empezar el combate gana +25% DEF de forma permanente.",
+		"trigger": "battle_start",
+		"condition": {},
+		"effects": [
+			{ "type": "stat_mod", "target": "self", "stat": "def", "kind": "mult", "value": 0.25, "turns": 0 }
+		]
+	},
+	"skills": [
+		{
+			"id": "sk_alfa_01",
+			"name": "Embestida",
+			"kind": "basic",
+			"power": 115,
+			"cost": 0,
+			"target": "enemy",
+			"effects": []
+		},
+		{
+			"id": "sk_alfa_02",
+			"name": "Golpe quebrantador",
+			"description": "Golpe fuerte a un rival y le baja un 30% la defensa durante 2 turnos.",
+			"kind": "special",
+			"power": 150,
+			"cost": 3,
+			"target": "enemy",
+			"effects": [
+				{ "type": "stat_mod", "target": "enemy", "stat": "def", "kind": "mult", "value": -0.3, "turns": 2 }
+			]
+		}
+	],
+	"transformations": []
+}

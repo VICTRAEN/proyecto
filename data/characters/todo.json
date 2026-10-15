@@ -1,0 +1,59 @@
+{
+	"id": "todo",
+	"name": "Aoi Todo",
+	"title": "Idolo de las chicas altas",
+	"genre": "Sobrenatural",
+	"rarity": "SR",
+	"type": "STR",
+	"portrait_style": "spiky",
+	"art": {
+		"front": "res://art/characters/todo/front.png",
+		"back": "res://art/characters/todo/back.png",
+		"icon": "res://art/characters/todo/icon.png"
+	},
+	"roles": ["Damage Dealer", "Tank"],
+	"stats": {
+		"max_hp": 1900,
+		"atk": 252,
+		"def": 126,
+		"speed": 150,
+		"crit_rate": 0.14,
+		"dodge_rate": 0.06
+	},
+	"categories": ["shonen", "supernatural", "school", "tacticos"],
+	"links": ["energia-oculta", "inquebrantables", "rivales"],
+	"passive": {
+		"id": "pas_todo_hermano",
+		"name": "Mi hermano",
+		"description": "Al empezar el combate su ataque sube un 25% de forma permanente si pelea por su gente.",
+		"trigger": "battle_start",
+		"condition": {},
+		"effects": [
+			{ "type": "stat_mod", "target": "self", "stat": "atk", "kind": "mult", "value": 0.25, "turns": 0 }
+		]
+	},
+	"skills": [
+		{
+			"id": "sk_todo_01",
+			"name": "Puñetazo de la mano votiva",
+			"kind": "basic",
+			"power": 124,
+			"cost": 0,
+			"target": "enemy",
+			"effects": []
+		},
+		{
+			"id": "sk_todo_02",
+			"name": "Cambio de lugar",
+			"description": "Intercambia posiciones y golpea: baja un 25% la defensa del rival durante 2 turnos.",
+			"kind": "special",
+			"power": 200,
+			"cost": 3,
+			"target": "enemy",
+			"effects": [
+				{ "type": "stat_mod", "target": "enemy", "stat": "def", "kind": "mult", "value": -0.25, "turns": 2 }
+			]
+		}
+	],
+	"transformations": []
+}

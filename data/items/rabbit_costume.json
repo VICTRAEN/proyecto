@@ -1,0 +1,10 @@
+{
+	"id": "rabbit_costume",
+	"name": "Uniforme de conejita",
+	"description": "El uniforme que Mai no se atreve a mirar dos veces. Lo sueltan los celadores del evento; sirve para despertar formas especiales.",
+	"type": "evolution_material",
+	"icon": "res://art/items/rabbit_costume.png",
+	"rarity": "SR",
+	"usable": false,
+	"obtained_from": "Evento: Sindromes de la pubertad"
+}

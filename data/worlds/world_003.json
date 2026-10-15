@@ -1,0 +1,50 @@
+{
+	"id": "world_003",
+	"name": "BLACK CLOVER",
+	"genre": "Fantasy",
+	"description": "Un reino donde la magia lo decide todo. El umbral ha echado raices en el toro negro.",
+	"background": "stages",
+	"position": { "x": 0.78, "y": 0.34 },
+	"unlock": { "requires_world": "world_002", "requires_levels_completed": 3 },
+	"levels": [
+		{
+			"id": "world_003_01",
+			"name": "El examen de caballeros magicos",
+			"position": { "x": 0.22, "y": 0.16 },
+			"next": "world_003_02",
+			"background": "battle_plain",
+			"dialogue": "dlg_world_003_001",
+			"difficulties": {
+				"normal": { "order": 0, "name": "NORMAL", "enemies": ["vigia_alfa"], "xp_reward": 320, "coin_reward": 125 },
+				"hard": { "order": 1, "name": "DIFICIL", "enemies": ["vigia_alfa", "vigia_beta"], "xp_reward": 480, "coin_reward": 195 },
+				"extreme": { "order": 2, "name": "EXTREMO", "enemies": ["void_warden", "vigia_beta"], "xp_reward": 800, "coin_reward": 340 }
+			}
+		},
+		{
+			"id": "world_003_02",
+			"name": "El toro negro",
+			"position": { "x": 0.52, "y": 0.32 },
+			"next": "world_003_03",
+			"background": "battle_plain",
+			"dialogue": "",
+			"difficulties": {
+				"normal": { "order": 0, "name": "NORMAL", "enemies": ["vigia_alfa", "vigia_beta"], "xp_reward": 360, "coin_reward": 140 },
+				"hard": { "order": 1, "name": "DIFICIL", "enemies": ["void_warden", "vigia_alfa"], "xp_reward": 540, "coin_reward": 220 },
+				"extreme": { "order": 2, "name": "EXTREMO", "enemies": ["void_warden", "vigia_beta", "vigia_alfa"], "xp_reward": 880, "coin_reward": 380 }
+			}
+		},
+		{
+			"id": "world_003_03",
+			"name": "El ojo del amanecer",
+			"position": { "x": 0.76, "y": 0.52 },
+			"next": "",
+			"background": "battle_plain",
+			"dialogue": "",
+			"difficulties": {
+				"normal": { "order": 0, "name": "NORMAL", "enemies": ["void_warden", "vigia_alfa"], "xp_reward": 420, "coin_reward": 165 },
+				"hard": { "order": 1, "name": "DIFICIL", "enemies": ["void_warden", "vigia_alfa", "vigia_beta"], "xp_reward": 620, "coin_reward": 250 },
+				"extreme": { "order": 2, "name": "EXTREMO", "enemies": ["void_warden", "vigia_alfa", "vigia_beta"], "xp_reward": 1100, "coin_reward": 470 }
+			}
+		}
+	]
+}

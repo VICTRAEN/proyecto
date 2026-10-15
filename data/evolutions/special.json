@@ -1,0 +1,45 @@
+{
+	"id": "special_evolutions",
+	"name": "EVOLUCIONES ESPECIALES",
+	"description": "Rutas que no cambian solo de rareza: cambian de PERSONAJE. Cada ruta dice de quien a quien, que nivel pide, que objetos consume y (si hace falta) cuantas veces hay que haber completado un evento. Anadir una ruta es una entrada mas en esta lista: no hay ninguna rama por personaje en el codigo.",
+	"routes": [
+		{
+			"id": "evo_sakuta_mai_to_sakuta",
+			"from": "sakuta_mai",
+			"to": "sakuta",
+			"to_rarity": "UR",
+			"level_required": 100,
+			"coin_cost": 0,
+			"item_cost": [
+				{ "item": "rabbit_costume", "amount": 25 }
+			],
+			"requires_story_level": "",
+			"boss": "boss_sakuta",
+			"dialogue": "dlg_evo_sakuta",
+			"keeps_mutation": true,
+			"transfer_party": true,
+			"consume_from": true,
+			"description": "Los dos despiertan juntos y se convierten en uno solo: Sakuta Azusagawa.",
+			"reward_text": "Cuesta 25 Uniformes de conejita y NO cuesta monedas. Sakuta hereda el nivel, las categorias y los links de los dos, y la mutacion no se pierde."
+		},
+		{
+			"id": "evo_sakuta_to_sakuta_mai_lr",
+			"from": "sakuta",
+			"to": "sakuta_mai_lr",
+			"to_rarity": "LR",
+			"level_required": 0,
+			"coin_cost": 0,
+			"item_cost": [
+				{ "item": "mai_token", "amount": 3 }
+			],
+			"requires_story_level": "",
+			"boss": "boss_sakuta",
+			"dialogue": "dlg_evo_sakuta",
+			"keeps_mutation": true,
+			"transfer_party": true,
+			"consume_from": true,
+			"description": "Con las fichas doradas de Mai en el bolsillo, Sakuta vuelve a ser dos: la forma definitiva.",
+			"reward_text": "Cuesta 3 Fichas doradas de Mai y NO cuesta monedas. Las fichas se consiguen en el Stage 3 del evento; no hace falta repetirlo. La forma LR conserva la mutacion y vuelve a pelear como pareja."
+		}
+	]
+}
