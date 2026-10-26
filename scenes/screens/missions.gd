@@ -40,7 +40,7 @@ func _ready() -> void:
 
 ## Aspecto estatico de la pantalla, con los tokens de la identidad visual.
 func _apply_identity() -> void:
-	VI.style_title(title_label, VI.FONT_BIG)
+	VI.screen_title(title_label, VI.BLUE)
 	VI.style_subtitle(subtitle_label)
 	VI.style_subtitle(counters_label)
 	VI.style_title(feedback, VI.FONT_BODY)
@@ -166,7 +166,7 @@ func _make_card(mission: Dictionary) -> Control:
 	var target := maxi(1, int(mission.get("target", 1)))
 
 	var card := PanelContainer.new()
-	var style: StyleBoxFlat = VI.panel(0.95, true, VI.RADIUS_CARD)
+	var style := VI.panel(0.95, true, VI.RADIUS_CARD)
 	style.set_border_width_all(3 if ready else 2)
 	style.border_color = Color(accent.r, accent.g, accent.b, 0.9 if ready else 0.5)
 	if ready:

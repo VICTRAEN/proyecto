@@ -92,6 +92,15 @@ func setup(data: Dictionary, ally_flag: bool, slot_index: int) -> void:
 	# evolucion) ya resuelto por GameState.character_data; una unidad sin evolucionar
 	# o un enemigo (que no trae el campo) valen 1.0 y no cambian.
 	stats.rarity_mult = maxf(0.01, float(data.get("stat_multiplier", 1.0)))
+	# DUPES: bonus permanente del personaje, como modificadores de origen "dupe".
+	# GameState.character_data los trae ya resueltos; un enemigo no trae ninguno. Se
+	# aplican AQUI, una vez por unidad construida, y add_mod sustituye por origen:
+	# abrir menus o cargar partidas no puede acumularlos.
+	var dupe_mods = data.get("dupe_mods", [])
+	if dupe_mods is Array:
+		for mod in dupe_mods:
+			if mod is Dictionary:
+				stats.add_mod(String(mod["stat"]), String(mod["kind"]), float(mod["value"]), String(mod.get("source", "dupe")))
 	battle = BattleStats.new()
 	hp = max_hp()
 

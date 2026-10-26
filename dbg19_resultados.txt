@@ -1,0 +1,196 @@
+[DBG19] --- comprobaciones del Hito E ---
+[DBG19] recursos de prueba: tema=false video=false
+[DBG19] == UNIDAD: DATOS ==
+[DBG19] el ID david_lucy_duo existe una sola vez -> OK
+[DBG19] el archivo data/characters/david_lucy_duo.json coincide con su id -> OK
+[DBG19] nace como SSR -> OK
+[DBG19] estadisticas en datos (hp, atk, def, speed) -> OK
+[DBG19] tiene tipo, categorias, links, pasiva y habilidades -> OK
+[DBG19] tiene Leader Skill declarada en datos -> OK
+[DBG19] David y Lucy individuales siguen intactos (SR, ids propios) -> OK
+[DBG19] DB arranca sin errores de carga -> OK
+[DBG19] el duo declara forma LR con ultimate en sus datos -> OK
+[DBG19] == EVOLUCION NORMAL SSR > UR > LR ==
+[DBG19] se obtiene en el roster como SSR -> OK
+[DBG19] en SSR no tiene ultimate -> OK
+[DBG19] a nivel 1 no puede evolucionar (nivel insuficiente) -> OK
+[DBG19] SSR>UR por la ruta NORMAL (rules.json): nivel 100 + monedas del sistema -> OK
+[DBG19] evoluciona a UR -> OK
+[DBG19] los recursos se cobran UNA sola vez (SSR>UR) -> OK
+[DBG19] repetir la evolucion no cobra ni cambia nada -> OK
+[DBG19] en UR no tiene ultimate -> OK
+[DBG19] UR trae su multiplicador x1.25 -> OK
+[DBG19] UR>LR pide nivel 100 de nuevo (nivel 1 tras evolucionar) -> OK
+[DBG19] UR>LR por la ruta NORMAL: sin materiales ni rutas especiales -> OK
+[DBG19] evoluciona a LR -> OK
+[DBG19] los recursos se cobran UNA sola vez (UR>LR) -> OK
+[DBG19] LR trae su multiplicador x1.5 y su pasiva propia -> OK
+[DBG19] LR acumula links y categorias de UR y LR -> OK
+[DBG19] LR tiene la ultimate -> OK
+[DBG19] en LR no hay mas evolucion -> OK
+[DBG19] un UR sin forma LR (Gojo) NO puede evolucionar a LR -> OK
+[DBG19] la rareza LR sobrevive a guardar y cargar -> OK
+[DBG19] == BANNER ==
+[DBG19] el banner del duo existe y esta activo -> OK
+[DBG19] el banner no tiene problemas de configuracion -> OK
+[DBG19] las tasas del banner suman exactamente 100% -> OK
+[DBG19] SSR configurado = 15% (sin renormalizar) -> OK
+[DBG19] la tabla efectiva (filas) suma 100% y el duo tiene su 7% (1.0000) -> OK
+[DBG19] el duo esta en el pool de SU banner -> OK
+[DBG19] el duo NO esta en ningun otro banner [] -> OK
+[DBG19] ningun banner puede dar formas LR ni la unidad F2P -> OK
+[DBG19] el pool del banner no contiene UR ni LR; el duo es SSR en datos -> OK
+[DBG19] muestreo: SSR ~15% (0.155) y duo ~7% (0.072) en 20000 tiradas -> OK
+[DBG19] x10 real: 10 resultados y cualquier duo sale como SSR -> OK
+[DBG19] invocar en un banner inexistente falla sin cobrar -> OK
+[DBG19] == API DE ESTADO: SECUENCIA PENDIENTE Y BANNER ==
+[DBG19] summon(x10, stage_reveal) cobra 90 una sola vez y fija 10 resultados -> OK
+[DBG19] con una secuencia pendiente no se puede invocar otra vez (sin cobro) -> OK
+[DBG19] reveal_advance pasa al resultado 2 sin re-tirar -> OK
+[DBG19] la secuencia pendiente sobrevive a guardar/cargar con los mismos resultados y el indice -> OK
+[DBG19] reveal_finish devuelve el resumen y limpia la secuencia -> OK
+[DBG19] un pendiente incoherente se descarta -> OK
+[DBG19] enabled:false oculta el banner y rechaza invocar sin cobrar -> OK
+[DBG19] la tasa propia del duo dentro del SSR ronda el 7/15 (2815/6000) -> OK
+[DBG19] los banners genericos siguen validos y sin tasas propias -> OK
+[DBG19] == REVELADO INDIVIDUAL x10 ==
+[DBG19] x10: el coste se cobra UNA vez nada mas pulsar (antes de revelar) -> OK
+[DBG19] x10: los 10 resultados quedan FIJADOS antes del revelado -> OK
+[DBG19] x10: primero la animacion de invocacion (no hay cartas todavia) -> OK
+[DBG19] x10: no se pueden iniciar otras invocaciones durante la secuencia -> OK
+[DBG19] x10: los botones de invocar estan bloqueados -> OK
+[DBG19] tras la animacion aparece el revelado a pantalla completa -> OK
+[DBG19] revelado: el rectangulo cubre toda la pantalla -> OK
+[DBG19] revelado: contador 1/10 -> OK
+[DBG19] revelado: solo UNA carta en pantalla -> OK
+[DBG19] revelado: se muestra el primer resultado fijado -> OK
+[DBG19] revelado: el contador avanza 2/10 ... 10/10 sin saltarse ninguno -> OK
+[DBG19] revelado: cada pantalla muestra el resultado fijado en su posicion (sin volver a sortear) -> OK
+[DBG19] revelado: siempre una sola carta a la vez -> OK
+[DBG19] revelado: el resumen NO se ve antes de los diez -> OK
+[DBG19] avanzar no ha tocado gemas, roster ni duplicados -> OK
+[DBG19] tras el 10/10 aparece la pantalla final con opciones -> OK
+[DBG19] el resumen sigue sin mostrarse hasta pedirlo -> OK
+[DBG19] el resumen muestra las 10 unidades (con todas visibles) -> OK
+[DBG19] VOLVER AL BANNER cierra el revelado y libera la secuencia -> OK
+[DBG19] los botones vuelven a estar disponibles -> OK
+[DBG19] el coste de la x10 se cobro una sola vez en total -> OK
+[DBG19] el guardado no conserva secuencia pendiente tras terminar -> OK
+[DBG19] == REVELADO x1 ==
+[DBG19] x1: concede exactamente un resultado y cobra una vez -> OK
+[DBG19] x1: revelado a pantalla completa -> OK
+[DBG19] x1: no hay contador 1/1 -> OK
+[DBG19] x1: carta con nombre, rareza y retrato -> OK
+[DBG19] x1: tocar cierra el revelado y vuelve al banner sin volver a cobrar -> OK
+[DBG19] == DUPLICADOS Y TECLADO ==
+[DBG19] un repetido suma duplicado y no duplica el roster -> OK
+[DBG19] secuencia con repetidos: se abre -> OK
+[DBG19] un repetido se anuncia como REPETIDO -> OK
+[DBG19] Enter avanza al siguiente (2/3) -> OK
+[DBG19] Espacio avanza al siguiente (3/3) -> OK
+[DBG19] un clic en el ultimo resultado lleva a la pantalla final -> OK
+[DBG19] la capa se cierra y deja la pantalla utilizable -> OK
+[DBG19] == CINEMATICA DEL DUO (video=false, tema=false) ==
+[DBG19] el duo abre la secuencia especial ANTES de revelar su carta -> OK
+[DBG19] todavia no se ha mostrado ninguna carta (["cinematic_start", "cinematic_fallback"]) -> OK
+[DBG19] la secuencia usa video o, si falta/falla, la alternativa -> OK
+[DBG19] sin archivo de video: no hay pantalla negra, entra la alternativa -> OK
+[DBG19] el boton SALTAR existe -> OK
+[DBG19] la cinematica no ha cobrado ni concedido nada -> OK
+[DBG19] sin tema: sigue la musica de la pantalla (no se silencia) -> OK
+[DBG19] saltar pasa directo al revelado del duo (sin perder la unidad) -> OK
+[DBG19] la cinematica no se repite por varios clics -> OK
+[DBG19] la carta del duo es la especial (cinta de unidad insignia) -> OK
+[DBG19] saltar no ha cobrado ni concedido nada -> OK
+[DBG19] la cinematica queda marcada como vista en la secuencia -> OK
+[DBG19] tras la carta del duo continua con el siguiente resultado (2/2) -> OK
+[DBG19] al terminar la secuencia se recupera la musica de la pantalla (no el tema) -> OK
+[DBG19] x10 con duo en 2a posicion: cinematica completa al llegar a el -> OK
+[DBG19] al terminar la alternativa pasa sola al revelado de la carta -> OK
+[DBG19] la segunda copia NO repite la cinematica completa (revelado corto) -> OK
+[DBG19] la secuencia termina -> OK
+[DBG19] un archivo de video invalido no rompe: entra la alternativa -> OK
+[DBG19] y el revelado llega igualmente -> OK
+[DBG19] == PERSISTENCIA DE LA SECUENCIA ==
+[DBG19] la secuencia pendiente se recupera tras cerrar y abrir (indice 3/4) -> OK
+[DBG19] al volver a la pantalla se retoma la secuencia -> OK
+[DBG19] se reanuda en 3/4 con el mismo personaje y sin cobrar ni conceder (3/4 frieren 100000/100000) -> OK
+[DBG19] mientras hay secuencia no se puede invocar -> OK
+[DBG19] un guardado de secuencia corrupto se descarta sin efectos -> OK
+[DBG19] un indice fuera de rango se descarta -> OK
+[DBG19] == ULTIMATE: DATOS Y DISPONIBILIDAD ==
+[DBG19] en SSR no hay ultimate -> OK
+[DBG19] en UR no hay ultimate -> OK
+[DBG19] en LR hay ultimate -> OK
+[DBG19] el nombre vive en datos: EDGERUNNERS: ULTIMATE -> OK
+[DBG19] efectos parametrizados en datos: ATK +40%, DEF +25% aliados, DEF -20% rivales (2 turnos) -> OK
+[DBG19] es de area (todos los rivales) y mucho mas potente que el especial -> OK
+[DBG19] el coste en SP viene de datos y se muestra -> OK
+[DBG19] un enemigo no tiene ultimate -> OK
+[DBG19] == ULTIMATE: MOTOR DE COMBATE ==
+[DBG19] SSR: can_use('ultimate') es falso -> OK
+[DBG19] LR sin SP suficiente: no disponible -> OK
+[DBG19] LR con SP: disponible -> OK
+[DBG19] la ultimate se resuelve y emite ultimate_started una vez -> OK
+[DBG19] gasta su coste en SP -> OK
+[DBG19] golpea a TODOS los enemigos vivos (area) -> OK
+[DBG19] aliados: ATK +40% y DEF +25% (444>622 / 192>240) -> OK
+[DBG19] rivales: DEF -20% -> OK
+[DBG19] no se puede volver a usar (una vez por combate) -> OK
+[DBG19] forzar una segunda ultimate se degrada a ataque basico: sin SP gastado de mas ni buffs duplicados (1, 621.6/621.6, sp 3/3) -> OK
+[DBG19] cambiar de turno o ronda no la rehabilita -> OK
+[DBG19] en el SIGUIENTE combate vuelve a estar disponible -> OK
+[DBG19] los buffs no se acumulan aunque se reaplique el mismo origen -> OK
+[DBG19] si la ultimate elimina al ultimo enemigo el combate se cierra con victoria -> OK
+[DBG19] tras la victoria no se procesa ningun turno mas -> OK
+[DBG19] terminado el combate la ultimate no se puede relanzar -> OK
+[DBG19] == ULTIMATE: COMBATE REAL (UI, MUSICA, RESULTADOS) ==
+[DBG19] se abre el combate con el duo LR -> OK
+[DBG19] antes de la ultimate suena la musica de combate -> OK
+[DBG19] el boton de la ultimate existe y se ve en el turno del duo LR (vis=true dis=false awaiting=true actor=david_lucy_duo) -> OK
+[DBG19] el boton muestra nombre, coste en SP y 'una vez' -> OK
+[DBG19] el boton de ESPECIAL sigue siendo el especial normal -> OK
+[DBG19] pulsar la ultimate lanza la presentacion cinematografica -> OK
+[DBG19] la ultimate cuenta como usada -> OK
+[DBG19] sin archivo del tema el combate sigue con su musica habitual -> OK
+[DBG19] tocar la presentacion la salta y devuelve los controles -> OK
+[DBG19] el combate termina y aparece el resultado -> OK
+[DBG19] en la pantalla de resultados no se puede volver a usar la ultimate -> OK
+[DBG19] al ganar se suelta el tema especial -> OK
+[DBG19] la musica de RESULTADOS recupera la prioridad -> OK
+[DBG19] resultados: una sola pista de musica sonando -> OK
+[DBG19] al volver al menu suena la musica normal (no el tema, no resultados) -> OK
+[DBG19] derrota: la musica de resultados recupera la prioridad y no queda el tema -> OK
+[DBG19] cierre anticipado del combate: vuelve la musica del menu y no queda el tema -> OK
+[DBG19] == AUDIO DEL TEMA ESPECIAL ==
+[DBG19] el tema esta en el catalogo (musica) con su ruta documentada -> OK
+[DBG19] los archivos de musica existentes no se han reemplazado (menu/battle/history/events/results) -> OK
+[DBG19] en el menu NO suena el tema -> OK
+[DBG19] sin archivo: override_start devuelve false y no cambia la musica -> OK
+[DBG19] el archivo ausente figura como pendiente en missing_user_supplied (aportado por el usuario) sin romper nada, y NO cuenta como fallo del catalogo -> OK
+[DBG19] sigue sonando solo una pista de musica -> OK
+[DBG19] == DEVELOPER TOOLS ==
+[DBG19] en esta ejecucion (depuracion) las herramientas estan habilitadas -> OK
+[DBG19] +1.000 monedas modifica el saldo REAL -> OK
+[DBG19] +10.000 monedas -> OK
+[DBG19] gemas (la unica moneda premium real) se suman -> OK
+[DBG19] materiales de evolucion -> OK
+[DBG19] uniformes de conejita y fichas de Mai (inventario real) -> OK
+[DBG19] no hay monedas duplicadas ni tickets inventados (solo recursos reales) -> OK
+[DBG19] cantidades negativas, cero o invalidas se rechazan sin cambiar nada -> OK
+[DBG19] un recurso desconocido se rechaza -> OK
+[DBG19] una cantidad escrita como texto valida se acepta (campo propio) -> OK
+[DBG19] los saldos se conservan tras guardar y cargar -> OK
+[DBG19] anadir al duo funciona y entra como SSR -> OK
+[DBG19] pulsar de nuevo NO lo duplica -> OK
+[DBG19] un id inexistente se rechaza -> OK
+[DBG19] anadir un personaje no cambia las tasas del banner -> OK
+[DBG19] el panel DEVELOPER TOOLS — TEMPORAL esta en Ajustes -> OK
+[DBG19] el boton rapido +1.000 concede una sola vez aunque se pulse varias veces seguidas -> OK
+[DBG19] el panel muestra el saldo resultante -> OK
+[DBG19] el campo propio rechaza negativos -> OK
+[DBG19] el campo propio suma la cantidad escrita -> OK
+[DBG19] distribucion: las acciones estan DENEGADAS y no modifican nada -> OK
+[DBG19] distribucion: el panel NO se monta en Ajustes -> OK
+[DBG19] al quitar la simulacion vuelve a estar habilitado -> OK
+[DBG19] --- fin: 179 comprobaciones, 0 FALLO(S) ---

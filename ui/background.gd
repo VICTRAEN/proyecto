@@ -22,7 +22,7 @@ const EXTS := [".png", ".jpg", ".jpeg", ".webp"]
 @export var slot := ""
 ## Oscurecido que se pinta encima de la imagen para que la interfaz se lea
 ## siempre. 0 = sin oscurecer; 0.42 = el valor por defecto.
-@export_range(0.0, 0.85, 0.01) var scrim := 0.42
+@export_range(0.0, 0.85, 0.01) var scrim := 0.20
 
 ## Colores del fondo provisional, por slot. top/mid/low son el cielo, glow el
 ## punto de luz y hill_a/hill_b las dos siluetas del terreno.
@@ -109,6 +109,24 @@ const PALETTES := {
 		"hill_a": Color(0.10, 0.11, 0.20), "hill_b": Color(0.05, 0.05, 0.12),
 	},
 }
+## Paletas de respaldo de las pantallas nuevas (si falta su imagen de fondo).
+const EXTRA_PALETTES := {
+	"summon": {
+		"top": Color(0.08, 0.04, 0.22), "mid": Color(0.36, 0.14, 0.52),
+		"low": Color(0.80, 0.34, 0.74), "glow": Color(1.0, 0.76, 0.95),
+		"hill_a": Color(0.10, 0.05, 0.22), "hill_b": Color(0.05, 0.03, 0.13),
+	},
+	"evolution": {
+		"top": Color(0.05, 0.07, 0.22), "mid": Color(0.20, 0.24, 0.55),
+		"low": Color(0.46, 0.70, 0.92), "glow": Color(0.90, 0.98, 1.0),
+		"hill_a": Color(0.07, 0.08, 0.20), "hill_b": Color(0.04, 0.05, 0.12),
+	},
+	"settings": {
+		"top": Color(0.07, 0.06, 0.20), "mid": Color(0.20, 0.15, 0.40),
+		"low": Color(0.38, 0.30, 0.58), "glow": Color(0.80, 0.78, 1.0),
+		"hill_a": Color(0.08, 0.07, 0.18), "hill_b": Color(0.05, 0.04, 0.12),
+	},
+}
 ## Escenarios de combate provisionales. El stage los pide por nombre con su
 ## campo "background" del JSON, asi que dos batallas pueden verse distintas
 ## antes de que exista ningun PNG.
@@ -133,7 +151,25 @@ const DEFAULT_PALETTE := {
 	"hill_a": Color(0.08, 0.08, 0.16), "hill_b": Color(0.05, 0.05, 0.11),
 }
 
+## Particulas ambientales por fondo: [modo, cantidad, color 1, color 2]. Solo es
+## adorno (ui/ambient_fx.gd); un slot que no este aqui no lleva particulas.
+const AMBIENT := {
+	"menu": ["motes", 22, Color(1.0, 0.86, 0.66), Color(1.0, 0.50, 0.85)],
+	"collection": ["stars", 18, Color(0.85, 0.80, 1.0), Color(0.50, 0.95, 1.0)],
+	"summon": ["motes", 26, Color(0.90, 0.75, 1.0), Color(1.0, 0.55, 0.90)],
+	"team": ["motes", 14, Color(0.55, 0.85, 1.0), Color(1.0, 0.50, 0.85)],
+	"events": ["embers", 20, Color(1.0, 0.82, 0.55), Color(1.0, 0.55, 0.80)],
+	"shop": ["embers", 18, Color(1.0, 0.80, 0.45), Color(1.0, 0.60, 0.35)],
+	"results": ["embers", 24, Color(1.0, 0.88, 0.55), Color(1.0, 0.70, 0.40)],
+	"history": ["stars", 18, Color(0.80, 0.85, 1.0), Color(1.0, 0.85, 0.60)],
+	"mutation": ["motes", 24, Color(0.60, 1.0, 0.85), Color(0.40, 0.95, 1.0)],
+	"evolution": ["embers", 26, Color(1.0, 0.88, 0.60), Color(0.55, 0.90, 1.0)],
+	"tower": ["stars", 16, Color(0.85, 0.80, 1.0), Color(1.0, 0.60, 0.85)],
+	"inventory": ["motes", 14, Color(1.0, 0.85, 0.55), Color(0.80, 0.60, 1.0)],
+}
+
 var texture: Texture2D = null
+var _ambient: Control = null
 
 
 func _ready() -> void:
@@ -153,7 +189,23 @@ func show_slot(new_slot: String) -> void:
 ## nuevo, la siguiente vez que se abra la pantalla se usa.
 func reload() -> void:
 	texture = load_texture(slot)
+	_update_ambient()
 	queue_redraw()
+
+
+## Crea, cambia o quita las particulas ambientales segun el slot actual.
+func _update_ambient() -> void:
+	var preset = AMBIENT.get(slot, null)
+	if preset == null:
+		if _ambient != null:
+			_ambient.queue_free()
+			_ambient = null
+		return
+	if _ambient == null:
+		_ambient = load("res://ui/ambient_fx.gd").new()
+		_ambient.name = "Ambient"
+		add_child(_ambient)
+	_ambient.call("setup", String(preset[0]), int(preset[1]), preset[2], preset[3])
 
 
 ## Imagen del slot, o null si todavia no existe el archivo.
@@ -217,7 +269,7 @@ func _draw_cover(w: float, h: float) -> void:
 ## siluetas de terreno. Es barato (solo se redibuja al cambiar de tamano) y da
 ## el tono de cada pantalla sin necesitar arte.
 func _draw_placeholder(w: float, h: float) -> void:
-	var pal: Dictionary = PALETTES.get(slot, DEFAULT_PALETTE)
+	var pal: Dictionary = PALETTES.get(slot, EXTRA_PALETTES.get(slot, DEFAULT_PALETTE))
 	var top: Color = pal["top"]
 	var mid: Color = pal["mid"]
 	var low: Color = pal["low"]

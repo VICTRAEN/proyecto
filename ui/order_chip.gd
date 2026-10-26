@@ -29,7 +29,7 @@ var _last_state := ""
 @onready var name_label: Label = $VBox/NameLabel
 @onready var marker: Label = $VBox/Marker
 
-var _frame := StyleBoxFlat.new()
+var _frame = VisualIdentity.chip(Color(0.5, 0.5, 0.7))
 
 
 func _ready() -> void:

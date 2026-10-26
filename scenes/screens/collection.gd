@@ -5,6 +5,8 @@ const VI := preload("res://ui/visual_identity.gd")
 const ROSTER_CARD := preload("res://ui/roster_card.tscn")
 const UnitInfoPanel := preload("res://ui/unit_info_panel.gd")
 const CardTile := preload("res://ui/card_tile.gd")
+const TitleBanner := preload("res://ui/title_banner.gd")
+const ThemeFactory := preload("res://ui/theme_factory.gd")
 
 ## COLECCION: los personajes que TIENE el jugador, con filtros y ordenacion.
 ##
@@ -39,7 +41,6 @@ const SORT_TYPE := 3
 
 @onready var grid: GridContainer = $Margin/Main/Scroll/Grid
 @onready var scroll: ScrollContainer = $Margin/Main/Scroll
-@onready var title_label: Label = $Margin/Main/Header/Title
 @onready var count_label: Label = $Margin/Main/Header/Count
 @onready var filters_panel: PanelContainer = $Margin/Main/FiltersPanel
 @onready var filter_label: Label = $Margin/Main/FiltersPanel/FiltersBox/FilterLabel
@@ -61,6 +62,7 @@ var _category_filter := ALL
 ## Nombres visibles de categoria por id, para no ensenar nunca el id crudo.
 var _category_names: Dictionary = {}
 var _sort_mode := SORT_RARITY
+var _progress: ProgressBar = null
 
 
 func _ready() -> void:
@@ -80,14 +82,27 @@ func _ready() -> void:
 ## tamanos salen de la identidad visual; aqui solo se decide que papel juega
 ## cada nodo.
 func _apply_identity() -> void:
-	VI.style_title(title_label, VI.FONT_BIG)
+	# CABECERA: placa violeta con el titulo, el contador y una barra de progreso de
+	# la coleccion (cuanto llevas de cuanto hay).
+	var header: VBoxContainer = count_label.get_parent()
+	var banner := TitleBanner.make("COLECCION", "", VI.VIOLET, VI.FONT_BIG)
+	banner.name = "Title"
+	header.add_child(banner)
+	header.move_child(banner, 0)
 	VI.style_subtitle(count_label)
-	filters_panel.add_theme_stylebox_override("panel", VI.panel(0.88, true))
+	count_label.add_theme_font_size_override("font_size", VI.FONT_SMALL)
+	_progress = ProgressBar.new()
+	_progress.name = "CollectionProgress"
+	_progress.show_percentage = false
+	_progress.custom_minimum_size = Vector2(0, 14)
+	_progress.add_theme_stylebox_override("fill", ThemeFactory.bar_fill(VI.GOLD))
+	header.add_child(_progress)
+	filters_panel.add_theme_stylebox_override("panel", VI.panel(0.80, true))
 	for label in [filter_label, type_title, category_title, sort_label]:
 		VI.style_title(label, VI.FONT_SMALL)
 	# La rejilla vive en un contenedor propio para que las tarjetas no se mezclen
 	# con el fondo de la pantalla.
-	scroll.add_theme_stylebox_override("panel", VI.panel(0.55, false))
+	scroll.add_theme_stylebox_override("panel", VI.panel(0.28, false))
 	VI.tint_button(sort_option, VI.BLUE)
 	VI.tint_button(back_button, VI.BLUE)
 	back_button.custom_minimum_size = Vector2(0, VI.TOUCH)
@@ -231,6 +246,10 @@ func _build() -> void:
 	else:
 		count_label.text = "%d de %d mostrados  -  %d / %d obtenidos" % [
 			shown.size(), all.size(), GameState.owned_count(), GameState.total_count()]
+
+	if _progress != null:
+		_progress.max_value = maxi(1, GameState.total_count())
+		_progress.value = GameState.owned_count()
 
 	for data in shown:
 		var card: PanelContainer = CardTile.new()

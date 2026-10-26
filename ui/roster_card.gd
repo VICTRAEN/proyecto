@@ -39,7 +39,7 @@ signal pressed(data: Dictionary)
 
 var data: Dictionary = {}
 var _selected := false
-var _frame := StyleBoxFlat.new()
+var _frame: StyleBox = null
 
 @onready var stripe: ColorRect = $HBox/RarityStripe
 @onready var portrait: Portrait = $HBox/Portrait

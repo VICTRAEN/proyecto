@@ -1,8 +1,11 @@
 extends Control
-## Ilustracion de un articulo de tienda dibujada por codigo (no hay arte de
-## objetos todavia). Tipos: coins, gems, materials, item. El personaje usa su
+## Ilustracion de un articulo de tienda. Usa los iconos semi-3D de
+## res://art/ui/icons/ (provisionales, reemplazables por arte final) y, si falta
+## alguno, el dibujo por codigo de siempre. Tipos: coins, gems, materials, item. El personaje usa su
 ## Portrait, no esto. Cantidad de piezas segun "amount" para que 5000 monedas se
 ## vean como un monton mayor que 1000.
+
+const VI := preload("res://ui/visual_identity.gd")
 
 var kind := "coins"
 var amount := 1
@@ -18,7 +21,58 @@ func setup(new_kind: String, new_amount: int, new_tint: Color) -> void:
 
 func _draw() -> void:
 	var c := size / 2.0
-	draw_circle(c, minf(size.x, size.y) * 0.46, Color(tint.r, tint.g, tint.b, 0.13))
+	# Halo: luz suave del color del articulo detras del icono (no un disco plano).
+	var radius := minf(size.x, size.y) * 0.52
+	for i in 6:
+		var k := float(i) / 6.0
+		draw_circle(c, radius * (1.0 - k * 0.8), Color(tint.r, tint.g, tint.b, 0.045 + 0.025 * k))
+	var icon_name := _icon_for(kind)
+	var tex := VI.icon(icon_name)
+	if tex == null:
+		_draw_fallback(c)
+		return
+	var base := minf(size.y * 0.92, 104.0)
+	match kind:
+		"coins":
+			var piles := 1 if amount < 1500 else (3 if amount < 10000 else 5)
+			_fan(tex, c, piles, base)
+		"gems":
+			_fan(tex, c, 1 if amount < 300 else 3, base)
+		_:
+			_put(tex, c, base)
+
+
+## Icono segun el tipo de articulo.
+func _icon_for(item_kind: String) -> String:
+	match item_kind:
+		"coins":
+			return "coin"
+		"gems":
+			return "gem"
+		"materials":
+			return "inventory"
+	return "crystal"
+
+
+## n iconos en abanico: el del centro delante y mas grande.
+func _fan(tex: Texture2D, c: Vector2, n: int, base: float) -> void:
+	var mid := (n - 1) / 2.0
+	var order := range(n)
+	order.sort_custom(func(a, b): return absf(a - mid) > absf(b - mid))
+	for i in order:
+		var d := float(i) - mid
+		var scale := 1.0 - absf(d) * 0.13
+		var p := c + Vector2(d * base * 0.46, absf(d) * base * 0.08)
+		_put(tex, p, base * scale)
+
+
+func _put(tex: Texture2D, center: Vector2, px: float) -> void:
+	# Sombra de contacto bajo el icono para que no flote sobre el halo.
+	draw_circle(center + Vector2(0, px * 0.40), px * 0.30, Color(0, 0, 0, 0.18))
+	draw_texture_rect(tex, Rect2(center - Vector2(px, px) * 0.5, Vector2(px, px)), false)
+
+
+func _draw_fallback(c: Vector2) -> void:
 	match kind:
 		"coins":
 			var piles := 1 if amount < 1500 else (3 if amount < 10000 else 5)

@@ -47,7 +47,7 @@ func _ready() -> void:
 ## Aspecto estatico de la pantalla: titulo, nota de apoyo y los tres botones del
 ## pie con su papel (volver, equipo, comenzar).
 func _apply_identity() -> void:
-	VI.style_title(title_label, VI.FONT_BIG)
+	VI.screen_title(title_label, VI.GOLD)
 	VI.style_subtitle(subtitle_label)
 	VI.style_note(team_hint)
 	VI.tint_button(back_button, VI.BLUE)

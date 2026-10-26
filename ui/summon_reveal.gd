@@ -276,14 +276,7 @@ func _present_card() -> void:
 	frame.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var style := VI.rarity_card(rarity, false, true)
 	if special:
-		style = StyleBoxFlat.new()
-		style.bg_color = Color(0.03, 0.04, 0.09, 0.96)
-		style.set_corner_radius_all(10)
-		style.set_border_width_all(7)
-		style.border_color = tint
-		style.shadow_color = Color(tint2.r, tint2.g, tint2.b, 0.65)
-		style.shadow_size = 34
-		style.set_content_margin_all(10)
+		style = VI.special_card(tint, tint2)
 	frame.add_theme_stylebox_override("panel", style)
 	col.add_child(frame)
 	var art := Portrait.new()

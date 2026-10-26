@@ -4,6 +4,7 @@ const CombatUnit := preload("res://core/combat_unit.gd")
 const Portrait := preload("res://ui/portrait.gd")
 const TypeColors := preload("res://ui/type_colors.gd")
 const VisualIdentity := preload("res://ui/visual_identity.gd")
+const ThemeFactory := preload("res://ui/theme_factory.gd")
 
 ## Tarjeta de una unidad en combate. Solo pinta; no decide nada.
 ##
@@ -35,7 +36,7 @@ var compact := false
 @onready var hp_bar: ProgressBar = $VBox/HpBar
 
 var _pips: Array = []
-var _hp_fill := StyleBoxFlat.new()
+var _hp_band := -1
 var _hp_tween: Tween = null
 var _is_active := false
 var _inspected := false
@@ -55,7 +56,6 @@ func _ready() -> void:
 		pip.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		sp_row.add_child(pip)
 		_pips.append(pip)
-	hp_bar.add_theme_stylebox_override("fill", _hp_fill)
 	_ignore_mouse_on_children(self)
 
 
@@ -138,12 +138,12 @@ func refresh() -> void:
 	hp_label.text = "%d / %d" % [int(round(unit.hp)), int(round(maximum))]
 
 	var ratio := unit.hp_ratio()
-	if ratio > 0.5:
-		_hp_fill.bg_color = VisualIdentity.GREEN
-	elif ratio > 0.25:
-		_hp_fill.bg_color = VisualIdentity.GOLD
-	else:
-		_hp_fill.bg_color = VisualIdentity.RED
+	# Barra con brillo: el color solo se reconstruye al cambiar de tramo de vida.
+	var band := 2 if ratio > 0.5 else (1 if ratio > 0.25 else 0)
+	if band != _hp_band:
+		_hp_band = band
+		var hp_color: Color = [VisualIdentity.RED, VisualIdentity.GOLD, VisualIdentity.GREEN][band]
+		hp_bar.add_theme_stylebox_override("fill", ThemeFactory.bar_fill(hp_color))
 
 	for i in _pips.size():
 		var pip: Panel = _pips[i]

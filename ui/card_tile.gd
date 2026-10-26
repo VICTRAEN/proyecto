@@ -17,7 +17,7 @@ const TypeColors := preload("res://ui/type_colors.gd")
 signal pressed(data: Dictionary)
 
 var data: Dictionary = {}
-var _frame: StyleBoxFlat = null
+var _frame = null
 var _glow_tween: Tween = null
 ## Alto del arte: la coleccion usa 250; el equipo, mas pequeno en la lista.
 var art_height := 250.0

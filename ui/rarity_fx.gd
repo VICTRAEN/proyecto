@@ -49,11 +49,19 @@ func _draw() -> void:
 	for s in _seeds:
 		var tw := 0.5 + 0.5 * sin(_t * (2.4 if rarity == "LR" else 1.6) + s.z)
 		var p := Vector2(s.x * size.x, s.y * size.y)
-		var rad := (5.0 + 9.0 * tw) * (1.3 if rarity == "LR" else 1.0)
-		var sc := Color(1, 1, 1, 0.25 + 0.7 * tw) if rarity == "LR" else Color(col.r, col.g, col.b, 0.2 + 0.6 * tw)
-		draw_line(p - Vector2(rad, 0), p + Vector2(rad, 0), sc, 2.0)
-		draw_line(p - Vector2(0, rad), p + Vector2(0, rad), sc, 2.0)
-		draw_circle(p, 2.0, sc)
+		var rad := (4.0 + 8.0 * tw) * (1.25 if rarity == "LR" else 1.0)
+		var tint: Color = Color(1.0, 0.97, 0.88) if rarity == "LR" else col.lerp(Color.WHITE, 0.45)
+		_star(p, rad, Color(tint.r, tint.g, tint.b, 0.20 + 0.75 * tw))
+
+
+## Destello de cuatro puntas: dos rombos finos y un halo suave en el centro. Mas
+## fino y con luz que una cruz de lineas, que se leia como un "+" suelto.
+func _star(p: Vector2, rad: float, c: Color) -> void:
+	var w := rad * 0.16
+	draw_colored_polygon(PackedVector2Array([p + Vector2(-rad, 0), p + Vector2(0, -w), p + Vector2(rad, 0), p + Vector2(0, w)]), c)
+	draw_colored_polygon(PackedVector2Array([p + Vector2(0, -rad), p + Vector2(w, 0), p + Vector2(0, rad), p + Vector2(-w, 0)]), c)
+	draw_circle(p, rad * 0.32, Color(c.r, c.g, c.b, c.a * 0.35))
+	draw_circle(p, rad * 0.14, Color(1, 1, 1, c.a))
 
 
 ## Barrido diagonal de luz: cruza la carta cada `period` segundos.

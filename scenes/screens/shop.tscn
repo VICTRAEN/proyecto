@@ -51,14 +51,6 @@ size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 40
 text = "TIENDA"
 
-[node name="Wallet" type="Label" parent="Margin/Main/Header"]
-layout_mode = 2
-size_flags_vertical = 8
-theme_override_colors/font_color = Color(1, 0.784, 0.337, 1)
-theme_override_font_sizes/font_size = 24
-text = "0 MONEDAS    0 GEMAS"
-horizontal_alignment = 2
-
 [node name="Subtitle" type="Label" parent="Margin/Main"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 18

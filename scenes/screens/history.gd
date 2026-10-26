@@ -30,7 +30,7 @@ func _ready() -> void:
 
 ## Aspecto estatico de la pantalla, con los tokens de la identidad visual.
 func _apply_identity() -> void:
-	VI.style_title(title_label, VI.FONT_BIG)
+	VI.screen_title(title_label, VI.VIOLET)
 	VI.style_subtitle(subtitle_label)
 	VI.tint_button(back_button, VI.BLUE)
 	back_button.custom_minimum_size = Vector2(0.0, VI.TOUCH)

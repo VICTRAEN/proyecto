@@ -842,14 +842,17 @@ func _build_active_frame() -> void:
 	_active_frame.name = "ActiveFrame"
 	_active_frame.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_active_frame.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var style := StyleBoxFlat.new()
-	style.set_corner_radius_all(VisualIdentity.RADIUS_PANEL)
-	style.set_border_width_all(4)
-	style.border_color = Color(GOLD.r, GOLD.g, GOLD.b, 0.95)
-	style.bg_color = Color(GOLD.r, GOLD.g, GOLD.b, 0.10)
-	style.shadow_color = Color(GOLD.r, GOLD.g, GOLD.b, 0.45)
-	style.shadow_size = 18
-	style.shadow_offset = Vector2.ZERO
+	var style := VisualIdentity.Frame.build({
+		"fill_top": Color(GOLD.r, GOLD.g, GOLD.b, 0.10),
+		"fill_bottom": Color(GOLD.r, GOLD.g, GOLD.b, 0.04),
+		"metal_light": VisualIdentity.METAL_GOLD_LIGHT,
+		"metal_dark": VisualIdentity.METAL_GOLD_DARK,
+		"edge_width": 4.0, "cut": 12.0, "studs": true,
+		"stud_color": VisualIdentity.GOLD_LIGHT,
+		"glow": Color(GOLD.r, GOLD.g, GOLD.b, 0.55), "glow_size": 18.0,
+		"shadow": 0.0,
+		"margin_x": 0.0, "margin_y": 0.0,
+	})
 	_active_frame.add_theme_stylebox_override("panel", style)
 	active_portrait.add_child(_active_frame)
 	_active_frame.visible = false

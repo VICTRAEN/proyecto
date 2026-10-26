@@ -586,6 +586,68 @@ API: `GameState.can_special_evolve(id)` (devuelve `ok`, `reason` en texto de
 jugador, la ruta, el coste, los objetos que faltan, el jefe y el dialogo) y
 `GameState.evolve_special(id)`, que solo actua si `ok` es cierto.
 
+## Dupes (`data/dupes/rules.json`)
+
+Las copias REPETIDAS de un personaje se gastan en SU ficha (pestana DUPES) para
+mejorarlo para siempre, de Dupe 0 a Dupe 5. No son nivel de combate, ni rareza, ni
+evolucion: son un eje aparte. Todo numero vive en este archivo.
+
+| Campo | Tipo | Notas |
+|---|---|---|
+| max_level | int | Dupe maximo (hoy 5). |
+| copies_per_level | array | Coste en copias de cada mejora: `[c0->1, c1->2, ...]`. Tiene `max_level` entradas, todas >= 1. |
+| levels | array | `max_level + 1` filas. La fila N son los bonus TOTALES del Dupe N (no se suman a los anteriores). La fila 0 es `{}`. |
+| overflow.coins_per_copy | int | Monedas por cada copia SOBRANTE (la que ya no puede mejorar al personaje). 0 o quitar el bloque desactiva la conversion. |
+| reserved | string | Hueco documentado para mejoras de habilidades/efectos. No se interpreta todavia. |
+
+Cada fila de `levels` es `{ "estadistica": valor }`. Las estadisticas validas son las de
+`StatBlock.LABELS` (`max_hp`, `atk`, `def`, `speed`, `crit_rate`, `dodge_rate`...). Un
+valor de vida/ataque/defensa/velocidad es un MULTIPLICADOR relativo a la base (`0.03` =
++3 %); el de una probabilidad (critico, esquiva) se SUMA en puntos (`0.03` = +3 puntos).
+
+Tabla actual (copias acumuladas = nivel, porque cada mejora cuesta 1):
+
+| Dupe | HP / ATK / DEF | Critico |
+|---|---|---|
+| 1 | +3 % | |
+| 2 | +6 % | |
+| 3 | +9 % | |
+| 4 | +12 % | |
+| 5 | +18 % | +3 puntos |
+
+**Como se calcula.** `StatBlock` da `valor_base * (1 + suma de multiplicadores) + planos`.
+El Dupe entra como modificadores de origen `"dupe"` al construir la unidad
+(`GameState.character_data` los lista en `dupe_mods`; `CombatUnit` los aplica; la vista
+previa de la ficha usa el MISMO calculo). `add_mod` con el mismo origen SUSTITUYE, y el
+bloque de estadisticas se crea nuevo en cada combate, asi que abrir menus, cambiar de
+escena, cargar o evolucionar no acumula nada. La base (nivel, rareza, evolucion) nunca se
+modifica: la ficha la ensena separada de la bonificacion.
+
+**Copias.** `duplicates[id]` cuenta las copias EXTRA (la primera copia del personaje es el
+propio personaje). Las gastadas se deducen del nivel (suma de `copies_per_level` hasta ese
+nivel), asi que lo UNICO que se guarda es `dupe_levels` y las disponibles se calculan:
+`disponibles = duplicates - gastadas`. Toda via de entrada (invocacion, tienda, eventos)
+pasa por `GameState.add_character`, por lo que un personaje F2P tambien genera copias.
+
+**Copias sobrantes.** En el Dupe maximo ya no sirven para mejorar. Si
+`overflow.coins_per_copy > 0` la ficha ofrece convertirlas en monedas (con confirmacion).
+Antes del maximo no hay sobrantes: toda copia disponible sirve para mejorar.
+
+API (`autoload/game_state.gd`): `dupe_status(id)` (informe con `ok`, `reason`, `level`,
+`cost`, `copies` y la vista previa), `dupe_upgrade(id)` (atomica: valida y solo entonces
+sube un nivel y guarda), `dupe_level_of`, `dupe_copies_available`, `dupe_mods_for(id)`,
+`dupe_stat_preview(id, desde, hasta)`, `dupe_overflow_copies(id)` y
+`dupe_convert_overflow(id)`.
+
+**Evolucion.** El nivel de Dupe pertenece al ID del personaje, asi que SSR -> UR -> LR lo
+conserva sin tocarlo (y el bonus, al ser un porcentaje, se aplica sobre la base nueva).
+En una evolucion ESPECIAL con `consume_from` (otro ID) se juntan las copias extra y el
+gasto de las dos identidades, y el nivel resultante es el mas alto que ese gasto paga.
+
+**Validaciones al cargar.** `dupe_levels` se recorta a `0..max_level`, se ignoran los IDs
+que no existen y, si un guardado trae menos copias que las que su nivel ya costo, se
+sube `duplicates` hasta ese gasto: un nivel nunca queda sin pagar y no se pierde nada.
+
 ## Relaciones entre personajes (`evolves_to` / `evolved_from`)
 
 Dentro del JSON del personaje, dos campos opcionales que dicen como se relaciona
@@ -609,6 +671,10 @@ en lugar de romper el juego.
 | 1 | roster, progress, party, amigo, monedas, gemas, materiales, stage, enemigos de la fase, counters, completed_stages, missions_claimed, energia. |
 | 2 | Anade `rarities` (rareza evolucionada por personaje) y `duplicates` (copias de mas por personaje). |
 | 3 | Anade `inventory` (id de objeto -> cantidad), `mutations` (la mutacion activa de cada personaje), `story_progress` (nivel de historia -> dificultades superadas) y `event_progress` (por evento: stages superados, recompensas entregadas y veces completado). |
+
+Anadido SIN subir la version (campo nuevo y opcional): `dupe_levels` (`{ "gojo": 3 }`,
+solo niveles > 0). Un guardado sin ese campo arranca con todos los Dupes a 0 y sus
+`duplicates` pasan a ser copias disponibles, sin perder ni regalar nada.
 
 | Campo v3 | Formato |
 |---|---|
@@ -661,6 +727,9 @@ vacios, que significan "no tiene objetos", "ningun personaje tiene mutacion",
 - **Evolucion especial nueva**: una entrada mas en `routes` de
   `data/evolutions/special.json`, con su `from`, su `to`, su coste y sus objetos.
   No hay ninguna rama del tipo "si el personaje es sakuta".
+- **Dupe**: cambiar un bonus o un coste es editar `data/dupes/rules.json`. Un nivel
+  nuevo es subir `max_level` y anadir su fila en `levels` y su coste en
+  `copies_per_level`. DB avisa al arrancar si las longitudes no cuadran.
 - Contador nuevo: una linea en `GameState.DEFAULT_COUNTERS`; se guarda solo.
 - Tipo o rol nuevo: se anade al esquema de datos y a la tabla de ventajas de
   `core/battle_math.gd` si debe afectar al dano.

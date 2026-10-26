@@ -78,10 +78,10 @@ func _ready() -> void:
 
 ## Aspecto estatico. El verde toxico manda: es el color de "algo esta cambiando".
 func _apply_identity() -> void:
-	VI.style_title(title_label, VI.FONT_BIG)
+	VI.screen_title(title_label, Color(0.25, 0.85, 0.70))
 	wallet_label.add_theme_color_override("font_color", VI.GOLD)
 	wallet_label.add_theme_font_size_override("font_size", VI.FONT_SMALL)
-	var frame: StyleBoxFlat = VI.panel(0.95, true, VI.RADIUS_PANEL)
+	var frame := VI.panel(0.95, true, VI.RADIUS_PANEL)
 	frame.set_border_width_all(4)
 	frame.border_color = Color(VI.GREEN.r, VI.GREEN.g, VI.GREEN.b, 0.9)
 	focal.add_theme_stylebox_override("panel", frame)
@@ -303,7 +303,7 @@ func _build_modal() -> void:
 
 	var panel := PanelContainer.new()
 	panel.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	var frame: StyleBoxFlat = VI.panel(0.98, true, VI.RADIUS_PANEL)
+	var frame := VI.panel(0.98, true, VI.RADIUS_PANEL)
 	frame.set_border_width_all(4)
 	frame.border_color = Color(VI.GREEN.r, VI.GREEN.g, VI.GREEN.b, 0.95)
 	frame.content_margin_left = 22.0

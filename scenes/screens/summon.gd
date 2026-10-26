@@ -8,6 +8,9 @@ const SummonFx := preload("res://ui/summon_fx.gd")
 const SummonReveal := preload("res://ui/summon_reveal.gd")
 const Portrait := preload("res://ui/portrait.gd")
 const TypeColors := preload("res://ui/type_colors.gd")
+const TitleBanner := preload("res://ui/title_banner.gd")
+const WalletChip := preload("res://ui/wallet_chip.gd")
+const Frame := preload("res://ui/vi_frame.gd")
 
 ## INVOCAR: el GACHA de verdad.
 ##
@@ -25,7 +28,6 @@ const TypeColors := preload("res://ui/type_colors.gd")
 
 @onready var main: VBoxContainer = $Margin/Main
 @onready var banner_row: HBoxContainer = $Margin/Main/BannerRow
-@onready var gems_label: Label = $Margin/Main/Coins
 @onready var cost_label: Label = $Margin/Main/Cost
 @onready var info_label: Label = $Margin/Main/Info
 @onready var single_button: Button = $Margin/Main/Buttons/SingleButton
@@ -41,6 +43,7 @@ var _results_scroll: ScrollContainer = null
 var _results_grid: GridContainer = null
 var _reveal: Control = null
 var _animating := false
+var _gems_chip: Control = null
 
 
 func _ready() -> void:
@@ -58,14 +61,30 @@ func _ready() -> void:
 
 
 func _apply_identity() -> void:
-	VI.style_title($Margin/Main/Title, VI.FONT_BIG)
-	VI.style_note($Margin/Main/BannerTitle)
-	VI.style_subtitle(gems_label)
+	# CABECERA: placa dorada con el titulo y, a la derecha, las gemas con su icono.
+	var header := HBoxContainer.new()
+	header.name = "Header"
+	header.add_theme_constant_override("separation", 14)
+	var banner := TitleBanner.make("INVOCAR", "", VI.MAGENTA, VI.FONT_BIG)
+	banner.name = "Title"
+	banner.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	banner.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	header.add_child(banner)
+	_gems_chip = WalletChip.make("gem", GameState.gems, VI.CYAN, 50.0)
+	_gems_chip.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	header.add_child(_gems_chip)
+	main.add_child(header)
+	main.move_child(header, 0)
 	VI.style_subtitle(cost_label)
+	cost_label.add_theme_color_override("font_color", VI.GOLD_LIGHT)
 	VI.style_note(info_label)
-	VI.tint_button(single_button, VI.BLUE)
-	VI.tint_button(multi_button, VI.GOLD)
-	VI.tint_button(back_button, VI.BLUE)
+	info_label.add_theme_font_size_override("font_size", VI.FONT_SMALL)
+	VI.icon_button_side(single_button, "gem", VI.BLUE, 70)
+	VI.icon_button_side(multi_button, "gem", VI.GOLD, 70)
+	for b in [single_button, multi_button]:
+		b.custom_minimum_size = Vector2(0.0, 150.0)
+		b.add_theme_font_size_override("font_size", VI.FONT_BODY + 3)
+	VI.tint_button(back_button, VI.VIOLET)
 	back_button.custom_minimum_size = Vector2(0.0, VI.TOUCH)
 
 
@@ -94,7 +113,7 @@ func refresh() -> void:
 	if _banner_id.is_empty():
 		_banner_id = _default_banner_id()
 	var banner := DB.get_banner(_banner_id)
-	gems_label.text = "GEMAS %d" % GameState.gems
+	_gems_chip.call("set_value", GameState.gems)
 	if banner.is_empty():
 		cost_label.text = ""
 		banner_row.visible = false
@@ -160,15 +179,14 @@ func _build_stage() -> void:
 	_stage.add_child(v)
 	_stage_title = Label.new()
 	_stage_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_stage_title.add_theme_font_size_override("font_size", VI.FONT_BIG)
-	_stage_title.add_theme_color_override("font_color", VI.GOLD)
-	_stage_title.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.9))
-	_stage_title.add_theme_constant_override("outline_size", 10)
+	VI.style_title(_stage_title, VI.FONT_BIG)
 	v.add_child(_stage_title)
 	_stage_rates = Label.new()
 	_stage_rates.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_stage_rates.add_theme_font_size_override("font_size", VI.FONT_SMALL)
-	_stage_rates.add_theme_color_override("font_color", VI.INK_SOFT)
+	_stage_rates.add_theme_color_override("font_color", VI.INK)
+	_stage_rates.add_theme_color_override("font_outline_color", Color(0.04, 0.0, 0.10, 0.8))
+	_stage_rates.add_theme_constant_override("outline_size", 4)
 	v.add_child(_stage_rates)
 	_stage_row = HBoxContainer.new()
 	_stage_row.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -218,20 +236,10 @@ func _refresh_stage(banner: Dictionary) -> void:
 	var themed: bool = theme is Dictionary and not (theme as Dictionary).is_empty()
 	var accent: Color = Color.html(String((theme as Dictionary).get("accent", "#ffc856"))) if themed else VI.GOLD
 	var accent2: Color = Color.html(String((theme as Dictionary).get("accent2", "#27e6d6"))) if themed else VI.GOLD
-	_stage_title.add_theme_color_override("font_color", accent)
+	_stage_title.add_theme_color_override("font_color", accent.lerp(Color.WHITE, 0.35))
+	_stage.add_theme_stylebox_override("panel", _stage_frame(accent, accent2, themed))
 	if themed:
-		var sb := StyleBoxFlat.new()
-		sb.bg_color = Color(0.03, 0.04, 0.09, 0.96)
-		sb.set_corner_radius_all(14)
-		sb.set_border_width_all(6)
-		sb.border_color = accent
-		sb.shadow_color = Color(accent2.r, accent2.g, accent2.b, 0.55)
-		sb.shadow_size = 26
-		sb.set_content_margin_all(14)
-		_stage.add_theme_stylebox_override("panel", sb)
 		_stage_title.text = "%s\n%s" % [String((theme as Dictionary).get("tagline", "")), _stage_title.text]
-	else:
-		_stage.add_theme_stylebox_override("panel", VI.rarity_card("SSR", false, true))
 	for child in _stage_row.get_children():
 		_stage_row.remove_child(child)
 		child.queue_free()
@@ -249,13 +257,16 @@ func _refresh_stage(banner: Dictionary) -> void:
 		var rarity := String(data.get("rarity", "SSR"))
 		var holder := PanelContainer.new()
 		holder.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		holder.add_theme_stylebox_override("panel", VI.rarity_card(rarity, false, false))
+		holder.add_theme_stylebox_override("panel", _featured_frame(rarity))
 		var col := VBoxContainer.new()
 		holder.add_child(col)
 		var art := Portrait.new()
 		art.size_flags_vertical = Control.SIZE_EXPAND_FILL
 		art.custom_minimum_size = Vector2(0, 380 if ids.size() > 1 else 560)
 		art.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		art.transparent_frame = true
+		art.aura = 1.0
+		art.rim_screen_px = 4.0
 		col.add_child(art)
 		art.setup(String(raw_id), tint, String(data.get("portrait_style", "short")), Portrait.art_path_from(data, "front"), "front", "")
 		var badge := VI.rarity_badge(rarity, VI.FONT_BODY)
@@ -286,11 +297,39 @@ func _refresh_stage(banner: Dictionary) -> void:
 		tab.button_pressed = String(b.get("id", "")) == _banner_id
 		tab.clip_text = true
 		tab.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		tab.custom_minimum_size = Vector2(0, 64)
+		tab.custom_minimum_size = Vector2(0, 72)
 		tab.add_theme_font_size_override("font_size", VI.FONT_TINY)
-		VI.tint_button(tab, VI.GOLD if tab.button_pressed else VI.BLUE)
+		VI.tint_button(tab, VI.GOLD if tab.button_pressed else VI.VIOLET)
 		tab.pressed.connect(_on_banner_tab.bind(String(b.get("id", ""))))
 		_tabs.add_child(tab)
+
+
+## Marco del escenario: translucido para que el portal del fondo se vea por detras,
+## con metal del acento del banner (dorado por defecto) y gemas en las esquinas.
+func _stage_frame(accent: Color, accent2: Color, themed: bool) -> StyleBox:
+	var light := VI.METAL_GOLD_LIGHT if not themed else accent.lerp(Color.WHITE, 0.5)
+	var dark := VI.METAL_GOLD_DARK if not themed else accent.darkened(0.55)
+	return Frame.build({
+		"fill_top": Color(0.10, 0.05, 0.22, 0.50),
+		"fill_bottom": Color(0.03, 0.02, 0.10, 0.72),
+		"metal_light": light, "metal_dark": dark,
+		"edge_width": 5.0, "cut": 20.0,
+		"studs": true, "stud_color": accent2 if themed else VI.GOLD_LIGHT,
+		"gloss": 0.0,
+		"inner_glow": Color(accent2.r, accent2.g, accent2.b, 0.40),
+		"glow": Color(accent2.r, accent2.g, accent2.b, 0.45), "glow_size": 18.0,
+		"shadow": 0.5,
+		"margin_x": 16.0, "margin_y": 14.0,
+	})
+
+
+## Peana de un destacado: marco de SU rareza, pero translucido para que el personaje
+## se vea sobre el portal y no sobre una caja marron.
+func _featured_frame(rarity: String) -> StyleBox:
+	var f := VI.rarity_card(rarity, false, false)
+	f.fill_top.a = 0.30
+	f.fill_bottom.a = 0.55
+	return f
 
 
 ## 7.0 -> "7", 15.5 -> "15.5": porcentaje legible sin ceros de sobra.

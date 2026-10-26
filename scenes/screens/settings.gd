@@ -52,8 +52,8 @@ func refresh() -> void:
 func _build_ui() -> void:
 	var title := Label.new()
 	title.text = "AJUSTES"
-	VI.style_title(title, VI.FONT_BIG)
 	main.add_child(title)
+	VI.screen_title(title, VI.BLUE)
 
 	var subtitle := Label.new()
 	subtitle.text = "Se guardan solos en este dispositivo."

@@ -58,7 +58,7 @@ func _ready() -> void:
 
 ## Aspecto estatico. Los colores y los tamanos salen de la identidad visual.
 func _apply_identity() -> void:
-	VI.style_title(title_label, VI.FONT_BIG)
+	VI.screen_title(title_label, VI.VIOLET)
 	VI.style_subtitle(subtitle_label)
 	VI.style_title(panel_title, VI.FONT_SECTION)
 	VI.style_subtitle(panel_info)
@@ -69,10 +69,10 @@ func _apply_identity() -> void:
 	back_button.custom_minimum_size = Vector2(0.0, VI.TOUCH)
 	close_button.custom_minimum_size = Vector2(0.0, VI.TOUCH)
 	start_button.custom_minimum_size = Vector2(0.0, VI.TOUCH)
-	var panel_style: StyleBoxFlat = VI.panel(0.97, true, VI.RADIUS_PANEL)
+	var panel_style := VI.panel(0.97, true, VI.RADIUS_PANEL)
 	panel_style.set_border_width_all(3)
 	level_panel.add_theme_stylebox_override("panel", panel_style)
-	var scrim_style: StyleBoxFlat = VI.panel(0.72, false, 0)
+	var scrim_style := VI.panel(0.72, false, 0)
 	panel_scrim.add_theme_stylebox_override("panel", scrim_style)
 	_build_legend()
 

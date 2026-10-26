@@ -1,6 +1,7 @@
 extends Control
 
 const NAV := preload("res://scenes/nav.gd")
+const WalletChip := preload("res://ui/wallet_chip.gd")
 const VI := preload("res://ui/visual_identity.gd")
 const ShopIcon := preload("res://ui/shop_icon.gd")
 const Portrait := preload("res://ui/portrait.gd")
@@ -24,7 +25,6 @@ const TypeColors := preload("res://ui/type_colors.gd")
 ## informe que devuelve. No hay ninguna comprobacion de saldo escrita en la UI.
 
 @onready var title_label: Label = $Margin/Main/Header/Title
-@onready var wallet_label: Label = $Margin/Main/Header/Wallet
 @onready var subtitle_label: Label = $Margin/Main/Subtitle
 @onready var shelves: VBoxContainer = $Margin/Main/Scroll/Shelves
 @onready var back_button: Button = $Margin/Main/BackButton
@@ -32,6 +32,8 @@ const TypeColors := preload("res://ui/type_colors.gd")
 
 ## Ultimo informe de compra, para pintarlo bajo la cabecera.
 var _last_purchase: Dictionary = {}
+var _coins_chip: Control = null
+var _gems_chip: Control = null
 var _confirm_panel: PanelContainer = null
 var _confirm_title: Label = null
 var _confirm_body: Label = null
@@ -48,11 +50,28 @@ func _ready() -> void:
 
 ## Aspecto estatico. El dorado manda aqui: es la pantalla del dinero.
 func _apply_identity() -> void:
-	VI.style_title(title_label, VI.FONT_BIG)
+	VI.screen_title(title_label, VI.GOLD)
 	VI.style_subtitle(subtitle_label)
 	back_button.custom_minimum_size = Vector2(0.0, VI.TOUCH)
 	VI.tint_button(back_button, VI.BLUE)
-	title_label.add_theme_color_override("font_color", VI.GOLD)
+	# Cartera: dos placas con icono (monedas a la izquierda, gemas a la derecha).
+	var wallet := HBoxContainer.new()
+	wallet.name = "Wallet"
+	wallet.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_coins_chip = WalletChip.make("coin", GameState.coins, VI.GOLD)
+	_gems_chip = WalletChip.make("gem", GameState.gems, VI.CYAN)
+	var gap := Control.new()
+	gap.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	gap.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	wallet.add_child(_coins_chip)
+	wallet.add_child(gap)
+	wallet.add_child(_gems_chip)
+	var header: Node = title_label.get_parent()
+	while header != null and header.get_parent() != subtitle_label.get_parent():
+		header = header.get_parent()
+	var host: Node = subtitle_label.get_parent()
+	host.add_child(wallet)
+	host.move_child(wallet, header.get_index() + 1)
 
 
 func refresh() -> void:
@@ -61,7 +80,8 @@ func refresh() -> void:
 
 
 func _update_wallet() -> void:
-	wallet_label.text = "%d MONEDAS    %d GEMAS" % [GameState.coins, GameState.gems]
+	_coins_chip.call("set_value", GameState.coins)
+	_gems_chip.call("set_value", GameState.gems)
 
 
 ## --- Construccion -----------------------------------------------------------
@@ -136,20 +156,26 @@ func _grant_kind(item: Dictionary) -> String:
 	return String((grant as Dictionary).get("type", ""))
 
 
-## Rotulo de estante: una franja dorada con el nombre y su nota.
+## Rotulo de estante: placa dorada angulada con el nombre, y su nota debajo.
 func _make_shelf_head(title_text: String, note_text: String) -> Control:
 	var box := VBoxContainer.new()
 	box.add_theme_constant_override("separation", 2)
 
 	var bar := PanelContainer.new()
-	var style: StyleBoxFlat = VI.panel(0.92, true, VI.RADIUS_CHIP)
-	style.set_border_width_all(2)
-	style.border_color = Color(VI.GOLD.r, VI.GOLD.g, VI.GOLD.b, 0.85)
+	var style := VI.chip(VI.GOLD, 0.95)
+	style.edge_width = 3.0
+	style.cut = 12.0
+	style.cut_corners = 15
+	style.studs = true
+	style.stud_color = VI.GOLD_LIGHT
+	style.gloss = 0.25
+	style.content_margin_top = 6.0
+	style.content_margin_bottom = 6.0
 	bar.add_theme_stylebox_override("panel", style)
 	var label := Label.new()
 	label.text = title_text
-	label.add_theme_font_size_override("font_size", VI.FONT_SECTION)
-	label.add_theme_color_override("font_color", VI.GOLD)
+	VI.style_title(label, VI.FONT_SECTION)
+	label.add_theme_constant_override("outline_size", 6)
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	bar.add_child(label)
 	box.add_child(bar)
@@ -158,7 +184,7 @@ func _make_shelf_head(title_text: String, note_text: String) -> Control:
 		var note := Label.new()
 		note.text = note_text
 		note.add_theme_font_size_override("font_size", VI.FONT_TINY)
-		note.add_theme_color_override("font_color", VI.INK_DIM)
+		note.add_theme_color_override("font_color", VI.INK_SOFT)
 		note.autowrap_mode = TextServer.AUTOWRAP_WORD
 		box.add_child(note)
 	return box
@@ -176,9 +202,16 @@ func _make_item_row(item: Dictionary) -> Control:
 	# PUESTO DE MERCADO: ilustracion arriba, nombre, lo que entrega, precio y compra.
 	var tile := PanelContainer.new()
 	tile.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	var style: StyleBoxFlat = VI.panel(0.93, true, VI.RADIUS_PANEL)
-	style.set_border_width_all(3 if affordable else 2)
-	style.border_color = Color(accent.r, accent.g, accent.b, 0.85 if affordable else 0.45)
+	# Puesto de mercado: marco dorado biselado si se puede comprar; cromo apagado si no.
+	var style := VI.panel(0.80, true, VI.RADIUS_PANEL)
+	if affordable:
+		style.metal_light = VI.METAL_GOLD_LIGHT
+		style.metal_dark = VI.METAL_GOLD_DARK
+		style.edge_width = 4.0
+		style.studs = true
+		style.stud_color = VI.GOLD_LIGHT
+		style.glow = Color(VI.GOLD.r, VI.GOLD.g, VI.GOLD.b, 0.30)
+		style.glow_size = 10.0
 	tile.add_theme_stylebox_override("panel", style)
 
 	var box := VBoxContainer.new()
@@ -254,21 +287,29 @@ func _make_price_tag(price_coins: int, price_gems: int, affordable: bool) -> Con
 
 
 func _price_line(amount: String, unit: String, color: Color, affordable: bool) -> Control:
-	var box := VBoxContainer.new()
-	box.add_theme_constant_override("separation", 0)
+	# Precio con el icono de su moneda: se reconoce de un vistazo sin leer la unidad.
+	var box := HBoxContainer.new()
+	box.alignment = BoxContainer.ALIGNMENT_CENTER
+	box.add_theme_constant_override("separation", 8)
+	var icon_name := "gem" if unit == "GEMAS" else ("coin" if unit == "MONEDAS" else "")
+	if not icon_name.is_empty() and VI.has_icon(icon_name):
+		var icon := VI.icon_rect(icon_name, 40.0)
+		icon.modulate = Color.WHITE if affordable else Color(0.55, 0.55, 0.62, 0.8)
+		box.add_child(icon)
 	var value := Label.new()
 	value.text = amount
-	value.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	value.add_theme_font_size_override("font_size", VI.FONT_BODY)
-	value.add_theme_color_override("font_color", color if affordable else VI.INK_DIM)
+	value.add_theme_font_size_override("font_size", VI.FONT_SECTION)
+	value.add_theme_color_override("font_color", color.lerp(Color.WHITE, 0.35) if affordable else VI.INK_DIM)
+	value.add_theme_color_override("font_outline_color", Color(0.04, 0.0, 0.10, 0.85))
+	value.add_theme_constant_override("outline_size", 4)
 	box.add_child(value)
-	if not unit.is_empty():
-		var unit_label := Label.new()
-		unit_label.text = unit
-		unit_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		unit_label.add_theme_font_size_override("font_size", VI.FONT_TINY)
-		unit_label.add_theme_color_override("font_color", VI.INK_DIM)
-		box.add_child(unit_label)
+	if unit.is_empty() or VI.has_icon(icon_name):
+		return box
+	var unit_label := Label.new()
+	unit_label.text = unit
+	unit_label.add_theme_font_size_override("font_size", VI.FONT_TINY)
+	unit_label.add_theme_color_override("font_color", VI.INK_DIM)
+	box.add_child(unit_label)
 	return box
 
 
@@ -298,7 +339,7 @@ func _grant_text(item: Dictionary) -> String:
 func _make_receipt() -> Control:
 	var ok := bool(_last_purchase.get("ok", false))
 	var bar := PanelContainer.new()
-	var style: StyleBoxFlat = VI.panel(0.95, true, VI.RADIUS_CHIP)
+	var style := VI.panel(0.95, true, VI.RADIUS_CHIP)
 	var accent: Color = VI.GREEN if ok else VI.RED
 	style.set_border_width_all(3)
 	style.border_color = accent
@@ -337,7 +378,7 @@ func _build_confirm_panel() -> void:
 	confirm_layer.add_child(center)
 
 	_confirm_panel = PanelContainer.new()
-	var style: StyleBoxFlat = VI.panel(0.99, true, VI.RADIUS_PANEL)
+	var style := VI.panel(0.99, true, VI.RADIUS_PANEL)
 	style.set_border_width_all(4)
 	style.border_color = VI.GOLD
 	_confirm_panel.add_theme_stylebox_override("panel", style)

@@ -230,14 +230,7 @@ static func edgerunners(host: Control, skill_name: String, accent: Color, accent
 	for i in hero_ids.size():
 		var hero := PanelContainer.new()
 		hero.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		var sb := StyleBoxFlat.new()
-		sb.bg_color = Color(0.02, 0.03, 0.07, 0.9)
-		sb.set_corner_radius_all(10)
-		sb.set_border_width_all(5)
-		sb.border_color = accent if i == 0 else accent2
-		sb.shadow_color = Color(sb.border_color.r, sb.border_color.g, sb.border_color.b, 0.7)
-		sb.shadow_size = 24
-		hero.add_theme_stylebox_override("panel", sb)
+		hero.add_theme_stylebox_override("panel", VI.special_card(accent if i == 0 else accent2, accent if i == 0 else accent2))
 		hero.size = Vector2(hero_w, hero_h)
 		var art: Control = (load("res://ui/portrait.gd") as GDScript).new()
 		art.mouse_filter = Control.MOUSE_FILTER_IGNORE

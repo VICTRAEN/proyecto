@@ -98,11 +98,7 @@ static func chip(text: String, color: Color, ratio: float = 0.30, alpha: float =
 	var panel := PanelContainer.new()
 	panel.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 
-	var style := StyleBoxFlat.new()
-	style.set_corner_radius_all(VI.RADIUS_CHIP)
-	style.bg_color = Color(color.r * ratio, color.g * ratio, color.b * ratio, alpha)
-	style.set_border_width_all(2)
-	style.border_color = Color(color.r, color.g, color.b, 0.9)
+	var style := VI.chip(color, alpha)
 	style.content_margin_left = 12.0
 	style.content_margin_right = 12.0
 	style.content_margin_top = 6.0

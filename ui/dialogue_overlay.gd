@@ -89,7 +89,7 @@ func _apply_identity() -> void:
 		skip_button.custom_minimum_size = Vector2(0.0, VI.TOUCH)
 
 	if _panel != null:
-		var style: StyleBoxFlat = VI.panel(0.97, true, VI.RADIUS_PANEL)
+		var style := VI.panel(0.97, true, VI.RADIUS_PANEL)
 		style.set_border_width_all(3)
 		_panel.add_theme_stylebox_override("panel", style)
 	if _scrim != null:

@@ -63,12 +63,47 @@ var texture: Texture2D = null
 ## Parte del PNG que se dibuja (su area visible), en pixeles de la imagen.
 var source_rect := Rect2()
 
-var _frame := StyleBoxFlat.new()
+const VI := preload("res://ui/visual_identity.gd")
+const Frame := preload("res://ui/vi_frame.gd")
+const LIGHT_SHADER := preload("res://ui/shaders/character_light.gdshader")
+const Layer := preload("res://ui/portrait_layer.gd")
+
+## ILUMINACION: el arte original se dibuja con un shader suave (cel-shading ligero,
+## gradacion de color y luz de contorno del color del tipo). `lit` lo desactiva.
+var lit := true
+## Resplandor de ESCENARIO detras del personaje (0 = ninguno). Lo activan las
+## presentaciones grandes (menu, ficha, invocacion); las tarjetas pequenas no.
+var aura := 0.0
+## Grosor aproximado del filo de luz, en pixeles de pantalla.
+var rim_screen_px := 3.0
+## Sin marco ni relleno: el personaje flota sobre el fondo (escaparates).
+var transparent_frame := false
+
+var _frame: StyleBox = null
+var _art_layer: Control = null
+var _frame_layer: Control = null
+var _material: ShaderMaterial = null
 
 
 func _ready() -> void:
 	resized.connect(_refresh)
+	_ensure_layers()
 	_refresh()
+
+
+func _ensure_layers() -> void:
+	if _art_layer != null:
+		return
+	_art_layer = Layer.new()
+	_art_layer.name = "ArtLayer"
+	_art_layer.portrait = self
+	_art_layer.kind = "art"
+	add_child(_art_layer)
+	_frame_layer = Layer.new()
+	_frame_layer.name = "FrameLayer"
+	_frame_layer.portrait = self
+	_frame_layer.kind = "frame"
+	add_child(_frame_layer)
 
 
 func setup(character_id: String, tint: Color, portrait_style: String = "short", explicit_path: String = "", portrait_slot: String = DEFAULT_SLOT, portrait_form: String = "") -> void:
@@ -326,16 +361,30 @@ func _try_load(path: String) -> Texture2D:
 
 
 func _refresh() -> void:
+	_ensure_layers()
 	_update_frame()
 	queue_redraw()
+	if _art_layer != null:
+		_art_layer.queue_redraw()
+		_frame_layer.queue_redraw()
 
 
+## Marco fino y anguloso del color del tipo. No lleva sombra ni brillo propios: las
+## tarjetas y los paneles que lo rodean ya los ponen.
 func _update_frame() -> void:
-	var radius := int(clampf(minf(size.x, size.y) * 0.09, 6.0, 26.0))
-	_frame.bg_color = Color(accent.r, accent.g, accent.b, 0.10)
-	_frame.set_corner_radius_all(radius)
-	_frame.set_border_width_all(3)
-	_frame.border_color = Color(accent.r, accent.g, accent.b, 0.75)
+	var cut := clampf(minf(size.x, size.y) * 0.07, 5.0, 18.0)
+	_frame = Frame.build({
+		"fill_top": Color(accent.r, accent.g, accent.b, 0.13),
+		"fill_bottom": Color(accent.r, accent.g, accent.b, 0.04),
+		"metal_light": Color(accent.r, accent.g, accent.b, 0.95).lerp(Color.WHITE, 0.35),
+		"metal_dark": Color(accent.r, accent.g, accent.b, 0.85).darkened(0.45),
+		"edge_width": 2.5,
+		"cut": cut,
+		"cut_corners": Frame.CORNERS_ALL,
+		"shadow": 0.0,
+		"outline": Color(0, 0, 0, 0.35),
+		"inner_light": Color(1, 1, 1, 0.0),
+	})
 
 
 func _draw() -> void:
@@ -343,27 +392,90 @@ func _draw() -> void:
 	var h := size.y
 	if w <= 2.0 or h <= 2.0:
 		return
+	# Relleno suave del hueco (se ve debajo del arte y de la silueta).
+	if _frame != null and not transparent_frame:
+		draw_style_box(_frame, Rect2(Vector2.ZERO, size))
+	if aura > 0.0:
+		_draw_aura(w, h)
 	if texture == null:
 		_draw_silhouette(w, h)
+
+
+## Resplandor de escenario: disco radial del color del tipo detras del personaje y
+## una elipse de luz en el suelo. Son circulos concentricos con alfa bajo.
+func _draw_aura(w: float, h: float) -> void:
+	var center := Vector2(w * 0.5, h * 0.46)
+	var radius := minf(w, h * 0.62) * 0.62
+	var warm := accent.lerp(Color(1.0, 0.92, 0.8), 0.45)
+	for i in range(9, 0, -1):
+		var k := float(i) / 9.0
+		draw_circle(center, radius * (0.25 + 0.75 * k), Color(warm.r, warm.g, warm.b, 0.045 * aura * (1.2 - k)))
+	var floor_c := Vector2(w * 0.5, h * 0.93)
+	for i in range(6, 0, -1):
+		var k := float(i) / 6.0
+		_draw_ellipse(floor_c, Vector2(w * 0.40 * k, h * 0.035 * k), Color(accent.r, accent.g, accent.b, 0.07 * aura * (1.1 - k)))
+
+
+func _draw_ellipse(center: Vector2, radii: Vector2, color: Color) -> void:
+	var pts := PackedVector2Array()
+	for i in 28:
+		var a := TAU * float(i) / 28.0
+		pts.append(center + Vector2(cos(a) * radii.x, sin(a) * radii.y))
+	draw_colored_polygon(pts, color)
+
+
+## Capa del arte (la llama portrait_layer.gd). Dibuja el PNG con el shader de luz.
+func paint_art(canvas: CanvasItem) -> void:
+	if texture == null:
+		canvas.material = null
+		return
+	var w := size.x
+	var h := size.y
+	if w <= 2.0 or h <= 2.0:
+		return
+	var fitted := _fitted_rect()
+	if lit:
+		if _material == null:
+			_material = ShaderMaterial.new()
+			_material.shader = LIGHT_SHADER
+		var rim := accent.lerp(Color.WHITE, 0.55)
+		_material.set_shader_parameter("rim_color", rim)
+		_material.set_shader_parameter("rim_px", clampf(rim_screen_px / maxf(fitted[2], 0.0001), 1.0, 60.0))
+		canvas.material = _material
 	else:
-		_draw_fitted_art(w, h)
-	draw_style_box(_frame, Rect2(Vector2.ZERO, size))
+		canvas.material = null
+	canvas.draw_texture_rect_region(texture, fitted[0], fitted[1])
 
 
-## Dibuja SOLO el area visible del PNG, escalada proporcionalmente y centrada en
-## el hueco. La escala es la misma en los dos ejes (se coge la menor), asi que la
-## imagen nunca se deforma, y al usar el area visible el personaje ocupa el maximo
-## espacio disponible sin quedar cortado.
-func _draw_fitted_art(w: float, h: float) -> void:
+func paint_frame(canvas: CanvasItem) -> void:
+	if transparent_frame:
+		return
+	if _frame != null and texture != null:
+		# El relleno ya se pinto debajo del arte: aqui solo el marco, con el centro
+		# transparente.
+		var edge := Frame.build({
+			"fill_top": Color(0, 0, 0, 0), "fill_bottom": Color(0, 0, 0, 0),
+			"metal_light": _frame.metal_light, "metal_dark": _frame.metal_dark,
+			"edge_width": _frame.edge_width, "cut": _frame.cut, "shadow": 0.0,
+			"outline": _frame.outline, "inner_light": Color(1, 1, 1, 0.0),
+		})
+		canvas.draw_style_box(edge, Rect2(Vector2.ZERO, size))
+	elif _frame != null:
+		canvas.draw_style_box(_frame, Rect2(Vector2.ZERO, size))
+
+
+## Rectangulo donde se dibuja el area visible del PNG, escalada proporcionalmente y
+## centrada en el hueco: [destino, origen, escala]. La escala es la misma en los
+## dos ejes (se coge la menor), asi que la imagen nunca se deforma, y al usar el
+## area visible el personaje ocupa el maximo espacio disponible sin quedar cortado.
+func _fitted_rect() -> Array:
 	var source := source_rect
 	if source.size.x <= 1.0 or source.size.y <= 1.0:
 		source = Rect2(Vector2.ZERO, texture.get_size())
-	if source.size.x <= 0.0 or source.size.y <= 0.0:
-		return
-	var scale := minf(w / source.size.x, h / source.size.y)
+	var scale := minf(size.x / maxf(source.size.x, 1.0), size.y / maxf(source.size.y, 1.0))
 	var drawn := source.size * scale
-	var position := Vector2((w - drawn.x) * 0.5, (h - drawn.y) * 0.5)
-	draw_texture_rect_region(texture, Rect2(position, drawn), source)
+	var position := Vector2((size.x - drawn.x) * 0.5, (size.y - drawn.y) * 0.5)
+	return [Rect2(position, drawn), source, scale]
 
 
 func _draw_silhouette(w: float, h: float) -> void:

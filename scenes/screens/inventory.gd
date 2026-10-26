@@ -31,7 +31,7 @@ func _ready() -> void:
 
 ## Aspecto estatico, con los tokens de la identidad visual.
 func _apply_identity() -> void:
-	VI.style_title(title_label, VI.FONT_BIG)
+	VI.screen_title(title_label, VI.GOLD)
 	VI.style_subtitle(subtitle_label)
 	VI.tint_button(back_button, VI.BLUE)
 	back_button.custom_minimum_size = Vector2(0.0, VI.TOUCH)
@@ -227,7 +227,7 @@ func _make_empty_slot() -> Control:
 	var panel := PanelContainer.new()
 	panel.custom_minimum_size = Vector2(0, 230)
 	panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	var style: StyleBoxFlat = VI.panel(0.35, true, VI.RADIUS_CARD)
+	var style := VI.panel(0.35, true, VI.RADIUS_CARD)
 	style.border_color = Color(VI.INK_DIM.r, VI.INK_DIM.g, VI.INK_DIM.b, 0.35)
 	panel.add_theme_stylebox_override("panel", style)
 	return panel
@@ -299,7 +299,7 @@ func _make_card(item: Dictionary) -> Control:
 	var accent: Color = VI.rarity_color(rarity) if not rarity.is_empty() else VI.BLUE
 
 	var card := PanelContainer.new()
-	var style: StyleBoxFlat = VI.panel(0.93, true, VI.RADIUS_PANEL)
+	var style := VI.panel(0.93, true, VI.RADIUS_PANEL)
 	style.set_border_width_all(3)
 	style.border_color = Color(accent.r, accent.g, accent.b, 0.85)
 	card.add_theme_stylebox_override("panel", style)
@@ -371,11 +371,17 @@ func _make_icon(item: Dictionary) -> Control:
 			texture_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
 			return texture_rect
 
+	# Sin el PNG propio del objeto (art/items/), se usa el icono semi-3D provisional
+	# de art/ui/icons/<id>.png; solo si tampoco existe sale la inicial de siempre.
+	var provisional := VI.icon(String(item.get("id", "")))
+	if provisional != null:
+		var rect := VI.icon_rect(String(item.get("id", "")), side)
+		return rect
 	var rarity := String(item.get("rarity", ""))
 	var accent: Color = VI.rarity_color(rarity) if not rarity.is_empty() else VI.BLUE
 	var holder := PanelContainer.new()
 	holder.custom_minimum_size = Vector2(side, side)
-	var style: StyleBoxFlat = VI.panel(0.88, true, VI.RADIUS_CHIP)
+	var style := VI.panel(0.88, true, VI.RADIUS_CHIP)
 	style.set_border_width_all(3)
 	style.border_color = Color(accent.r, accent.g, accent.b, 0.9)
 	holder.add_theme_stylebox_override("panel", style)

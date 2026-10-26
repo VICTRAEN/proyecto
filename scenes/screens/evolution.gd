@@ -60,7 +60,7 @@ func _make_selector_strip() -> void:
 
 ## Aspecto estatico, con los tokens de la identidad visual.
 func _apply_identity() -> void:
-	VI.style_title(title_label, VI.FONT_BIG)
+	VI.screen_title(title_label, VI.GREEN)
 	VI.style_subtitle(subtitle_label)
 	VI.style_title(selector_title, VI.FONT_SMALL)
 	VI.tint_button(back_button, VI.BLUE)

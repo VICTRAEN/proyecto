@@ -68,7 +68,7 @@ func _ready() -> void:
 ## Aspecto estatico de la pantalla, en un solo sitio: el equipo arriba, el
 ## roster abajo y los botones al pie.
 func _apply_identity() -> void:
-	VI.style_title(title_label, VI.FONT_BIG)
+	VI.screen_title(title_label, VI.BLUE)
 	VI.style_title(lineup_title, VI.FONT_SMALL)
 	VI.style_title(pool_title, VI.FONT_SMALL)
 	VI.style_subtitle(slot_hint)

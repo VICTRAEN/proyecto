@@ -109,6 +109,13 @@ func _ready() -> void:
 		_debug_v15()
 	elif dbg_args.has("--dbg18"):
 		_start_hito_d()
+	elif dbg_args.has("--dbg20"):
+		var hito_f: GDScript = load("res://scenes/debug/hito_f_checks.gd")
+		var hito_f_node := Node.new()
+		hito_f_node.set_script(hito_f)
+		hito_f_node.name = "HitoFChecks"
+		add_child(hito_f_node)
+		hito_f_node.call_deferred("run", self)
 	elif dbg_args.has("--dbg19"):
 		var hito_e: GDScript = load("res://scenes/debug/hito_e_checks.gd")
 		var hito_e_node := Node.new()
@@ -122,6 +129,12 @@ func _ready() -> void:
 		motion_node.set_script(motion)
 		add_child(motion_node)
 		motion_node.call_deferred("run", self)
+	elif dbg_args.has("--shots-f"):
+		var shots_f: GDScript = load("res://scenes/debug/shots_f.gd")
+		var shots_f_node := Node.new()
+		shots_f_node.set_script(shots_f)
+		add_child(shots_f_node)
+		shots_f_node.call_deferred("run", self)
 	elif dbg_args.has("--shots-e"):
 		var shots_e: GDScript = load("res://scenes/debug/shots_e.gd")
 		var shots_e_node := Node.new()
@@ -2046,14 +2059,14 @@ func _debug_v14() -> void:
 	# El marco de cada rareza es DISTINTO de verdad (no solo la etiqueta).
 	var borders: Array = []
 	for rarity in forms:
-		var style: StyleBoxFlat = VI.rarity_card(String(rarity))
+		var style := VI.rarity_card(String(rarity))
 		borders.append(style.border_color.to_html(false))
 	_out14("[DBG14] colores de borde por rareza: %s" % str(borders))
 	var unique_borders := {}
 	for b in borders:
 		unique_borders[b] = true
 	_mark14("cada rareza tiene su propio marco de carta", unique_borders.size() == forms.size())
-	var evolved_style: StyleBoxFlat = VI.rarity_card("UR", false, true)
+	var evolved_style := VI.rarity_card("UR", false, true)
 	_mark14("una forma evolucionada se viste distinto (borde secundario)",
 		evolved_style.border_color.to_html(false) != VI.rarity_card("UR").border_color.to_html(false))
 	_mark14("la comparacion de formas es correcta (SSR < UR < LR)",

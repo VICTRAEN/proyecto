@@ -41,7 +41,7 @@ func _ready() -> void:
 
 ## Aspecto estatico, con los tokens de la identidad visual.
 func _apply_identity() -> void:
-	VI.style_title(title_label, VI.FONT_BIG)
+	VI.screen_title(title_label, VI.MAGENTA)
 	VI.style_subtitle(subtitle_label)
 	VI.style_subtitle(stock_label)
 	VI.style_title(feedback, VI.FONT_BODY)
@@ -108,7 +108,7 @@ func _make_event_card(status: Dictionary) -> Control:
 	var event_id := String(status.get("id", ""))
 
 	var card := PanelContainer.new()
-	var banner_style: StyleBoxFlat = VI.panel(0.96, true, VI.RADIUS_PANEL)
+	var banner_style := VI.panel(0.96, true, VI.RADIUS_PANEL)
 	banner_style.border_color = Color(accent.r, accent.g, accent.b, 0.9)
 	banner_style.set_border_width_all(3)
 	banner_style.shadow_color = Color(accent.r, accent.g, accent.b, 0.3)
@@ -292,7 +292,7 @@ func _make_stage_card(event_id: String, stage: Dictionary) -> Control:
 	var accent := _state_accent(unlocked, completed)
 
 	var card := PanelContainer.new()
-	var style: StyleBoxFlat = VI.card(accent, false, "", true)
+	var style := VI.card(accent, false, "", true)
 	style.set_border_width_all(2)
 	card.add_theme_stylebox_override("panel", style)
 

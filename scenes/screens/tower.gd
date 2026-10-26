@@ -64,9 +64,8 @@ func _build() -> void:
 	_title = Label.new()
 	_title.text = "TORRE"
 	_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	VI.style_title(_title, VI.FONT_BIG)
-	_title.add_theme_color_override("font_color", VI.GOLD)
 	main.add_child(_title)
+	VI.screen_title(_title, VI.CYAN)
 
 	_status = Label.new()
 	_status.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER

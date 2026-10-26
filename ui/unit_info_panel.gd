@@ -6,6 +6,7 @@ const Portrait := preload("res://ui/portrait.gd")
 const TypeColors := preload("res://ui/type_colors.gd")
 const VI := preload("res://ui/visual_identity.gd")
 const FichaTabs := preload("res://ui/ficha_tabs.gd")
+const DupeTab := preload("res://ui/dupe_tab.gd")
 const EvolutionFx := preload("res://ui/evolution_fx.gd")
 
 ## Panel de informacion de una unidad.
@@ -66,6 +67,7 @@ const TAB_HABILIDADES := 1
 const TAB_LINKS := 2
 const TAB_CATEGORIAS := 3
 const TAB_BATALLA := 4
+const TAB_DUPES := 5
 
 var unit: CombatUnit = null
 
@@ -105,10 +107,15 @@ var _source_data: Dictionary = {}
 ## Pestana que el jugador tenia abierta. Se conserva al refrescar para que una
 ## accion no devuelva la vista al principio.
 var _tab_index := TAB_DATOS
+## Pestana DUPES (creada por codigo) y estado de su confirmacion de consumo.
+var tab_dupes: VBoxContainer = null
+var _dupe_confirming := false
 
 
 func _ready() -> void:
 	visible = false
+	# Ventana premium: marco dorado biselado con gemas (el contenido no cambia).
+	panel.add_theme_stylebox_override("panel", VI.window())
 	dim.gui_input.connect(_on_dim_input)
 	close_button.pressed.connect(close_panel)
 	level_button.pressed.connect(_on_level_pressed)
@@ -130,6 +137,11 @@ func _setup_tabs() -> void:
 	_rename_tab(TAB_LINKS, "LINKS")
 	_rename_tab(TAB_CATEGORIAS, "CATEGORIAS")
 	_rename_tab(TAB_BATALLA, "BATALLA")
+	if tabs != null and tab_dupes == null:
+		tab_dupes = VBoxContainer.new()
+		tab_dupes.name = "TabDupes"
+		tabs.add_child(tab_dupes)
+		_rename_tab(TAB_DUPES, "DUPES")
 
 
 func _rename_tab(index: int, title: String) -> void:
@@ -147,6 +159,7 @@ func open_for(new_unit: CombatUnit, show_combat_stats: bool = true) -> void:
 	if new_unit == null:
 		return
 	unit = new_unit
+	_dupe_confirming = false
 	_show_combat_stats = show_combat_stats
 	_is_ficha = not show_combat_stats
 	# Una unidad de combate no es una ficha: los datos guardados de la ficha
@@ -208,6 +221,7 @@ func refresh() -> void:
 	_fill_habilidades()
 	_fill_links()
 	_fill_categorias()
+	_fill_dupes()
 	_fill_effects()
 	_fill_stats()
 
@@ -528,6 +542,39 @@ func _fill_links() -> void:
 		tab_links.add_child(FichaTabs.note("Links activos del equipo en combate: %d." % active))
 
 
+## --- DUPES -------------------------------------------------------------------------
+func _fill_dupes() -> void:
+	if tab_dupes == null or unit == null:
+		return
+	_clear(tab_dupes)
+	# Solo se puede mejorar desde la FICHA (fuera del combate); en combate se ve el estado.
+	tab_dupes.add_child(DupeTab.build(unit.id, _is_ficha, _dupe_confirming, _on_dupe_ask, _on_dupe_confirm, _on_dupe_cancel))
+
+
+func _on_dupe_ask() -> void:
+	_dupe_confirming = true
+	_fill_dupes()
+
+
+func _on_dupe_cancel() -> void:
+	_dupe_confirming = false
+	_fill_dupes()
+
+
+## Gasta la copia. El estado cambia SOLO aqui (y dentro de GameState.dupe_upgrade, que
+## valida y es atomica); el flag se apaga antes para que un doble toque no consuma dos.
+func _on_dupe_confirm() -> void:
+	if not _dupe_confirming or unit == null:
+		return
+	_dupe_confirming = false
+	# En el Dupe maximo la unica accion posible es convertir las copias sobrantes.
+	if GameState.dupe_level_of(unit.id) >= GameState.dupe_max_level():
+		GameState.dupe_convert_overflow(unit.id)
+	else:
+		GameState.dupe_upgrade(unit.id)
+	_reload_after_progress()
+
+
 func _fill_categorias() -> void:
 	_clear(tab_categorias)
 	var categories: Array = unit.categories
@@ -599,11 +646,7 @@ func _make_effect_row(effect: Dictionary) -> Control:
 	var detail := _effect_value_text(effect)
 
 	var row := PanelContainer.new()
-	var style := StyleBoxFlat.new()
-	style.set_corner_radius_all(10)
-	style.bg_color = Color(color.r * 0.18, color.g * 0.18, color.b * 0.22, 0.85)
-	style.set_border_width_all(2)
-	style.border_color = Color(color.r, color.g, color.b, 0.45)
+	var style := VI.chip(color, 0.88)
 	style.content_margin_left = 10.0
 	style.content_margin_right = 10.0
 	style.content_margin_top = 6.0

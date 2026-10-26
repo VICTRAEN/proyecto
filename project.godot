@@ -34,6 +34,11 @@ window/handheld/orientation="portrait"
 
 project/assembly_name="Nuevo Proyecto de Juego"
 
+[gui]
+
+theme/custom="res://ui/theme.tres"
+
+
 [input]
 
 ui_left={

@@ -1,0 +1,17 @@
+{
+	"id": "dupe_rules",
+	"description": "Sistema de DUPES. Las copias repetidas de un personaje (GameState.duplicates) se consumen en su ficha para subir su Dupe de 0 a max_level. Cada mejora cuesta copies_per_level[nivel_actual] copias de ESE personaje. Los bonus de cada nivel son TOTALES (no se suman a los anteriores) y se aplican como modificadores de origen 'dupe' (kind mult para vida/ataque/defensa/velocidad, flat para critico y esquiva). Anadir una estadistica a un nivel es una linea; anadir un nivel nuevo es subir max_level y rellenar su fila.",
+	"max_level": 5,
+	"copies_per_level": [1, 1, 1, 1, 1],
+	"levels": [
+		{},
+		{ "max_hp": 0.03, "atk": 0.03, "def": 0.03 },
+		{ "max_hp": 0.06, "atk": 0.06, "def": 0.06 },
+		{ "max_hp": 0.09, "atk": 0.09, "def": 0.09 },
+		{ "max_hp": 0.12, "atk": 0.12, "def": 0.12 },
+		{ "max_hp": 0.18, "atk": 0.18, "def": 0.18, "crit_rate": 0.03 }
+	],
+	"overflow": { "coins_per_copy": 1000 },
+	"overflow_description": "Copias SOBRANTES: las que sobran cuando el personaje ya esta en max_level no sirven para mejorarlo, asi que se pueden convertir en monedas (coins_per_copy cada una). Poner 0 o quitar el bloque desactiva la conversion.",
+	"reserved": "Hueco para futuras mejoras de habilidades o efectos especiales por nivel: no se interpreta todavia."
+}

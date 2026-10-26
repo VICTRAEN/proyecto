@@ -9,6 +9,17 @@
 **No hay que editar ningun script ni ningun JSON.** El juego busca la imagen por
 su nombre cada vez que abre la pantalla.
 
+## ARTE PROVISIONAL (rediseno artistico global)
+
+Los `.webp` que hay en esta carpeta (menu, collection, summon, team, stages,
+battle, battle_forest, battle_ruins, results, missions, events, history, map,
+inventory, mutation, shop, tower, evolution, settings) son **fondos provisionales
+generados por codigo** (`tools/gen_backgrounds.py`, 1080x1920): ciudades
+futuristas al atardecer, cielos violeta/magenta, portal magico, etc. **No son arte
+final.** Para sustituir uno basta meter un `.png` con el mismo nombre: **el `.png`
+gana al `.webp`** y no se toca ningun script. Para regenerarlos todos:
+`python3 tools/gen_backgrounds.py` (necesita numpy, scipy y Pillow).
+
 ## Nombres de archivo
 
 | Archivo | Pantalla donde se ve |
@@ -25,6 +36,11 @@ su nombre cada vez que abre la pantalla.
 | `events.png` | Eventos |
 | `inventory.png` | Mochila |
 | `mutation.png` | Mutaciones |
+| `summon.png` | Invocar (portal) |
+| `shop.png` | Tienda |
+| `tower.png` | Torre |
+| `evolution.png` | Evolucion |
+| `settings.png` | Ajustes |
 
 Tambien valen `.jpg` y `.webp`. Si existen dos, gana el `.png`.
 
@@ -61,7 +77,7 @@ exacta.
 El nodo `Background` de cada pantalla tiene una propiedad `scrim`:
 
 - `0.0` = sin oscurecer (fondo muy visible, texto mas dificil de leer).
-- `0.42` = valor por defecto.
+- `0.20` = valor por defecto (el fondo se ve; los paneles ya oscurecen lo justo).
 - `0.7` = fondo casi decorativo.
 
 Se cambia desde el inspector, escena por escena.

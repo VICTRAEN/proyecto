@@ -74,6 +74,10 @@ var rarities: Dictionary = {}
 ## Duplicados obtenidos de cada personaje. id -> copias de mas. El primer
 ## personaje obtenido NO cuenta como duplicado.
 var duplicates: Dictionary = {}
+## Nivel de DUPE de cada personaje (0..max). Es lo UNICO que se guarda del sistema de
+## Dupes: las copias disponibles se CALCULAN (duplicates - nivel) y los bonus salen de
+## data/dupes/rules.json, asi no hay datos redundantes que puedan desincronizarse.
+var dupe_levels: Dictionary = {}
 ## Equipo activo: lo usa el combate, tal cual, sin copias.
 var party: Array = []
 var friend: String = ""
@@ -331,6 +335,8 @@ func character_data(id: String) -> Dictionary:
 			data["stat_multiplier"] = float(into.get("stat_multiplier", 1.0))
 	data["owned"] = is_owned(String(id))
 	data["duplicates"] = duplicates_of(String(id))
+	data["dupe_level"] = dupe_level_of(String(id))
+	data["dupe_mods"] = dupe_mods_for(String(id))
 	# El bloque "evolution" es la RECETA (pasiva mejorada, links y categorias
 	# nuevos), no algo que se pinte: la ficha ve el resultado ya aplicado.
 	var evolution = data.get("evolution", {})
@@ -1645,6 +1651,208 @@ func reveal_finish() -> Dictionary:
 	save_game()
 	return summary
 
+
+
+## --- DUPES -----------------------------------------------------------------------
+## Copias repetidas de un personaje -> mejora permanente de ESE personaje. Reglas y
+## numeros en data/dupes/rules.json. Copias EXTRA obtenidas = duplicates[id] (la primera
+## copia del personaje no cuenta: es el propio personaje); las ya gastadas salen de
+## dupe_levels[id] (cada nivel cuesta copies_per_level); disponibles = extra - gastadas.
+## Es independiente del nivel de combate, la rareza y la
+## evolucion (no se tocan al evolucionar), y los bonus entran en combate como
+## modificadores de origen "dupe": reaplicar el mismo origen SUSTITUYE, no acumula.
+
+func dupe_max_level() -> int:
+	return int(DB.dupe_rules.get("max_level", 0))
+
+
+func dupe_level_of(id: String) -> int:
+	return clampi(int(dupe_levels.get(String(id), 0)), 0, dupe_max_level())
+
+
+## Copias que el jugador puede gastar ahora: las obtenidas menos las ya consumidas.
+func dupe_copies_available(id: String) -> int:
+	return maxi(0, duplicates_of(String(id)) - _dupe_copies_spent(String(id)))
+
+
+## Copias ya consumidas: suma del coste de cada nivel alcanzado.
+func _dupe_copies_spent(id: String) -> int:
+	var spent := 0
+	var costs: Array = DB.dupe_rules.get("copies_per_level", [])
+	for i in dupe_level_of(id):
+		spent += int(costs[i])
+	return spent
+
+
+## Nivel mas alto de Dupe que se paga con `budget` copias gastadas (se usa al fusionar los
+## Dupes de dos identidades en una evolucion especial).
+func _dupe_level_for_budget(budget: int) -> int:
+	var costs: Array = DB.dupe_rules.get("copies_per_level", [])
+	var level := 0
+	var spent := 0
+	while level < dupe_max_level() and level < costs.size() and spent + int(costs[level]) <= budget:
+		spent += int(costs[level])
+		level += 1
+	return level
+
+
+## Coste en copias del SIGUIENTE nivel, o 0 si ya esta al maximo.
+func dupe_next_cost(id: String) -> int:
+	var level := dupe_level_of(id)
+	var costs: Array = DB.dupe_rules.get("copies_per_level", [])
+	if level >= dupe_max_level() or level >= costs.size():
+		return 0
+	return int(costs[level])
+
+
+## Bonus TOTALES de un nivel de Dupe: { stat: valor }. Nivel fuera de rango = {}.
+func dupe_bonus_for_level(level: int) -> Dictionary:
+	var levels: Array = DB.dupe_rules.get("levels", [])
+	if level <= 0 or level >= levels.size():
+		return {}
+	var row = levels[level]
+	return (row as Dictionary).duplicate() if row is Dictionary else {}
+
+
+## Modificadores de un nivel de Dupe listos para StatBlock.add_mod. kind: "mult"
+## (relativo a la base) salvo para las probabilidades (critico/esquiva), que son flat.
+func dupe_mods_for_level(level: int) -> Array:
+	var out: Array = []
+	var bonus := dupe_bonus_for_level(level)
+	for stat in bonus.keys():
+		var stat_name := String(stat)
+		if not StatBlock.LABELS.has(stat_name):
+			continue
+		out.append({
+			"stat": stat_name,
+			"kind": "flat" if StatBlock.is_rate_stat(stat_name) else "mult",
+			"value": float(bonus[stat]),
+			"source": "dupe",
+		})
+	return out
+
+
+func dupe_mods_for(id: String) -> Array:
+	return dupe_mods_for_level(dupe_level_of(id))
+
+
+## Informe de la siguiente mejora, siempre con el mismo formato:
+## { ok, reason, level, max_level, next_level, cost, copies, preview: [ {stat, label,
+##   current, next} ] }. La vista previa sale del MISMO calculo que el combate.
+func dupe_status(id: String) -> Dictionary:
+	var key := String(id)
+	var level := dupe_level_of(key)
+	var report := {
+		"ok": false, "reason": "", "id": key, "level": level, "max_level": dupe_max_level(),
+		"next_level": mini(level + 1, dupe_max_level()), "cost": dupe_next_cost(key),
+		"copies": dupe_copies_available(key), "preview": [],
+	}
+	if DB.get_character(key).is_empty() or not is_owned(key):
+		report["reason"] = "Todavia no tienes a ese personaje."
+		return report
+	if dupe_max_level() <= 0:
+		report["reason"] = "El sistema de Dupes no esta disponible."
+		return report
+	if level >= dupe_max_level():
+		report["reason"] = "Dupe maximo alcanzado (Dupe %d)." % dupe_max_level()
+		return report
+	report["preview"] = dupe_stat_preview(key, level, level + 1)
+	if int(report["copies"]) < int(report["cost"]):
+		report["reason"] = "Faltan copias: necesitas %d y tienes %d." % [int(report["cost"]), int(report["copies"])]
+		return report
+	report["ok"] = true
+	report["reason"] = "Listo para mejorar a Dupe %d." % (level + 1)
+	return report
+
+
+## Estadisticas de la unidad (a su nivel y rareza actuales) con el Dupe `from_level` y
+## con el `to_level`. Mismo StatBlock que usa el combate: nada calculado aparte.
+func dupe_stat_preview(id: String, from_level: int, to_level: int) -> Array:
+	var rows: Array = []
+	var data := character_data(String(id))
+	if data.is_empty():
+		return rows
+	var blocks: Array = []
+	for lvl in [from_level, to_level]:
+		var block := StatBlock.new(data.get("stats", {}), int(data.get("level", 1)))
+		block.set_rarity_multiplier(float(data.get("stat_multiplier", 1.0)))
+		for mod in dupe_mods_for_level(int(lvl)):
+			block.add_mod(String(mod["stat"]), String(mod["kind"]), float(mod["value"]), String(mod["source"]))
+		blocks.append(block)
+	for stat in ["max_hp", "atk", "def", "speed", "crit_rate", "dodge_rate"]:
+		rows.append({
+			"stat": stat,
+			"label": StatBlock.label(stat),
+			"base": (blocks[0] as StatBlock).base_value(stat),
+			"current": (blocks[0] as StatBlock).get_stat(stat),
+			"next": (blocks[1] as StatBlock).get_stat(stat),
+		})
+	return rows
+
+
+## Consume copias y sube un nivel de Dupe. ATOMICA: valida todo primero y solo
+## entonces cambia el estado (un nivel y un guardado), asi un error no deja nada a
+## medias y una segunda llamada sin copias no hace nada. Devuelve el informe.
+func dupe_upgrade(id: String) -> Dictionary:
+	var key := String(id)
+	var check := dupe_status(key)
+	if not bool(check["ok"]):
+		check["done"] = false
+		return check
+	dupe_levels[key] = int(check["level"]) + 1
+	save_game()
+	var after := dupe_status(key)
+	after["done"] = true
+	after["spent"] = int(check["cost"])
+	after["reached"] = int(check["level"]) + 1
+	return after
+
+
+## Monedas que da cada copia SOBRANTE (0 = conversion desactivada en data/dupes/rules.json).
+func dupe_overflow_rate() -> int:
+	var overflow = DB.dupe_rules.get("overflow", {})
+	if not (overflow is Dictionary):
+		return 0
+	return maxi(0, int((overflow as Dictionary).get("coins_per_copy", 0)))
+
+
+## Copias sobrantes: SOLO existen cuando el personaje ya esta en el Dupe maximo (antes,
+## toda copia disponible sirve para mejorar). Ningun otro personaje las puede usar.
+func dupe_overflow_copies(id: String) -> int:
+	var key := String(id)
+	if not is_owned(key) or dupe_max_level() <= 0 or dupe_level_of(key) < dupe_max_level():
+		return 0
+	return dupe_copies_available(key)
+
+
+## Convierte TODAS las copias sobrantes de ESE personaje en monedas. Atomica: valida, y
+## solo entonces resta las copias, suma las monedas y guarda (un unico guardado). Nunca
+## toca copias ya gastadas ni las de otros personajes. Devuelve { done, reason, copies, coins }.
+func dupe_convert_overflow(id: String) -> Dictionary:
+	var key := String(id)
+	var copies := dupe_overflow_copies(key)
+	var rate := dupe_overflow_rate()
+	var report := { "done": false, "reason": "", "id": key, "copies": copies, "coins": copies * rate }
+	if rate <= 0:
+		report["reason"] = "La conversion de copias sobrantes no esta disponible."
+		return report
+	if copies <= 0:
+		report["reason"] = "No hay copias sobrantes."
+		return report
+	duplicates[key] = duplicates_of(key) - copies
+	add_coins(copies * rate)
+	save_game()
+	report["done"] = true
+	report["reason"] = "Copias convertidas."
+	return report
+
+
+## Aplica el Dupe a un StatBlock (una vez por unidad, con origen "dupe").
+func apply_dupe_mods(stat_block, id: String) -> void:
+	if stat_block == null:
+		return
+	for mod in dupe_mods_for(id):
+		stat_block.add_mod(String(mod["stat"]), String(mod["kind"]), float(mod["value"]), String(mod["source"]))
 
 ## --- Inventario -------------------------------------------------------------
 
@@ -3520,6 +3728,21 @@ func evolve_special(id: String) -> Dictionary:
 	progress[to_id] = inherited
 	if not duplicates.has(to_id):
 		duplicates[to_id] = 0
+	# Los DUPES son del personaje y no se pierden: si la ruta consume la forma
+	# anterior, sus copias y su nivel de Dupe pasan a la nueva (sin duplicar bonus:
+	# el nivel es un numero, no un modificador guardado).
+	if bool(route.get("consume_from", true)):
+		# Se juntan las copias EXTRA y las ya gastadas de las dos identidades; el nivel
+		# resultante es el mas alto que ese gasto total paga. Con coste uniforme equivale
+		# a sumar niveles (con tope); con costes distintos nunca se pierde ninguna copia.
+		var spent_budget := _dupe_copies_spent(to_id) + _dupe_copies_spent(key)
+		duplicates[to_id] = duplicates_of(to_id) + duplicates_of(key)
+		var merged_level := _dupe_level_for_budget(spent_budget)
+		if merged_level > 0:
+			dupe_levels[to_id] = merged_level
+		else:
+			dupe_levels.erase(to_id)
+		dupe_levels.erase(key)
 	# La mutacion pertenece al PERSONAJE y no se pierde: se muda al nuevo.
 	if not mutation_before.is_empty():
 		mutations[to_id] = mutations.get(key, {})
@@ -3581,6 +3804,7 @@ func save_game() -> void:
 		"missions_claimed": missions_claimed,
 		"rarities": rarities,
 		"duplicates": duplicates,
+		"dupe_levels": dupe_levels,
 		"inventory": inventory,
 		"mutations": mutations,
 		"story_progress": story_progress,
@@ -3664,6 +3888,20 @@ func load_game() -> bool:
 	if loaded_duplicates is Dictionary:
 		for key in loaded_duplicates.keys():
 			duplicates[String(key)] = int(loaded_duplicates[key])
+	# Dupes: solo se guarda el NIVEL por personaje. Un guardado anterior no lo trae y
+	# arranca en 0 (sus duplicados pasan a ser copias disponibles, sin perder nada).
+	# Se sanea: nivel dentro de rango y nunca mayor que las copias que lo pagan.
+	dupe_levels = {}
+	var loaded_dupes = data.get("dupe_levels", {})
+	if loaded_dupes is Dictionary:
+		for key in loaded_dupes.keys():
+			var lvl := clampi(int(loaded_dupes[key]), 0, dupe_max_level())
+			if lvl > 0 and DB.has_character(String(key)):
+				dupe_levels[String(key)] = lvl
+	for key in dupe_levels.keys():
+		var owed := _dupe_copies_spent(String(key))
+		if duplicates_of(String(key)) < owed:
+			duplicates[String(key)] = owed
 	# V3: inventario, mutaciones, progreso de historia y progreso de eventos. Un
 	# guardado v1 o v2 no trae estos campos y se quedan vacios ("no tiene ningun
 	# objeto", "ningun personaje tiene mutacion", "no ha jugado la historia ni los

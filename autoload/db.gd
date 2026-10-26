@@ -34,6 +34,7 @@ const MUTATIONS_FILE := "res://data/mutations/config.json"
 const EVOLUTION_FILE := "res://data/evolution/rules.json"
 ## Las evoluciones ESPECIALES (cambian de personaje, no solo de rareza) viven en
 ## su propio archivo con "routes", con el mismo formato de lectura.
+const DUPE_RULES_FILE := "res://data/dupes/rules.json"
 const SPECIAL_EVOLUTION_FILE := "res://data/evolutions/special.json"
 ## Orden de las dificultades de un nivel de historia cuando su JSON no trae el
 ## campo "order". Completa una dificultad de orden N desbloquea y paga las de
@@ -65,6 +66,8 @@ var leader_table: Dictionary = {}
 var mutations_config: Dictionary = {}
 ## { "routes": [ { from, to, level_required, coin_cost, item_cost, boss } ] }
 var special_evolution_rules: Dictionary = {}
+## Reglas de Dupes (res://data/dupes/rules.json): niveles, coste y bonus. Un solo sitio.
+var dupe_rules: Dictionary = {}
 var load_errors: Array = []
 
 
@@ -90,6 +93,7 @@ func load_all() -> void:
 	mutations_config = _load_mutations()
 	evolution_rules = _read_routes_file(EVOLUTION_FILE)
 	special_evolution_rules = _read_routes_file(SPECIAL_EVOLUTION_FILE)
+	dupe_rules = _load_dupe_rules()
 	leader_table = _load_leaders()
 	_check_references()
 	if load_errors.is_empty():
@@ -503,6 +507,35 @@ func all_links() -> Array:
 
 func all_categories() -> Array:
 	return _all_sorted(categories)
+
+
+## Carga y VALIDA las reglas de Dupes. Si el archivo falta o es incoherente se deja
+## constancia en load_errors y el sistema queda desactivado (max_level 0) en vez de
+## aplicar numeros a medias.
+func _load_dupe_rules() -> Dictionary:
+	var off := { "max_level": 0, "copies_per_level": [], "levels": [{}] }
+	if not FileAccess.file_exists(DUPE_RULES_FILE):
+		return off
+	var parsed = JSON.parse_string(FileAccess.get_file_as_string(DUPE_RULES_FILE))
+	if not (parsed is Dictionary):
+		load_errors.append("%s no es un JSON valido." % DUPE_RULES_FILE)
+		return off
+	var rules: Dictionary = parsed
+	var max_level := int(rules.get("max_level", 0))
+	var levels = rules.get("levels", [])
+	var costs = rules.get("copies_per_level", [])
+	if not (levels is Array) or (levels as Array).size() != max_level + 1 or not (costs is Array) or (costs as Array).size() != max_level:
+		load_errors.append("Dupes: 'levels' debe tener max_level+1 filas y 'copies_per_level' max_level.")
+		return off
+	for cost in costs:
+		if int(cost) < 1:
+			load_errors.append("Dupes: cada mejora cuesta al menos 1 copia.")
+			return off
+	var overflow = rules.get("overflow", {})
+	if not (overflow is Dictionary) or int((overflow as Dictionary).get("coins_per_copy", 0)) < 0:
+		load_errors.append("Dupes: 'overflow.coins_per_copy' debe ser un numero >= 0 (0 = sin conversion).")
+		rules["overflow"] = {}
+	return rules
 
 
 ## Banners ACTIVOS (los que no declaran "enabled": false), ordenados por id.
