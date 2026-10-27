@@ -3863,12 +3863,47 @@ func save_game() -> void:
 		"tower_team": tower_team,
 		"pending_reveal": pending_reveal,
 	}
+	_write_save_safely(JSON.stringify(payload, "\t"))
+
+
+## Escritura SEGURA del guardado (v10). Escribir directamente sobre save.json lo
+## vaciaba primero: si el movil mataba la app a mitad de escritura, el progreso se
+## perdia. Ahora: 1) se escribe un temporal completo, 2) se guarda la copia buena
+## anterior como save.json.bak, 3) el temporal sustituye al guardado. Si algo falla
+## se cae a la escritura directa de siempre (nunca se pierde un guardado).
+func _write_save_safely(text: String) -> void:
+	var tmp_path := SAVE_PATH + ".tmp"
+	var tmp := FileAccess.open(tmp_path, FileAccess.WRITE)
+	if tmp != null:
+		tmp.store_string(text)
+		tmp.close()
+		if FileAccess.get_file_as_string(tmp_path) == text:
+			if FileAccess.file_exists(SAVE_PATH) and _read_save_dict(SAVE_PATH).size() > 0:
+				DirAccess.copy_absolute(SAVE_PATH, SAVE_PATH + ".bak")
+			if DirAccess.rename_absolute(tmp_path, SAVE_PATH) == OK:
+				return
 	var file := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
 	if file == null:
 		push_error("GameState: no se pudo escribir %s" % SAVE_PATH)
 		return
-	file.store_string(JSON.stringify(payload, "\t"))
+	file.store_string(text)
 	file.close()
+
+
+## Lee un guardado y devuelve su diccionario, o {} si no existe o esta roto.
+func _read_save_dict(path: String) -> Dictionary:
+	if not FileAccess.file_exists(path):
+		return {}
+	var parsed = _parse_json_quiet(FileAccess.get_file_as_string(path))
+	return parsed if parsed is Dictionary else {}
+
+
+## JSON sin ruido en consola: un guardado roto es un caso previsto, no un error.
+func _parse_json_quiet(text: String) -> Variant:
+	var parser := JSON.new()
+	if parser.parse(text) != OK:
+		return null
+	return parser.data
 
 
 ## Devuelve true si se ha cargado un archivo valido. Si no existe, se queda con
@@ -3884,10 +3919,16 @@ func load_game() -> bool:
 		return false
 	var text := file.get_as_text()
 	file.close()
-	var parsed = JSON.parse_string(text)
+	var parsed = _parse_json_quiet(text)
 	if not (parsed is Dictionary):
-		push_warning("GameState: %s no es un guardado valido; se ignora." % SAVE_PATH)
-		return false
+		# Guardado roto (p. ej. la app se cerro a mitad de escribir): se recupera la
+		# ultima copia buena en vez de empezar de cero.
+		var backup := _read_save_dict(SAVE_PATH + ".bak")
+		if backup.is_empty():
+			push_warning("GameState: %s no es un guardado valido; se ignora." % SAVE_PATH)
+			return false
+		push_warning("GameState: %s estaba roto; se recupera la copia anterior (.bak)." % SAVE_PATH)
+		parsed = backup
 	var data: Dictionary = parsed
 	var version := int(data.get("version", 0))
 	if version > SAVE_VERSION:
@@ -4115,5 +4156,6 @@ func _migrate_save(data: Dictionary, version: int) -> Dictionary:
 
 
 func delete_save() -> void:
-	if FileAccess.file_exists(SAVE_PATH):
-		DirAccess.remove_absolute(SAVE_PATH)
+	for path in [SAVE_PATH, SAVE_PATH + ".bak", SAVE_PATH + ".tmp"]:
+		if FileAccess.file_exists(path):
+			DirAccess.remove_absolute(path)

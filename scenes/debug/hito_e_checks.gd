@@ -163,7 +163,7 @@ func _check_unit_data() -> void:
 	_check("nace como SSR", String(data.get("rarity", "")) == "SSR")
 	_check("estadisticas en datos (hp, atk, def, speed)", int(data["stats"]["max_hp"]) > 0 and int(data["stats"]["atk"]) > 0 and int(data["stats"]["def"]) > 0 and int(data["stats"]["speed"]) > 0)
 	_check("tiene tipo, categorias, links, pasiva y habilidades", not String(data.get("type", "")).is_empty() and not (data["categories"] as Array).is_empty() and not (data["links"] as Array).is_empty() and not (data["passive"] as Dictionary).is_empty() and (data["skills"] as Array).size() == 2)
-	_check("tiene Leader Skill declarada en datos", not String((DB.get("leaders_data") if DB.get("leaders_data") != null else {}).get("x", "")).is_empty() or GameState.leader_skill_for(DUO).size() > 0 if GameState.has_method("leader_skill_for") else true)
+	_check("tiene Leader Skill declarada en datos", DB.leader_id_for(DUO) == "lead_david_lucy_duo" and not (DB.leader_for(DUO) as Dictionary).is_empty())
 	var david := DB.get_character("david")
 	var lucy := DB.get_character("lucy")
 	_check("David y Lucy individuales siguen intactos (SR, ids propios)", String(david.get("id", "")) == "david" and String(lucy.get("id", "")) == "lucy" and String(david.get("rarity", "")) == "SR" and String(lucy.get("rarity", "")) == "SR" and int(david["stats"]["max_hp"]) == 1290 and int(lucy["stats"]["max_hp"]) == 1150)

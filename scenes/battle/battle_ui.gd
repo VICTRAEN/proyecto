@@ -163,6 +163,7 @@ func _ready() -> void:
 	manager.battle_finished.connect(_on_battle_finished)
 	manager.ultimate_started.connect(_on_ultimate_started)
 	_build_ultimate_button()
+	_build_speed_auto_buttons()
 
 	attack_button.pressed.connect(_on_attack_pressed)
 	special_button.pressed.connect(_on_special_pressed)
@@ -449,6 +450,8 @@ func _on_battle_finished(victory: bool, rounds: int) -> void:
 	# El boton SALIR flotante vive por encima del resultado: se aparta para no
 	# tapar la pantalla de recompensa, que trae su propio CONTINUAR.
 	exit_button.visible = false
+	if _tools_row != null:
+		_tools_row.visible = false
 	action_hint.text = ""
 	result_overlay.visible = true
 	# La pantalla de resultado tiene su propio fondo, distinto del escenario del
@@ -490,6 +493,70 @@ func _on_special_pressed() -> void:
 
 func _on_ultimate_pressed() -> void:
 	_submit("ultimate")
+
+
+## --- AUTO y VELOCIDAD en combate ------------------------------------------------
+## Dos botones bajo el numero de ronda: AUTO (el combate elige las acciones de tus
+## personajes; se puede apagar en cualquier momento) y x1/x2 (misma velocidad que
+## el ajuste COMBATE > Velocidad, que se guarda). No cambian ninguna regla.
+var _tools_row: HBoxContainer = null
+var auto_button: Button = null
+var speed_button: Button = null
+
+
+func _build_speed_auto_buttons() -> void:
+	_tools_row = HBoxContainer.new()
+	_tools_row.name = "BattleTools"
+	_tools_row.add_theme_constant_override("separation", 8)
+	_tools_row.anchor_left = 1.0
+	_tools_row.anchor_right = 1.0
+	_tools_row.offset_left = -270.0
+	_tools_row.offset_right = -16.0
+	_tools_row.offset_top = 64.0
+	_tools_row.offset_bottom = 116.0
+	add_child(_tools_row)
+	auto_button = Button.new()
+	auto_button.name = "AutoButton"
+	speed_button = Button.new()
+	speed_button.name = "SpeedButton"
+	for b in [auto_button, speed_button]:
+		b.focus_mode = Control.FOCUS_NONE
+		b.custom_minimum_size = Vector2(0, 52)
+		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		b.add_theme_font_size_override("font_size", 20)
+		_tools_row.add_child(b)
+		b.button_down.connect(_nudge.bind(b))
+	auto_button.pressed.connect(_on_auto_pressed)
+	speed_button.pressed.connect(_on_speed_pressed)
+	_refresh_tool_buttons()
+
+
+func _on_auto_pressed() -> void:
+	manager.set_auto(not manager.auto_mode)
+	if manager.auto_mode:
+		# El turno que esperaba al jugador ya lo ha resuelto el combate.
+		awaiting_input = false
+		_clear_targeting()
+	_refresh_tool_buttons()
+
+
+func _on_speed_pressed() -> void:
+	var fast := GameSettings.choice("battle_speed") == "fast"
+	var next := "normal" if fast else "fast"
+	GameSettings.set_value("battle_speed", next)
+	GameSettings.set_value("anim_speed", next)
+	_refresh_tool_buttons()
+
+
+func _refresh_tool_buttons() -> void:
+	if auto_button == null:
+		return
+	var on: bool = manager != null and manager.auto_mode
+	auto_button.text = "AUTO SI" if on else "AUTO NO"
+	VisualIdentity.tint_button(auto_button, VisualIdentity.GOLD if on else VisualIdentity.BLUE)
+	var fast := GameSettings.choice("battle_speed") == "fast"
+	speed_button.text = "x2" if fast else "x1"
+	VisualIdentity.tint_button(speed_button, VisualIdentity.GOLD if fast else VisualIdentity.BLUE)
 
 
 ## Boton de la ULTIMATE de forma (LR). Se construye por codigo junto al ESPECIAL y

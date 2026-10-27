@@ -48,6 +48,11 @@ const STUN_PAUSE := 0.4
 var pause_scale := 1.0
 
 
+func _on_setting_changed(key: String) -> void:
+	if key == "battle_speed" and GameSettings != null:
+		pause_scale = GameSettings.battle_pause_scale()
+
+
 ## Pausa real de un tiempo base, ya con el ajuste de velocidad aplicado.
 func pause_time(base_seconds: float) -> float:
 	return base_seconds * pause_scale
@@ -57,6 +62,31 @@ func pause_time(base_seconds: float) -> float:
 ## comprobar que la pasiva de Isagi sube el numero y que vuelve a bajar cuando
 ## caduca. False en el juego normal.
 const DEBUG_BATTLE := false
+## MODO AUTO (boton AUTO del combate): los aliados eligen la accion por el jugador
+## (ultimate > especial > basico, objetivo automatico). Se puede activar y
+## desactivar a mitad de combate; empieza apagado en cada batalla.
+var auto_mode := false
+## Verdadero mientras el combate espera la accion de un aliado (lo usa set_auto).
+var _awaiting_ally_action := false
+
+
+func set_auto(enabled: bool) -> void:
+	auto_mode = enabled
+	# Si justo ahora se esta esperando al jugador, la accion se decide sola.
+	if enabled and _awaiting_ally_action and not _finished:
+		var unit := next_actor()
+		if unit != null and unit.is_ally and unit.alive:
+			submit_action({ "kind": _pick_auto_kind(unit), "target_key": "" })
+
+
+func _pick_auto_kind(unit: CombatUnit) -> String:
+	if can_use(unit, "ultimate"):
+		return "ultimate"
+	if can_use(unit, "special"):
+		return "special"
+	return "basic"
+
+
 ## Los aliados actuan solos, como el enemigo. SOLO para la verificacion en
 ## ejecucion: con esto se pueden leer varias rondas de tiradas sin tocar
 ## pantalla. En el juego normal va en false.
@@ -103,6 +133,9 @@ func setup(ally_data: Array, enemy_data: Array, reserve_data: Array = []) -> voi
 	# El ajuste de velocidad de combate se lee UNA vez por batalla: si el jugador
 	# lo cambia en AJUSTES, la siguiente batalla ya va distinto.
 	pause_scale = GameSettings.battle_pause_scale() if GameSettings != null else 1.0
+	# La velocidad se puede cambiar EN el combate (boton de la pantalla): se reaplica.
+	if GameSettings != null and not GameSettings.changed.is_connected(_on_setting_changed):
+		GameSettings.changed.connect(_on_setting_changed)
 
 	var index := 0
 	for data in ally_data:
@@ -242,14 +275,27 @@ func _take_turn(unit: CombatUnit) -> void:
 	if unit.is_ally and DEBUG_AUTOPLAY:
 		await get_tree().create_timer(ENEMY_THINK_TIME * pause_scale).timeout
 		_perform(unit, _pick_enemy_kind(unit))
+	elif unit.is_ally and auto_mode:
+		await get_tree().create_timer(ENEMY_THINK_TIME * pause_scale).timeout
+		# Si el jugador apago AUTO durante la espera, la mano vuelve a el.
+		if auto_mode:
+			_perform(unit, _pick_auto_kind(unit))
+		else:
+			action_requested.emit(unit)
+			_awaiting_ally_action = true
+			var manual: Dictionary = await action_chosen
+			_awaiting_ally_action = false
+			_perform(unit, String(manual.get("kind", "basic")), String(manual.get("target_key", "")))
 	elif unit.is_ally:
 		action_requested.emit(unit)
+		_awaiting_ally_action = true
 		var payload: Dictionary = await action_chosen
+		_awaiting_ally_action = false
 		# El objetivo elegido por el jugador viaja con la accion. Si no lo manda
 		# (o ya no es valido) el combate elige por el.
 		_perform(unit, String(payload.get("kind", "basic")), String(payload.get("target_key", "")))
 	else:
-		await get_tree().create_timer(ENEMY_THINK_TIME).timeout
+		await get_tree().create_timer(ENEMY_THINK_TIME * pause_scale).timeout
 		_perform(unit, _pick_enemy_kind(unit))
 
 	unit.tick_statuses()
@@ -259,7 +305,7 @@ func _take_turn(unit: CombatUnit) -> void:
 		await get_tree().create_timer(ULTIMATE_CINEMATIC_PAUSE * pause_scale).timeout
 	elif _last_action_kind == "special":
 		await get_tree().create_timer(ULTIMATE_PAUSE * pause_scale).timeout
-	await get_tree().create_timer(TURN_PAUSE).timeout
+	await get_tree().create_timer(TURN_PAUSE * pause_scale).timeout
 
 
 func _perform(actor: CombatUnit, kind: String, target_key: String = "") -> void:

@@ -39,6 +39,9 @@ const CARD_TILE := preload("res://ui/card_tile.gd")
 var _selected_slot := 0
 ## Personaje cuya informacion se esta mostrando abajo.
 var _focused_id := ""
+## Orden de la lista de personajes (se recuerda mientras dura la sesion).
+static var _sort_mode := 0
+var _sort_option: OptionButton = null
 
 @onready var title_label: Label = $Margin/Main/Title
 @onready var lineup_title: Label = $Margin/Main/LineupTitle
@@ -63,6 +66,7 @@ func _ready() -> void:
 	back_button.pressed.connect(_back)
 	remove_button.pressed.connect(_on_remove_pressed)
 	play_button.pressed.connect(_play)
+	_build_sort_row()
 
 
 ## Aspecto estatico de la pantalla, en un solo sitio: el equipo arriba, el
@@ -176,9 +180,66 @@ func _build_lineup() -> void:
 
 ## --- La lista de personajes (abajo) ----------------------------------------
 
+## Selector de ORDEN encima de la lista: con muchos personajes, encontrar al que se
+## busca era recorrerlo todo. No cambia el equipo ni los datos, solo el orden de las
+## tarjetas. Por defecto, mejor rareza primero (como la Coleccion).
+func _build_sort_row() -> void:
+	var row := HBoxContainer.new()
+	row.name = "SortRow"
+	row.add_theme_constant_override("separation", 10)
+	var label := Label.new()
+	label.text = "ORDEN"
+	VI.style_note(label)
+	row.add_child(label)
+	_sort_option = OptionButton.new()
+	_sort_option.name = "SortOption"
+	_sort_option.custom_minimum_size = Vector2(0, 52)
+	_sort_option.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	for entry in ["Rareza", "Nivel", "Nombre", "Tipo"]:
+		_sort_option.add_item(entry)
+	_sort_option.selected = clampi(_sort_mode, 0, 3)
+	VI.tint_button(_sort_option, VI.BLUE)
+	_sort_option.item_selected.connect(_on_sort_selected)
+	row.add_child(_sort_option)
+	var parent := pool_title.get_parent()
+	parent.add_child(row)
+	parent.move_child(row, pool_title.get_index() + 1)
+
+
+func _on_sort_selected(index: int) -> void:
+	_sort_mode = index
+	_build_pool()
+
+
+## Lista ordenada segun el selector. Orden estable: a igualdad, por nombre.
+func sorted_roster() -> Array:
+	var list: Array = GameState.roster_data().duplicate()
+	list.sort_custom(func(a, b):
+		match _sort_mode:
+			1:
+				var la := int(a.get("level", 1))
+				var lb := int(b.get("level", 1))
+				if la != lb:
+					return la > lb
+			2:
+				pass
+			3:
+				var ta := String(a.get("type", ""))
+				var tb := String(b.get("type", ""))
+				if ta != tb:
+					return ta < tb
+			_:
+				var ra := VI.rarity_rank(String(a.get("rarity", "R")))
+				var rb := VI.rarity_rank(String(b.get("rarity", "R")))
+				if ra != rb:
+					return ra > rb
+		return String(a.get("name", "")) < String(b.get("name", "")))
+	return list
+
+
 func _build_pool() -> void:
 	_clear(pool)
-	for data in GameState.roster_data():
+	for data in sorted_roster():
 		var id := String(data.get("id", ""))
 		var pos := GameState.party.find(id)
 		var extra := "LIBRE"
