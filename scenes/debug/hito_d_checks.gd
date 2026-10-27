@@ -783,8 +783,15 @@ func _check_audio_files() -> void:
 	GameAudio.play_music("history")
 	_check("audio: la musica 'history' suena (pista cargada)", not String(GameAudio.get("_music_path")).is_empty())
 	var player: AudioStreamPlayer = GameAudio.get("_music")
-	var stream := player.stream as AudioStreamWAV
-	_check("audio: el WAV de musica tiene bucle cerrado", stream != null and stream.loop_mode == AudioStreamWAV.LOOP_FORWARD and stream.loop_end > 0)
+	var loop_ok := false
+	if player.stream is AudioStreamWAV:
+		var w := player.stream as AudioStreamWAV
+		loop_ok = w.loop_mode == AudioStreamWAV.LOOP_FORWARD and w.loop_end > 0
+	elif player.stream is AudioStreamMP3:
+		loop_ok = (player.stream as AudioStreamMP3).loop
+	elif player.stream is AudioStreamOggVorbis:
+		loop_ok = (player.stream as AudioStreamOggVorbis).loop
+	_check("audio: la musica (wav/mp3/ogg) tiene bucle", loop_ok)
 	GameSettings.set_value("music_volume", 0.0, false)
 	_check("audio: music_volume 0 = silencio", player.volume_db <= -79.0)
 	GameSettings.set_value("music_volume", 0.8, false)
@@ -810,7 +817,7 @@ func _check_music_flow() -> void:
 		_app.call("open_screen", screen)
 		await _frames(3)
 		var path := String(GameAudio.get("_music_path"))
-		_check("musica en %s = %s" % [screen, expected[screen]], path.ends_with("/%s.wav" % expected[screen]))
+		_check("musica en %s = %s" % [screen, expected[screen]], path.get_file().get_basename() == String(expected[screen]))
 		_check("musica en %s: una sola pista sonando (%d)" % [screen, _music_players_playing()], _music_players_playing() <= 1)
 		_app.call("go_back")
 		await _frames(2)
@@ -819,14 +826,14 @@ func _check_music_flow() -> void:
 	GameState.prepare_battle(GameState.BATTLE_STORY, { "level": "world_001_01", "difficulty": "normal" })
 	_app.call("open_battle")
 	await _wait(0.6)
-	_check("musica de combate al abrir la batalla", String(GameAudio.get("_music_path")).ends_with("/battle.wav"))
+	_check("musica de combate al abrir la batalla", String(GameAudio.get("_music_path")).get_file().get_basename() == "battle")
 	await _app.call("_dbg12_finish_battle", false)
 	await _wait(2.4)
-	_check("musica de RESULTADOS al aparecer el panel de resultados", String(GameAudio.get("_music_path")).ends_with("/results.wav"))
+	_check("musica de RESULTADOS al aparecer el panel de resultados", String(GameAudio.get("_music_path")).get_file().get_basename() == "results")
 	_check("resultados: una sola pista de musica sonando", _music_players_playing() <= 1)
 	_app.call("close_battle")
 	await _wait(0.3)
-	_check("al cerrar el combate vuelve la musica de pantalla (no sigue 'results')", not String(GameAudio.get("_music_path")).ends_with("/results.wav"))
+	_check("al cerrar el combate vuelve la musica de pantalla (no sigue 'results')", not String(GameAudio.get("_music_path")).get_file().get_basename() == "results")
 	GameAudio.stop_music()
 
 
@@ -894,7 +901,7 @@ func _check_audio_flow() -> void:
 	var moved: Array = []
 	for cat in GameAudio.CATALOG:
 		for n in GameAudio.CATALOG[cat]:
-			for ext in [".wav", ".wav.import"]:
+			for ext in [".wav", ".wav.import", ".ogg", ".ogg.import", ".mp3", ".mp3.import"]:
 				var path := "res://audio/%s/%s%s" % [cat, n, ext]
 				if FileAccess.file_exists(path):
 					DirAccess.rename_absolute(path, path + ".bak")

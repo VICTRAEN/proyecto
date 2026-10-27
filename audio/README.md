@@ -1,5 +1,14 @@
 # Audio (reemplazable)
 
+## v9: banda sonora real colocada
+
+Las 5 pistas de musica de pantalla ya son las del usuario (`.mp3`, ~3 min cada una):
+`music/menu.mp3`, `battle.mp3`, `history.mp3`, `events.mp3` y `results.mp3`
+(esta ultima viene de "Musica_RECOMPENSA.mp3"). Se retiraron los `.wav` provisionales de
+esas 5 pistas, porque el orden de busqueda `.ogg > .wav > .mp3` hacia que ganaran al `.mp3`.
+Tambien esta el tema del duo: `music/david_lucy_theme.ogg`. Los 20 efectos siguen siendo provisionales.
+No esta escuchado por una persona en el entorno de pruebas: solo se verifica que carga y hace bucle.
+
 ## Estado actual
 
 Los 25 sonidos del catalogo (`GameAudio.CATALOG`) tienen un archivo **provisional

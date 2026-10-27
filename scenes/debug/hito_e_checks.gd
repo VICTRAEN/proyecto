@@ -583,7 +583,11 @@ func _check_cinematic() -> void:
 		var p2: VideoStreamPlayer = rv.find_child("CinematicVideo", true, false)
 		_check("la cinematica completa usa el video", p2 != null)
 		# Dejar que termine sola (2 s de video de prueba): finished -> revelado.
-		await _wait(2.6)
+		# Con el video real (~35 s) se espera a que termine sola (sondeo, maximo 45 s).
+		var waited := 0.0
+		while String(rv.call("phase")) == "cinematic" and waited < 45.0:
+			await _wait(0.5)
+			waited += 0.5
 		_check("al TERMINAR el video pasa solo al revelado de la carta", String(rv.call("phase")) == "card" and String(rv.call("current_id")) == DUO)
 	else:
 		await _wait(3.2)
