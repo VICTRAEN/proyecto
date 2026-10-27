@@ -76,6 +76,7 @@ func _ready() -> void:
 	_compact_filters()
 	back_button.pressed.connect(_back)
 	_setup_sort()
+	info_panel.changed.connect(_build)
 
 
 ## Todo el aspecto estatico de la pantalla, en un solo sitio. Los colores y
@@ -232,20 +233,42 @@ func _build_filter_row(row: HBoxContainer, options: Array, selected_value: Strin
 func _build() -> void:
 	_clear(grid)
 	var all: Array = GameState.roster_data()
+	# COPIAS: material aparte de la unidad, siempre en su calidad inicial. Una sola carta
+	# por calidad y personaje: si la unidad esta en esa calidad lleva el contador x N en
+	# su propia carta; si evoluciono (Gojo UR + 3 SSR) hay una carta SSR x3 aparte.
+	var merged_counts := {}
+	var separate: Array = []
+	for stack in GameState.copy_stacks():
+		if bool(stack["merged"]):
+			merged_counts[String(stack["id"])] = int(stack["count"])
+		else:
+			separate.append(stack)
 	var shown: Array = []
 	for data in all:
+		data["copy_count"] = int(merged_counts.get(String(data.get("id", "")), 0))
 		if _matches(data):
 			shown.append(data)
+	var units_shown := shown.size()
+	for stack in separate:
+		var pile: Dictionary = GameState.character_data(String(stack["id"]))
+		if pile.is_empty():
+			continue
+		pile["rarity"] = String(stack["quality"])
+		pile["form_override"] = String(stack["quality"]).to_lower()
+		pile["copy_only"] = true
+		pile["copy_count"] = int(stack["count"])
+		if _matches(pile):
+			shown.append(pile)
 	_sort_list(shown)
 
 	# Contador "obtenidos / total": el dia que exista el gacha, un personaje que
 	# este en los datos pero no en el roster no aparece y ademas se nota aqui.
-	if shown.size() == all.size():
+	if units_shown == all.size():
 		count_label.text = "%d / %d personajes. Toca uno para ver su ficha." % [
 			GameState.owned_count(), GameState.total_count()]
 	else:
 		count_label.text = "%d de %d mostrados  -  %d / %d obtenidos" % [
-			shown.size(), all.size(), GameState.owned_count(), GameState.total_count()]
+			units_shown, all.size(), GameState.owned_count(), GameState.total_count()]
 
 	if _progress != null:
 		_progress.max_value = maxi(1, GameState.total_count())
@@ -354,6 +377,9 @@ func _on_sort_selected(index: int) -> void:
 func _on_card_pressed(data: Dictionary) -> void:
 	if data.is_empty():
 		return
+	# Una pila de COPIAS abre la ficha de la unidad (es donde se consumen como Dupe).
+	if bool(data.get("copy_only", false)):
+		data = GameState.character_data(String(data.get("id", "")))
 	info_panel.open_for_data(data, false)
 
 

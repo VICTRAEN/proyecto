@@ -46,6 +46,9 @@ const EvolutionFx := preload("res://ui/evolution_fx.gd")
 ## El ROL del personaje no se muestra nunca: es una clasificacion de diseno.
 
 signal closed
+## El jugador cambio algo de la unidad (Dupe, nivel...): las pantallas que la muestran
+## (la coleccion con sus contadores de copias) se repintan al momento.
+signal changed
 
 ## Experiencia que suman los botones de prueba.
 const XP_TEST_AMOUNT := 250
@@ -353,6 +356,7 @@ func _on_xp_pressed() -> void:
 ## Rehace la vista previa con el nivel nuevo. El nivel cambia las estadisticas, y
 ## estas salen de StatBlock: por eso la ficha y el combate nunca pueden discrepar.
 func _reload_after_progress() -> void:
+	changed.emit()
 	if unit == null:
 		return
 	if _source_data.is_empty():

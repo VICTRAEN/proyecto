@@ -109,6 +109,13 @@ func _ready() -> void:
 		_debug_v15()
 	elif dbg_args.has("--dbg18"):
 		_start_hito_d()
+	elif dbg_args.has("--dbg21"):
+		var hito_g: GDScript = load("res://scenes/debug/hito_g_checks.gd")
+		var hito_g_node := Node.new()
+		hito_g_node.set_script(hito_g)
+		hito_g_node.name = "HitoGChecks"
+		add_child(hito_g_node)
+		hito_g_node.call_deferred("run", self)
 	elif dbg_args.has("--dbg20"):
 		var hito_f: GDScript = load("res://scenes/debug/hito_f_checks.gd")
 		var hito_f_node := Node.new()
@@ -129,6 +136,12 @@ func _ready() -> void:
 		motion_node.set_script(motion)
 		add_child(motion_node)
 		motion_node.call_deferred("run", self)
+	elif dbg_args.has("--shots-g"):
+		var shots_g: GDScript = load("res://scenes/debug/shots_g.gd")
+		var shots_g_node := Node.new()
+		shots_g_node.set_script(shots_g)
+		add_child(shots_g_node)
+		shots_g_node.call_deferred("run", self)
 	elif dbg_args.has("--shots-f"):
 		var shots_f: GDScript = load("res://scenes/debug/shots_f.gd")
 		var shots_f_node := Node.new()

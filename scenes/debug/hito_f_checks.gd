@@ -43,7 +43,9 @@ func _own(id: String, copies: int = 0, level: int = 0) -> void:
 	if not GameState.roster.has(id):
 		GameState.roster.append(id)
 	GameState.progress[id] = { "level": 1, "xp": 0 }
-	GameState.rarities.erase(id)
+	# Desde v8 solo las unidades UR o LR reciben Dupes (data/dupes/rules.json ->
+	# target_rarities): las unidades de prueba nacen UR. Los casos de SSR estan en DBG21.
+	GameState.rarities[id] = "UR"
 	GameState.duplicates[id] = copies
 	if level > 0:
 		GameState.dupe_levels[id] = level
@@ -130,7 +132,8 @@ func _check_upgrade_flow() -> void:
 	var base_atk := (GameState.dupe_stat_preview(A, 0, 0)[1]["current"]) as float
 	_check("la vista previa de Dupe 5 vale base x (1 + 18%)", absf(prev_atk - base_atk * 1.18) < 0.01)
 	var data := GameState.character_data(A)
-	_check("el Dupe no cambia el nivel de combate ni la rareza", int(data["level"]) == 1 and String(data["rarity"]) == String(DB.get_character(A)["rarity"]) and not bool(data["evolved"]))
+	# La unidad de prueba es UR (solo UR/LR reciben Dupes): el Dupe no debe moverla de ahi.
+	_check("el Dupe no cambia el nivel de combate ni la rareza", int(data["level"]) == 1 and String(data["rarity"]) == "UR" and GameState.rarity_of(A) == "UR")
 
 
 func _check_failures() -> void:
@@ -171,7 +174,8 @@ func _check_combat() -> void:
 	var expected := base_atk * 1.09
 	_check("ATK en combate = base x (1 + bonus Dupe 3)", absf(unit.attack() - expected) < 0.01)
 	_check("HP y DEF tambien suben", absf(unit.max_hp() - unit.base_stat("max_hp") * 1.09) < 0.01 and absf(unit.defense() - unit.base_stat("def") * 1.09) < 0.01)
-	_check("la base se mantiene separada (base_stat no incluye el bonus)", absf(base_atk - float(DB.get_character(A)["stats"]["atk"])) < 0.01)
+	# base_stat lleva el multiplicador de la FORMA (UR x1.25) pero NO el bonus de Dupe.
+	_check("la base se mantiene separada (base_stat no incluye el bonus)", absf(base_atk - float(DB.get_character(A)["stats"]["atk"]) * float(data["stat_multiplier"])) < 0.01)
 	# Sin acumulacion al reconstruir muchas veces o reaplicar.
 	var again := CombatUnit.new()
 	for i in 5:
@@ -210,6 +214,7 @@ func _check_evolution() -> void:
 	_out("[DBG20] == EVOLUCION CON DUPES ==")
 	var id := "gojo"
 	_own(id, 4, 3)
+	GameState.rarities.erase(id)  # esta prueba evoluciona desde SSR
 	GameState.progress[id] = { "level": 100, "xp": 0 }
 	GameState.coins = 1000000
 	var before := GameState.character_data(id)
@@ -418,9 +423,12 @@ func _check_f2p_sources() -> void:
 	GameState._grant_shop_reward({ "type": "character", "character_id": "sakuta_mai" })
 	GameState._grant_shop_reward({ "type": "character", "character_id": "sakuta_mai" })
 	_check("un F2P repetido por una recompensa genera una copia de Dupe, sin pago", GameState.is_owned("sakuta_mai") and GameState.dupe_copies_available("sakuta_mai") == 1)
+	# Solo las unidades UR o LR reciben Dupes: el F2P se prueba en su forma UR.
+	GameState.rarities["sakuta_mai"] = "UR"
 	var up := GameState.dupe_upgrade("sakuta_mai")
 	_check("el personaje F2P se puede mejorar con esa copia", bool(up["done"]) and GameState.dupe_level_of("sakuta_mai") == 1)
 	GameState.roster.erase("sakuta_mai")
+	GameState.rarities.erase("sakuta_mai")
 	GameState.dupe_levels.erase("sakuta_mai")
 	GameState.duplicates.erase("sakuta_mai")
 	# Invocaciones siguen funcionando y cuentan copias.

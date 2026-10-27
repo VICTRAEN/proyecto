@@ -55,7 +55,9 @@ func bind(new_data: Dictionary, selected: bool = false, extra: String = "") -> v
 	art_holder.add_child(art)
 	art.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	if owned:
-		art.setup(id, tint, String(data.get("portrait_style", "short")), Portrait.art_path_from(data, "front"), "front", "")
+		# "form_override": una COPIA se ve en su calidad inicial (p. ej. SSR) aunque la
+		# unidad del jugador haya evolucionado y tenga otra forma.
+		art.setup(id, tint, String(data.get("portrait_style", "short")), Portrait.art_path_from(data, "front"), "front", String(data.get("form_override", "")))
 	else:
 		art.setup("", VI.INK_DIM, String(data.get("portrait_style", "short")), "", "front", "")
 
@@ -70,6 +72,42 @@ func bind(new_data: Dictionary, selected: bool = false, extra: String = "") -> v
 		art_holder.add_child(fx)
 		fx.call("setup", rarity)
 
+	# Circulo de COPIAS disponibles (x3) en la esquina: material que se puede consumir
+	# como Dupe. Una sola carta por calidad y personaje: si la unidad esta en esa misma
+	# calidad el contador va en su propia carta; si evoluciono, hay una carta de copias.
+	var copies := int(data.get("copy_count", 0))
+	if owned and copies > 0:
+		var circle := PanelContainer.new()
+		circle.name = "CopyBadge"
+		circle.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		var disc := StyleBoxFlat.new()
+		disc.bg_color = Color(0.05, 0.30, 0.38, 0.97)
+		disc.set_corner_radius_all(40)
+		disc.set_border_width_all(3)
+		disc.border_color = Color(0.45, 0.95, 1.0, 1.0)
+		disc.shadow_color = Color(0.2, 0.9, 1.0, 0.5)
+		disc.shadow_size = 8
+		disc.content_margin_left = 9.0
+		disc.content_margin_right = 9.0
+		disc.content_margin_top = 2.0
+		disc.content_margin_bottom = 2.0
+		circle.add_theme_stylebox_override("panel", disc)
+		var count_text := Label.new()
+		count_text.name = "CopyCount"
+		count_text.text = "×%d" % copies
+		count_text.add_theme_font_size_override("font_size", VI.FONT_SMALL)
+		count_text.add_theme_color_override("font_color", Color.WHITE)
+		count_text.add_theme_color_override("font_outline_color", Color(0, 0.1, 0.15, 0.9))
+		count_text.add_theme_constant_override("outline_size", 4)
+		count_text.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		circle.add_child(count_text)
+		art_holder.add_child(circle)
+		circle.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT, Control.PRESET_MODE_MINSIZE)
+		circle.grow_horizontal = Control.GROW_DIRECTION_BEGIN
+		circle.offset_right = -6.0
+		circle.offset_left = -6.0 - 56.0
+		circle.offset_top = 6.0
+
 	var name_label := Label.new()
 	name_label.text = String(data.get("name", id)) if owned else "???"
 	name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -82,7 +120,10 @@ func bind(new_data: Dictionary, selected: bool = false, extra: String = "") -> v
 	var parts := PackedStringArray()
 	if owned:
 		parts.append(String(data.get("type", "")))
-		parts.append("Nv.%d" % int(data.get("level", 1)))
+		if bool(data.get("copy_only", false)) or bool(data.get("is_copy", false)):
+			parts.append("COPIAS")
+		else:
+			parts.append("Nv.%d" % int(data.get("level", 1)))
 	else:
 		parts.append("NO OBTENIDO")
 	if not extra.is_empty():

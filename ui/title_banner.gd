@@ -34,6 +34,10 @@ static func adopt(label: Label, color: Color = VI.GOLD, font_size: int = VI.FONT
 	var parent := label.get_parent()
 	if parent == null:
 		return null
+	# Idempotente: si la pantalla vuelve a aplicar su identidad, el Label ya esta dentro
+	# de una placa y no se envuelve otra vez (antes daba "already has a parent").
+	if parent.get_script() == load("res://ui/title_banner.gd"):
+		return parent as Control
 	var index := label.get_index()
 	var banner = load("res://ui/title_banner.gd").new()
 	parent.add_child(banner)
@@ -54,8 +58,6 @@ func setup(title_text: String, subtitle_text: String = "", color: Color = VI.GOL
 			child.queue_free()
 	if existing != null:
 		_title = existing
-		if _title.get_parent() == null:
-			add_child(_title)
 	else:
 		_title = Label.new()
 		_title.text = title_text
@@ -65,7 +67,8 @@ func setup(title_text: String, subtitle_text: String = "", color: Color = VI.GOL
 	_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_title.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	_title.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(_title)
+	if _title.get_parent() != self:
+		add_child(_title)
 	_plate_h = float(font_size) * 1.55
 	var total_h := _plate_h + 14.0
 	if not subtitle_text.is_empty():

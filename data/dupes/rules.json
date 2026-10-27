@@ -2,6 +2,8 @@
 	"id": "dupe_rules",
 	"description": "Sistema de DUPES. Las copias repetidas de un personaje (GameState.duplicates) se consumen en su ficha para subir su Dupe de 0 a max_level. Cada mejora cuesta copies_per_level[nivel_actual] copias de ESE personaje. Los bonus de cada nivel son TOTALES (no se suman a los anteriores) y se aplican como modificadores de origen 'dupe' (kind mult para vida/ataque/defensa/velocidad, flat para critico y esquiva). Anadir una estadistica a un nivel es una linea; anadir un nivel nuevo es subir max_level y rellenar su fila.",
 	"max_level": 5,
+	"target_rarities": ["UR", "LR"],
+	"target_rarities_description": "Rarezas de UNIDAD que pueden recibir Dupes. Una unidad SSR (o inferior) nunca recibe Dupes; las copias se guardan hasta que evolucione. Las copias siempre llegan en la calidad inicial del personaje.",
 	"copies_per_level": [1, 1, 1, 1, 1],
 	"levels": [
 		{},

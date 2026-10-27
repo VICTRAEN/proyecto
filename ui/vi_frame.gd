@@ -247,7 +247,22 @@ func _draw_gloss(ci: RID, inner: PackedVector2Array, inner_rect: Rect2) -> void:
 	for p in pts:
 		var t := clampf((p.y - top_y) / maxf(mid_y - top_y, 1.0), 0.0, 1.0)
 		cols.append(Color(1.0, 1.0, 1.0, gloss * 0.30 * (1.0 - t)))
+	if _area(pts) < 0.5 or Geometry2D.triangulate_polygon(pts).is_empty():
+		return
 	RenderingServer.canvas_item_add_polygon(ci, pts, cols)
+
+
+## Area de un poligono (formula del cordon). Se usa para no mandar al renderizador
+## poligonos degenerados (rectangulos casi vacios, puntos alineados), que dan
+## "triangulation failed".
+static func _area(pts: PackedVector2Array) -> float:
+	var total := 0.0
+	var n := pts.size()
+	for i in n:
+		var a := pts[i]
+		var b := pts[(i + 1) % n]
+		total += a.x * b.y - b.x * a.y
+	return absf(total) * 0.5
 
 
 ## Marco metalico: un trapecio por lado, mas claro o mas oscuro segun mire a la
@@ -265,11 +280,10 @@ func _draw_metal(ci: RID, outer: PackedVector2Array, inner: PackedVector2Array) 
 		var base := metal_dark.lerp(metal_light, lit)
 		var edge_col := base.darkened(0.16)
 		var inner_col := base.lightened(0.10)
-		RenderingServer.canvas_item_add_polygon(
-			ci,
-			PackedVector2Array([outer[i], outer[j], inner[j], inner[i]]),
-			PackedColorArray([edge_col, edge_col, inner_col, inner_col])
-		)
+		var quad := PackedVector2Array([outer[i], outer[j], inner[j], inner[i]])
+		if _area(quad) < 0.25 or Geometry2D.triangulate_polygon(quad).is_empty():
+			continue
+		RenderingServer.canvas_item_add_polygon(ci, quad, PackedColorArray([edge_col, edge_col, inner_col, inner_col]))
 
 
 ## Linea fina de luz en el borde interior de los lados que miran a la luz.

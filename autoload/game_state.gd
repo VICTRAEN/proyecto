@@ -1113,7 +1113,9 @@ func add_character(id: String) -> Dictionary:
 		return {
 			"id": key,
 			"name": display_name(key),
-			"rarity": rarity_of(key),
+			# CALIDAD DE LA COPIA = la inicial del personaje (su rareza base), no la de
+			# la unidad que ya tengas: una copia nueva de un Gojo UR llega como SSR.
+			"rarity": base_rarity_of(key),
 			"added": false,
 			"duplicate": true,
 			"known": true,
@@ -1127,7 +1129,7 @@ func add_character(id: String) -> Dictionary:
 	return {
 		"id": key,
 		"name": display_name(key),
-		"rarity": rarity_of(key),
+		"rarity": base_rarity_of(key),
 		"added": true,
 		"duplicate": false,
 		"known": true,
@@ -1572,7 +1574,7 @@ func summon(banner_id: String, count: int = 1, stage_reveal: bool = false) -> Di
 		results.append({
 			"id": picked,
 			"name": display_name(picked),
-			"rarity": rarity_of(picked),
+			"rarity": String(info.get("rarity", base_rarity_of(picked))),
 			"new": bool(info.get("added", false)),
 			"duplicate": bool(info.get("duplicate", false)),
 			"duplicates": int(info.get("duplicates", 0)),
@@ -1662,6 +1664,49 @@ func reveal_finish() -> Dictionary:
 ## evolucion (no se tocan al evolucionar), y los bonus entran en combate como
 ## modificadores de origen "dupe": reaplicar el mismo origen SUSTITUYE, no acumula.
 
+## CALIDAD de las copias de un personaje: siempre la INICIAL (rareza base del JSON). Las
+## copias son material aparte de la unidad: evolucionar o no la unidad no las cambia.
+func copy_quality_of(id: String) -> String:
+	return base_rarity_of(String(id))
+
+
+## Rarezas de unidad que pueden RECIBIR Dupes (data/dupes/rules.json ->
+## "target_rarities"). Por defecto UR y LR: una unidad SSR nunca recibe Dupes.
+func dupe_target_rarities() -> Array:
+	var raw = DB.dupe_rules.get("target_rarities", ["UR", "LR"])
+	var out: Array = []
+	if raw is Array:
+		for r in raw:
+			out.append(String(r))
+	return out
+
+
+## La unidad (en su rareza ACTUAL) puede recibir un Dupe?
+func dupe_can_receive(id: String) -> bool:
+	return dupe_target_rarities().has(rarity_of(String(id)))
+
+
+## Pilas de COPIAS para la coleccion y la mochila: una por personaje con copias
+## disponibles, siempre en su calidad inicial. { id, name, quality, count, merged }.
+## "merged" = la unidad esta en esa misma calidad (no evolucionada): entonces la pila
+## no se pinta aparte, su contador va en la propia carta de la unidad.
+func copy_stacks() -> Array:
+	var out: Array = []
+	for raw_id in roster:
+		var key := String(raw_id)
+		var count := dupe_copies_available(key)
+		if count <= 0:
+			continue
+		out.append({
+			"id": key,
+			"name": display_name(key),
+			"quality": copy_quality_of(key),
+			"count": count,
+			"merged": rarity_of(key) == copy_quality_of(key),
+		})
+	return out
+
+
 func dupe_max_level() -> int:
 	return int(DB.dupe_rules.get("max_level", 0))
 
@@ -1745,7 +1790,8 @@ func dupe_status(id: String) -> Dictionary:
 	var report := {
 		"ok": false, "reason": "", "id": key, "level": level, "max_level": dupe_max_level(),
 		"next_level": mini(level + 1, dupe_max_level()), "cost": dupe_next_cost(key),
-		"copies": dupe_copies_available(key), "preview": [],
+		"copies": dupe_copies_available(key), "preview": [], "eligible": true,
+		"quality": copy_quality_of(key),
 	}
 	if DB.get_character(key).is_empty() or not is_owned(key):
 		report["reason"] = "Todavia no tienes a ese personaje."
@@ -1755,6 +1801,10 @@ func dupe_status(id: String) -> Dictionary:
 		return report
 	if level >= dupe_max_level():
 		report["reason"] = "Dupe maximo alcanzado (Dupe %d)." % dupe_max_level()
+		return report
+	if not dupe_can_receive(key):
+		report["eligible"] = false
+		report["reason"] = "Solo las unidades %s pueden recibir Dupes. Evoluciona a este personaje para usar sus copias." % " o ".join(PackedStringArray(dupe_target_rarities()))
 		return report
 	report["preview"] = dupe_stat_preview(key, level, level + 1)
 	if int(report["copies"]) < int(report["cost"]):
@@ -3880,6 +3930,11 @@ func load_game() -> bool:
 	# V2: rareza evolucionada y duplicados por personaje. Un guardado v1 no las
 	# trae y se queda con lo que ya hubiera (vacio), que significa "nadie ha
 	# evolucionado todavia" y "cero duplicados".
+	# Se parte de CERO, no se fusiona con la memoria: si una sesion ya tenia copias o
+	# formas en memoria (pruebas, restaurar un guardado), fusionar dejaba COPIAS
+	# FANTASMA que el archivo nunca tuvo.
+	rarities = {}
+	duplicates = {}
 	var loaded_rarities = data.get("rarities", {})
 	if loaded_rarities is Dictionary:
 		for key in loaded_rarities.keys():
@@ -3887,7 +3942,11 @@ func load_game() -> bool:
 	var loaded_duplicates = data.get("duplicates", {})
 	if loaded_duplicates is Dictionary:
 		for key in loaded_duplicates.keys():
-			duplicates[String(key)] = int(loaded_duplicates[key])
+			# Las copias y su identidad son del personaje (id estable). Un id que ya no
+			# esta en el roster, o una cuenta negativa, no son copias reales.
+			var copies := maxi(0, int(loaded_duplicates[key]))
+			if roster.has(String(key)):
+				duplicates[String(key)] = copies
 	# Dupes: solo se guarda el NIVEL por personaje. Un guardado anterior no lo trae y
 	# arranca en 0 (sus duplicados pasan a ser copias disponibles, sin perder nada).
 	# Se sanea: nivel dentro de rango y nunca mayor que las copias que lo pagan.

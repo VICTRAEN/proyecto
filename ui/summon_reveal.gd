@@ -228,7 +228,10 @@ func _present_card() -> void:
 		child.queue_free()
 	var id := current_id()
 	var data := GameState.character_data(id)
-	var rarity := String(_entry.get("rarity", data.get("rarity", "SR")))
+	# Lo que se revela es la COPIA que acaba de salir: siempre en su calidad INICIAL
+	# (rareza base), aunque ya tengas ese personaje evolucionado. La unidad existente
+	# ni se toca ni se muestra aqui.
+	var rarity := GameState.base_rarity_of(id) if not data.is_empty() else String(_entry.get("rarity", "SR"))
 	var special := not _cin_cfg.is_empty()
 	var tint: Color = VI.rarity_color(rarity)
 	var tint2: Color = VI.rarity_secondary(rarity)
@@ -284,7 +287,7 @@ func _present_card() -> void:
 	art.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	art.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	frame.add_child(art)
-	art.setup(id, type_tint, String(data.get("portrait_style", "short")), Portrait.art_path_from(data, "front"), "front", "")
+	art.setup(id, type_tint, String(data.get("portrait_style", "short")), Portrait.art_path_from(data, "front"), "front", rarity.to_lower())
 	if rarity == "UR" or rarity == "LR":
 		var fx := RarityFx.new()
 		frame.add_child(fx)
@@ -612,6 +615,12 @@ func _show_summary() -> void:
 		var data := GameState.character_data(String((entry as Dictionary).get("id", "")))
 		if data.is_empty():
 			continue
+		# La carta del resumen es la COPIA recibida: calidad inicial, no la de la unidad.
+		var quality := GameState.base_rarity_of(String(data.get("id", "")))
+		data["rarity"] = quality
+		data["form_override"] = quality.to_lower()
+		if not bool((entry as Dictionary).get("new", false)):
+			data["is_copy"] = true
 		var card: PanelContainer = CardTile.new()
 		card.art_height = 250.0
 		grid.add_child(card)

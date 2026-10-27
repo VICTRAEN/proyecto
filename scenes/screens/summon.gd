@@ -254,7 +254,8 @@ func _refresh_stage(banner: Dictionary) -> void:
 		if data.is_empty():
 			continue
 		var tint: Color = TypeColors.color_for(String(data.get("type", "STR")))
-		var rarity := String(data.get("rarity", "SSR"))
+		# El escaparate ensena al personaje como SALE del banner: su calidad inicial.
+		var rarity := GameState.base_rarity_of(String(raw_id))
 		var holder := PanelContainer.new()
 		holder.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		holder.add_theme_stylebox_override("panel", _featured_frame(rarity))
@@ -268,7 +269,7 @@ func _refresh_stage(banner: Dictionary) -> void:
 		art.aura = 1.0
 		art.rim_screen_px = 4.0
 		col.add_child(art)
-		art.setup(String(raw_id), tint, String(data.get("portrait_style", "short")), Portrait.art_path_from(data, "front"), "front", "")
+		art.setup(String(raw_id), tint, String(data.get("portrait_style", "short")), Portrait.art_path_from(data, "front"), "front", rarity.to_lower())
 		var badge := VI.rarity_badge(rarity, VI.FONT_BODY)
 		badge.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		col.add_child(badge)
@@ -471,6 +472,12 @@ func _show_results(report: Dictionary) -> void:
 			continue
 		# Cartas verticales como en la coleccion (arte front, marco de rareza y los
 		# efectos de UR/LR): el resultado de una tirada se SIENTE segun lo que sale.
+		# La carta es la COPIA recibida: calidad inicial, no la de la unidad existente.
+		var quality := GameState.base_rarity_of(String(data.get("id", "")))
+		data["rarity"] = quality
+		data["form_override"] = quality.to_lower()
+		if not bool((entry as Dictionary).get("new", false)):
+			data["is_copy"] = true
 		var card: PanelContainer = CardTile.new()
 		card.art_height = 400.0
 		_results_grid.add_child(card)

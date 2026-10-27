@@ -55,7 +55,8 @@ static func build(id: String, editable: bool, confirming: bool, on_ask: Callable
 	var copies_row := HBoxContainer.new()
 	copies_row.alignment = BoxContainer.ALIGNMENT_CENTER
 	box.add_child(copies_row)
-	var chip := _copies_chip("COPIAS DISPONIBLES: %d" % copies, CYAN if copies > 0 else VI.INK_DIM)
+	var quality := String(status.get("quality", ""))
+	var chip := _copies_chip("COPIAS %s DISPONIBLES: %d" % [quality, copies] if not quality.is_empty() else "COPIAS DISPONIBLES: %d" % copies, CYAN if copies > 0 else VI.INK_DIM)
 	chip.name = "DupeCopies"
 	copies_row.add_child(chip)
 
@@ -128,7 +129,8 @@ static func build(id: String, editable: bool, confirming: bool, on_ask: Callable
 	var button := Button.new()
 	button.name = "DupeUpgradeButton"
 	var ready := bool(status.get("ok", false))
-	button.text = "CONSUMIR %d COPIA(S)  >  DUPE %d" % [cost, level + 1] if ready else "SIN COPIAS SUFICIENTES"
+	var eligible := bool(status.get("eligible", true))
+	button.text = "CONSUMIR %d COPIA(S)  >  DUPE %d" % [cost, level + 1] if ready else ("SIN COPIAS SUFICIENTES" if eligible else "SOLO UNIDADES UR O LR")
 	button.disabled = not ready
 	button.custom_minimum_size = Vector2(0, VI.TOUCH)
 	VI.tint_button(button, VI.GOLD if ready else VI.INK_DIM)
@@ -136,7 +138,7 @@ static func build(id: String, editable: bool, confirming: bool, on_ask: Callable
 		button.pressed.connect(on_ask)
 	box.add_child(button)
 	if not ready:
-		var note := FichaTabs.note(message + " Se consiguen invocando, en eventos, misiones y recompensas.")
+		var note := FichaTabs.note(message + (" Se consiguen invocando, en eventos, misiones y recompensas." if eligible else ""))
 		note.name = "DupeMessage"
 		box.add_child(note)
 	return box

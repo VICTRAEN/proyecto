@@ -2,6 +2,8 @@ extends Control
 
 const NAV := preload("res://scenes/nav.gd")
 const VI := preload("res://ui/visual_identity.gd")
+const Portrait := preload("res://ui/portrait.gd")
+const TypeColors := preload("res://ui/type_colors.gd")
 
 ## INVENTARIO: los objetos que el jugador tiene DE VERDAD.
 ##
@@ -54,6 +56,7 @@ const CATEGORY_NAMES := {
 	"consumable": "CONSUMIBLES",
 	"token": "FICHAS",
 	"special": "ESPECIALES",
+	"copies": "COPIAS",
 }
 const COLUMNS := 3
 const MIN_SLOTS := 9
@@ -99,6 +102,10 @@ func _build() -> void:
 	_ensure_layout()
 	_build_wallet()
 	var entries: Array = owned_items()
+	# COPIAS de personaje: material aparte de la unidad (siempre en su calidad inicial).
+	# Salen de GameState.copy_stacks(), la misma fuente que la Coleccion: una pila por
+	# personaje, y cuando llega a cero deja de existir y desaparece de aqui.
+	entries.append_array(copy_entries())
 	_build_tabs(entries)
 	for child in _grid.get_children():
 		_grid.remove_child(child)
@@ -120,6 +127,8 @@ func _build() -> void:
 
 
 func _category_of(item: Dictionary) -> String:
+	if bool(item.get("copy", false)):
+		return "copies"
 	var t := String(item.get("type", ""))
 	return t if CATEGORY_NAMES.has(t) else "special"
 
@@ -263,6 +272,32 @@ func _build_detail(entries: Array) -> void:
 	_detail.add_child(label)
 
 
+## Copias disponibles como entradas de mochila: { id: "copy:<personaje>", character_id,
+## name, count, type: "copies", rarity (la CALIDAD de la copia), copy: true, ... }.
+## El id del personaje es la identidad: nunca se agrupa por nombre ni por rareza.
+func copy_entries() -> Array:
+	var out: Array = []
+	for stack in GameState.copy_stacks():
+		var cid := String(stack["id"])
+		var receives := GameState.dupe_can_receive(cid)
+		var hint := ("Abre la ficha de %s y pulsa DUPES para consumir una copia." % GameState.display_name(cid)) if receives \
+			else ("%s todavia es %s: las copias se guardan y se podran consumir cuando sea UR o LR." % [GameState.display_name(cid), GameState.rarity_of(cid)])
+		out.append({
+			"id": "copy:%s" % cid,
+			"character_id": cid,
+			"name": "%s (%s)" % [String(stack["name"]), String(stack["quality"])],
+			"description": "Copias de %s en su calidad inicial. Son material para subir su Dupe, no una segunda unidad. %s" % [GameState.display_name(cid), hint],
+			"count": int(stack["count"]),
+			"type": "copies",
+			"rarity": String(stack["quality"]),
+			"icon": "",
+			"obtained_from": "Invocaciones y recompensas repetidas",
+			"copy": true,
+		})
+	out.sort_custom(func(a, b): return String(a["name"]) < String(b["name"]))
+	return out
+
+
 ## Objetos que el jugador tiene, con cantidad mayor que cero, ya resueltos para
 ## pintar: { id, name, description, count, type, rarity, icon }. Ordenados por
 ## nombre para que la lista no cambie de sitio entre repintados.
@@ -359,6 +394,19 @@ func _make_card(item: Dictionary) -> Control:
 ## mientras no exista, un marcador con la inicial para que la ficha siga leyendose.
 func _make_icon(item: Dictionary) -> Control:
 	var side := 116.0
+	if bool(item.get("copy", false)):
+		# Retrato de la copia en SU calidad (form_override), aunque la unidad haya evolucionado.
+		var cid := String(item.get("character_id", ""))
+		var cdata := GameState.character_data(cid)
+		var holder := Control.new()
+		holder.custom_minimum_size = Vector2(side, side)
+		var art := Portrait.new()
+		art.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		holder.add_child(art)
+		art.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		art.setup(cid, TypeColors.color_for(String(cdata.get("type", "STR"))), String(cdata.get("portrait_style", "short")),
+			Portrait.art_path_from(cdata, "icon"), "icon", String(item.get("rarity", "")).to_lower())
+		return holder
 	var path := String(item.get("icon", ""))
 	if not path.is_empty() and ResourceLoader.exists(path):
 		var loaded = load(path)
