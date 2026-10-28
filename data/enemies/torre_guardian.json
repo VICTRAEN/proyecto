@@ -1,13 +1,7 @@
 {
 	"id": "torre_guardian",
-	"name": "Guardian de la torre",
-	"title": "El que abre la puerta",
-	"genre": "Sobrenatural",
-	"rarity": "SR",
-	"type": "STR",
-	"art": {},
-	"portrait_style": "spiky",
-	"roles": ["Tank"],
+	"based_on": "asta",
+	"_note": "v11: antes era el enemigo generico 'Guardian de la torre'. Ahora pelea con la identidad (nombre, tipo, rareza, arte, pasiva y habilidades) del personaje 'asta' y CONSERVA sus estadisticas originales. Para cambiar la cara basta con cambiar 'based_on'.",
 	"stats": {
 		"max_hp": 3200,
 		"atk": 210,
@@ -15,33 +9,5 @@
 		"speed": 118,
 		"crit_rate": 0.08,
 		"dodge_rate": 0.03
-	},
-	"categories": ["guardianes"],
-	"links": [],
-	"passive": {
-		"id": "pas_torre_guardian_muro",
-		"name": "Muro de piedra",
-		"description": "Al comenzar su turno su defensa sube un 30%.",
-		"trigger": "turn_start",
-		"condition": {},
-		"effects": [
-			{ "type": "stat_mod", "target": "self", "stat": "def", "kind": "mult", "value": 0.3, "turns": 1 }
-		]
-	},
-	"skills": [
-		{ "id": "sk_torre_guardian_01", "name": "Punetazo", "kind": "basic", "power": 110, "cost": 0, "target": "enemy", "effects": [] },
-		{
-			"id": "sk_torre_guardian_02",
-			"name": "Golpe de puerta",
-			"description": "Sacude a un rival y le baja un 20% la defensa durante 2 turnos.",
-			"kind": "special",
-			"power": 165,
-			"cost": 3,
-			"target": "enemy",
-			"effects": [
-				{ "type": "stat_mod", "target": "enemy", "stat": "def", "kind": "mult", "value": -0.2, "turns": 2 }
-			]
-		}
-	],
-	"transformations": []
+	}
 }

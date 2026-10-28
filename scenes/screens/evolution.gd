@@ -7,6 +7,7 @@ const FichaTabs := preload("res://ui/ficha_tabs.gd")
 const Portrait := preload("res://ui/portrait.gd")
 const TypeColors := preload("res://ui/type_colors.gd")
 const EvolutionFx := preload("res://ui/evolution_fx.gd")
+const PickToolbar := preload("res://ui/pick_toolbar.gd")
 
 ## EVOLUCION: elegir un personaje y evolucionarlo cuando de verdad cumpla TODOS
 ## los requisitos.
@@ -38,6 +39,7 @@ func _ready() -> void:
 	_apply_identity()
 	back_button.pressed.connect(_back)
 	_make_selector_strip()
+	_make_toolbar()
 
 
 ## El selector es una TIRA horizontal de una fila (no una lista vertical): asi el
@@ -56,6 +58,78 @@ func _make_selector_strip() -> void:
 	strip.add_child(grid)
 	grid.columns = 999
 	grid.size_flags_horizontal = Control.SIZE_FILL
+
+
+## Buscador y filtros encima de la tira (v11): LISTOS, FALTAN, y por salto de rareza.
+var toolbar: PickToolbar = null
+
+
+func _make_toolbar() -> void:
+	toolbar = PickToolbar.new()
+	var content: VBoxContainer = grid.get_parent().get_parent()
+	content.add_child(toolbar)
+	content.move_child(toolbar, selector_title.get_index() + 1)
+	toolbar.setup([
+		{ "key": "all", "label": "TODOS" },
+		{ "key": "ready", "label": "LISTOS" },
+		{ "key": "missing", "label": "FALTAN REQUISITOS" },
+		{ "key": "to_UR", "label": "SSR > UR" },
+		{ "key": "to_LR", "label": "UR > LR" },
+	], "Buscar personaje para evolucionar...")
+	toolbar.changed.connect(_build_selector)
+
+
+## Ids que pasan el buscador y el filtro, ORDENADOS: primero los que ya pueden
+## evolucionar, luego por rareza (mejor primero) y por nombre.
+func visible_ids() -> Array:
+	var out: Array = []
+	for raw_id in eligible_ids():
+		var id := String(raw_id)
+		var route := _route_of(id)
+		var ready := bool((route["check"] as Dictionary).get("ok", false))
+		if toolbar != null:
+			if not toolbar.text_matches(GameState.display_name(id)):
+				continue
+			match toolbar.filter_key:
+				"ready":
+					if not ready:
+						continue
+				"missing":
+					if ready:
+						continue
+				"to_UR":
+					if String(route.get("to_form", "")) != "UR":
+						continue
+				"to_LR":
+					if String(route.get("to_form", "")) != "LR":
+						continue
+		out.append(id)
+	out.sort_custom(func(a, b):
+		var ra := bool((_check_of(String(a))).get("ok", false))
+		var rb := bool((_check_of(String(b))).get("ok", false))
+		if ra != rb:
+			return ra
+		var qa := VI.rarity_rank(GameState.rarity_of(String(a)))
+		var qb := VI.rarity_rank(GameState.rarity_of(String(b)))
+		if qa != qb:
+			return qa > qb
+		return GameState.display_name(String(a)) < GameState.display_name(String(b)))
+	return out
+
+
+## Por que no puede evolucionar todavia, en dos o tres palabras.
+func _missing_text(check: Dictionary) -> String:
+	var need := int(check.get("level_required", 0))
+	if need > 0 and int(check.get("level", 0)) < need:
+		return "NIVEL %d/%d" % [int(check.get("level", 0)), need]
+	if int(check.get("coin_cost", 0)) > int(check.get("coins", 0)):
+		return "FALTAN MONEDAS"
+	if int(check.get("event_clears_required", 0)) > int(check.get("event_clears", 0)):
+		return "FALTA EVENTO"
+	for raw_cost in check.get("item_cost", []):
+		if raw_cost is Dictionary and GameState.item_count(String((raw_cost as Dictionary).get("item", ""))) < int((raw_cost as Dictionary).get("amount", 1)):
+			return "FALTA MATERIAL"
+	return "FALTAN REQUISITOS"
 
 
 ## Aspecto estatico, con los tokens de la identidad visual.
@@ -150,17 +224,34 @@ func _build_selector() -> void:
 		empty.autowrap_mode = TextServer.AUTOWRAP_WORD
 		grid.add_child(empty)
 		return
-	selector_title.text = "ELIGE UN PERSONAJE"
+	var shown := visible_ids()
+	var ready_total := 0
 	for raw_id in ids:
+		if bool(_check_of(String(raw_id)).get("ok", false)):
+			ready_total += 1
+	selector_title.text = "ELIGE UN PERSONAJE"
+	if toolbar != null:
+		toolbar.set_count_text("%d LISTOS PARA EVOLUCIONAR  -  mostrando %d de %d" % [ready_total, shown.size(), ids.size()])
+	if shown.is_empty():
+		var none := Label.new()
+		none.text = "Ningun personaje coincide con la busqueda o el filtro."
+		none.add_theme_font_size_override("font_size", VI.FONT_BODY)
+		none.add_theme_color_override("font_color", VI.INK_DIM)
+		none.autowrap_mode = TextServer.AUTOWRAP_WORD
+		grid.add_child(none)
+		return
+	for raw_id in shown:
 		var id := String(raw_id)
 		var check := _check_of(id)
 		var ready := bool(check.get("ok", false))
-		var extra := "LISTO PARA EVOLUCIONAR" if ready else "FALTAN REQUISITOS"
+		var extra := "LISTO PARA EVOLUCIONAR" if ready else _missing_text(check)
 		var card = ROSTER_CARD.instantiate()
 		grid.add_child(card)
 		card.bind(GameState.character_data(id), id == _selected_id, extra, true)
 		card.custom_minimum_size = Vector2(380, 0)
 		card.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+		# Los que YA pueden evolucionar destacan en verde; el resto, apagados.
+		card.modulate = Color(1, 1, 1, 1) if ready else Color(1, 1, 1, 0.62)
 		card.pressed.connect(_on_card_pressed)
 
 

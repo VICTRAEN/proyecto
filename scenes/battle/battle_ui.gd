@@ -179,6 +179,12 @@ func _ready() -> void:
 	_polish_buttons()
 
 	log_view.bbcode_enabled = true
+	# INTERFAZ DESPEJADA: orden de ataque, registro y barra grande del activo quedan
+	# ocultos; el boton INFO los muestra cuando el jugador quiere consultarlos.
+	order_panel.visible = false
+	log_panel.visible = false
+	active_bar.visible = false
+	ally_grid.columns = 4
 	action_row.visible = false
 	cancel_button.visible = false
 	result_overlay.visible = false
@@ -226,6 +232,7 @@ func _build_cards() -> void:
 	for unit in manager.allies:
 		var card: UnitCard = UNIT_CARD.instantiate()
 		ally_grid.add_child(card)
+		card.minimal = true
 		card.bind(unit, false)
 		card.card_pressed.connect(_on_card_pressed)
 		cards[unit.source_key] = card
@@ -236,6 +243,7 @@ func _build_cards() -> void:
 	for unit in manager.enemies:
 		var card: UnitCard = UNIT_CARD.instantiate()
 		enemy_row.add_child(card)
+		card.minimal = true
 		card.bind(unit, true, several)
 		card.card_pressed.connect(_on_card_pressed)
 		# En modo compacto la fila se estrecha: el nombre largo no debe desbordar.
@@ -255,6 +263,7 @@ func _on_reserve_entered(out_unit, in_unit, slot_index: int) -> void:
 	var old_card = cards.get(out_unit.source_key, null)
 	var card: UnitCard = UNIT_CARD.instantiate()
 	ally_grid.add_child(card)
+	card.minimal = true
 	card.bind(in_unit, false)
 	card.card_pressed.connect(_on_card_pressed)
 	cards[in_unit.source_key] = card
@@ -361,7 +370,7 @@ func _on_turn_started(unit: CombatUnit) -> void:
 		var card: UnitCard = cards[unit.source_key]
 		card.bump()
 	if unit.is_ally:
-		action_hint.text = "Turno de %s" % unit.display_name
+		action_hint.text = "Turno de %s   -   SP %d / %d" % [unit.display_name, unit.sp, CombatUnit.SP_MAX]
 	else:
 		action_hint.text = "Turno del enemigo..."
 
@@ -375,7 +384,7 @@ func _on_action_requested(unit: CombatUnit) -> void:
 	action_row.visible = true
 	attack_button.visible = true
 	special_button.visible = true
-	action_hint.text = "Elige accion"
+	action_hint.text = "%s   -   SP %d / %d" % [unit.display_name, unit.sp, CombatUnit.SP_MAX]
 	attack_button.text = "ATAQUE BASICO"
 	attack_button.disabled = not manager.can_use(unit, "basic")
 	var special := unit.skill_by_kind("special")
@@ -502,6 +511,7 @@ func _on_ultimate_pressed() -> void:
 var _tools_row: HBoxContainer = null
 var auto_button: Button = null
 var speed_button: Button = null
+var info_button: Button = null
 
 
 func _build_speed_auto_buttons() -> void:
@@ -510,7 +520,7 @@ func _build_speed_auto_buttons() -> void:
 	_tools_row.add_theme_constant_override("separation", 8)
 	_tools_row.anchor_left = 1.0
 	_tools_row.anchor_right = 1.0
-	_tools_row.offset_left = -270.0
+	_tools_row.offset_left = -420.0
 	_tools_row.offset_right = -16.0
 	_tools_row.offset_top = 64.0
 	_tools_row.offset_bottom = 116.0
@@ -528,6 +538,23 @@ func _build_speed_auto_buttons() -> void:
 		b.button_down.connect(_nudge.bind(b))
 	auto_button.pressed.connect(_on_auto_pressed)
 	speed_button.pressed.connect(_on_speed_pressed)
+	info_button = Button.new()
+	info_button.name = "InfoButton"
+	info_button.focus_mode = Control.FOCUS_NONE
+	info_button.custom_minimum_size = Vector2(0, 52)
+	info_button.add_theme_font_size_override("font_size", 20)
+	info_button.text = "INFO"
+	_tools_row.add_child(info_button)
+	info_button.button_down.connect(_nudge.bind(info_button))
+	info_button.pressed.connect(_on_info_pressed)
+	_refresh_tool_buttons()
+
+
+## INFO: muestra u oculta el orden de ataque y el registro del combate.
+func _on_info_pressed() -> void:
+	var show := not order_panel.visible
+	order_panel.visible = show
+	log_panel.visible = show
 	_refresh_tool_buttons()
 
 
@@ -555,6 +582,8 @@ func _refresh_tool_buttons() -> void:
 	auto_button.text = "AUTO SI" if on else "AUTO NO"
 	VisualIdentity.tint_button(auto_button, VisualIdentity.GOLD if on else VisualIdentity.BLUE)
 	var fast := GameSettings.choice("battle_speed") == "fast"
+	if info_button != null:
+		VisualIdentity.tint_button(info_button, VisualIdentity.GOLD if order_panel.visible else VisualIdentity.BLUE)
 	speed_button.text = "x2" if fast else "x1"
 	VisualIdentity.tint_button(speed_button, VisualIdentity.GOLD if fast else VisualIdentity.BLUE)
 

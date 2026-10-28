@@ -124,11 +124,16 @@ func bind(new_data: Dictionary, selected: bool = false, extra: String = "") -> v
 			parts.append("COPIAS")
 		else:
 			parts.append("Nv.%d" % int(data.get("level", 1)))
+		# Libro de copias: disponibles / totales (las usadas = totales - disponibles).
+		if int(data.get("copy_total", 0)) > 0 and int(data.get("copy_count", 0)) > 0:
+			parts.append("%d/%d" % [int(data.get("copy_count", 0)), int(data.get("copy_total", 0))])
 	else:
 		parts.append("NO OBTENIDO")
 	if not extra.is_empty():
 		parts.append(extra)
 	meta.text = "  ".join(parts)
+	if not String(data.get("copy_ledger", "")).is_empty():
+		tooltip_text = "Copias: %s" % String(data["copy_ledger"])
 	meta.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	meta.clip_text = true
 	meta.add_theme_font_size_override("font_size", VI.FONT_TINY)

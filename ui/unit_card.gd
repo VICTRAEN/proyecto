@@ -25,6 +25,9 @@ var unit: CombatUnit = null
 var prominent := false
 ## Varios rivales en pantalla: la tarjeta se hace estrecha para compartir la fila.
 var compact := false
+## MODO MINIMO (combate): solo el sprite sin marco y la barra de vida. Nombre, tipo,
+## rareza, nivel, cifras y SP se consultan tocando la tarjeta (panel de informacion).
+var minimal := false
 
 @onready var portrait: Portrait = $VBox/Top/Portrait
 @onready var name_label: Label = $VBox/Top/Info/NameLabel
@@ -92,6 +95,8 @@ func bind(new_unit: CombatUnit, make_prominent: bool = false, make_compact: bool
 		size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		portrait.custom_minimum_size = Vector2(120, 132)
 		_apply_text_sizes(25, 18, 22)
+	if minimal:
+		_apply_minimal_layout()
 	var tint: Color = TypeColors.color_for(unit.type)
 	# El rival se muestra de frente; las unidades del jugador, de espaldas.
 	# FRONT en las casillas: la fila entera se ve de FRENTE porque es la
@@ -105,6 +110,30 @@ func bind(new_unit: CombatUnit, make_prominent: bool = false, make_compact: bool
 	type_chip.add_theme_color_override("font_color", tint)
 	_apply_identity()
 	refresh()
+
+
+## Tarjeta de combate despejada: el sprite manda. La informacion sigue ahi (los
+## nodos existen y se actualizan) pero oculta; tocar la tarjeta abre la ficha.
+func _apply_minimal_layout() -> void:
+	var info: Control = $VBox/Top/Info
+	info.visible = false
+	# Antes de portrait.setup(): el sprite va sin marco, con los pies en el suelo.
+	portrait.transparent_frame = true
+	portrait.feet_down = true
+	portrait.width_slack = 0.0
+	portrait.aura = 0.0
+	hp_bar.custom_minimum_size = Vector2(0, 14)
+	hp_bar.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	if prominent and not compact:
+		custom_minimum_size = Vector2(520, 0)
+		portrait.custom_minimum_size = Vector2(480, 560)
+	elif prominent:
+		custom_minimum_size = Vector2(150, 0)
+		portrait.custom_minimum_size = Vector2(0, 440)
+	else:
+		portrait.custom_minimum_size = Vector2(0, 420)
+	portrait.size_flags_stretch_ratio = 1.0
+	portrait.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 
 
 ## Rareza, nivel y tipo: tres datos cortos, en una sola linea de etiquetas.
@@ -243,6 +272,9 @@ func _update_frame() -> void:
 		return
 	var tint: Color = TypeColors.color_for(unit.type)
 	var rarity := String(unit.rarity)
+	if minimal:
+		_update_minimal_frame(tint)
+		return
 	var style := VisualIdentity.card(tint, _is_active or _selectable, rarity, prominent)
 	if _selectable:
 		style.border_color = VisualIdentity.GREEN
@@ -254,4 +286,30 @@ func _update_frame() -> void:
 		style.shadow_color = Color(VisualIdentity.BLUE.r, VisualIdentity.BLUE.g, VisualIdentity.BLUE.b, 0.45)
 		style.shadow_size = 14
 		style.shadow_offset = Vector2.ZERO
+	add_theme_stylebox_override("panel", style)
+
+
+## Marco del modo minimo: invisible, salvo un halo suave cuando la unidad actua, se
+## puede elegir como objetivo o se esta mirando.
+func _update_minimal_frame(tint: Color) -> void:
+	var style := StyleBoxFlat.new()
+	style.bg_color = Color(0, 0, 0, 0)
+	style.set_corner_radius_all(18)
+	style.content_margin_left = 4
+	style.content_margin_right = 4
+	style.content_margin_top = 4
+	style.content_margin_bottom = 4
+	var ring := Color(0, 0, 0, 0)
+	if _selectable:
+		ring = VisualIdentity.GREEN
+	elif _is_active:
+		ring = VisualIdentity.GOLD
+	elif _inspected:
+		ring = VisualIdentity.BLUE
+	if ring.a > 0.0:
+		style.bg_color = Color(ring.r, ring.g, ring.b, 0.05)
+		style.set_border_width_all(3)
+		style.border_color = ring
+		# Sin sombra: con el centro transparente la sombra se vería a traves.
+		style.shadow_size = 0
 	add_theme_stylebox_override("panel", style)

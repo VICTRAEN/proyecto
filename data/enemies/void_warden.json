@@ -1,16 +1,7 @@
 {
 	"id": "void_warden",
-	"name": "Vigia del Vacio",
-	"title": "Centinela del umbral",
-	"genre": "Sobrenatural",
-	"rarity": "SSR",
-	"type": "PHY",
-	"art": {
-		"front": "res://art/characters/void_warden/front.png",
-		"back": "res://art/characters/void_warden/back.png",
-		"icon": "res://art/characters/void_warden/icon.png"
-	},
-	"roles": ["Tank", "Utility"],
+	"based_on": "makima",
+	"_note": "v11: antes era el enemigo generico 'Vigia del Vacio'. Ahora pelea con la identidad (nombre, tipo, rareza, arte, pasiva y habilidades) del personaje 'makima' y CONSERVA sus estadisticas originales. Para cambiar la cara basta con cambiar 'based_on'.",
 	"stats": {
 		"max_hp": 5200,
 		"atk": 185,
@@ -18,41 +9,5 @@
 		"speed": 104,
 		"crit_rate": 0.05,
 		"dodge_rate": 0.03
-	},
-	"categories": ["Villains", "Supernatural"],
-	"links": [],
-	"passive": {
-		"id": "pas_warden_piel_vacio",
-		"name": "Piel del vacio",
-		"description": "Al empezar el combate gana +30% DEF de forma permanente.",
-		"trigger": "battle_start",
-		"condition": {},
-		"effects": [
-			{ "type": "stat_mod", "target": "self", "stat": "def", "kind": "mult", "value": 0.3, "turns": 0 }
-		]
-	},
-	"skills": [
-		{
-			"id": "sk_warden_01",
-			"name": "Zarpa",
-			"kind": "basic",
-			"power": 110,
-			"cost": 0,
-			"target": "enemy",
-			"effects": []
-		},
-		{
-			"id": "sk_warden_02",
-			"name": "Onda de vacio",
-			"description": "Golpea a todo el equipo y le baja un 20% el ataque durante 2 turnos.",
-			"kind": "special",
-			"power": 130,
-			"cost": 3,
-			"target": "enemy_all",
-			"effects": [
-				{ "type": "stat_mod", "target": "enemy_all", "stat": "atk", "kind": "mult", "value": -0.2, "turns": 2 }
-			]
-		}
-	],
-	"transformations": []
+	}
 }

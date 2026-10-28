@@ -246,6 +246,8 @@ func _build() -> void:
 	var shown: Array = []
 	for data in all:
 		data["copy_count"] = int(merged_counts.get(String(data.get("id", "")), 0))
+		data["copy_ledger"] = GameState.copy_ledger_text(String(data.get("id", ""))) if int(data["copy_count"]) > 0 else ""
+		data["copy_total"] = int(GameState.copy_ledger(String(data.get("id", "")))["total"]) if int(data["copy_count"]) > 0 else 0
 		if _matches(data):
 			shown.append(data)
 	var units_shown := shown.size()
@@ -257,6 +259,8 @@ func _build() -> void:
 		pile["form_override"] = String(stack["quality"]).to_lower()
 		pile["copy_only"] = true
 		pile["copy_count"] = int(stack["count"])
+		pile["copy_ledger"] = GameState.copy_ledger_text(String(stack["id"]))
+		pile["copy_total"] = int(stack["total"])
 		if _matches(pile):
 			shown.append(pile)
 	_sort_list(shown)

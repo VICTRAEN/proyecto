@@ -34,6 +34,23 @@ func run(app: Node) -> void:
 	inv.call("refresh")
 	await _frames(15)
 	_save("02_inventario_copias")
+	# v11: 12 copias del duo (unidad SSR + 11) y las pantallas de Evolucion/Mutaciones.
+	GameState.rarities.erase("david_lucy_duo")
+	GameState.duplicates["david_lucy_duo"] = 11
+	_app.call("open_screen", "collection")
+	await _frames(30)
+	_save("03_coleccion_duo_12")
+	for id in ["gojo", "isagi", "frieren", "goku", "makima"]:
+		if not GameState.roster.has(id):
+			GameState.roster.append(id)
+		GameState.progress[id] = { "level": 60, "xp": 0 }
+	GameState.coins = 500000
+	_app.call("open_screen", "evolution")
+	await _frames(30)
+	_save("04_evolucion")
+	_app.call("open_screen", "mutations")
+	await _frames(30)
+	_save("05_mutaciones")
 	_app.call("_restore_save")
 	get_tree().quit()
 

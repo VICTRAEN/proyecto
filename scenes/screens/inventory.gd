@@ -286,7 +286,7 @@ func copy_entries() -> Array:
 			"id": "copy:%s" % cid,
 			"character_id": cid,
 			"name": "%s (%s)" % [String(stack["name"]), String(stack["quality"])],
-			"description": "Copias de %s en su calidad inicial. Son material para subir su Dupe, no una segunda unidad. %s" % [GameState.display_name(cid), hint],
+			"description": "Copias de %s en su calidad inicial (%s). Son material para subir su Dupe, no una segunda unidad. %s" % [GameState.display_name(cid), GameState.copy_ledger_text(cid), hint],
 			"count": int(stack["count"]),
 			"type": "copies",
 			"rarity": String(stack["quality"]),

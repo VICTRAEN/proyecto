@@ -46,6 +46,9 @@ const BUTTON_SFX := "click"
 ## Volumen general. 1.0 = tal cual viene el archivo.
 const SFX_VOLUME := -6.0
 const MUSIC_VOLUME := -12.0
+## Ganancia extra por pista (dB). El tema del duo David & Lucy suena al DOBLE de
+## volumen que el resto de la musica (+6 dB ~ x2 de amplitud); las demas no cambian.
+const SLOT_GAIN_DB := { "david_lucy_theme": 6.0 }
 
 ## Categoria de un sonido, o "" si no esta en el catalogo.
 var _category_of: Dictionary = {}
@@ -82,7 +85,15 @@ static func _db_for(setting: String, base_db: float) -> float:
 
 func _on_setting_changed(key: String) -> void:
 	if key == "music_volume" and _music != null:
-		_music.volume_db = _db_for("music_volume", MUSIC_VOLUME)
+		_music.volume_db = _music_db(_music_slot)
+
+
+## Volumen de una pista de musica: el del ajuste del jugador + su ganancia propia.
+static func _music_db(slot: String) -> float:
+	var db := _db_for("music_volume", MUSIC_VOLUME)
+	if db <= -79.0:
+		return db
+	return db + float(SLOT_GAIN_DB.get(slot, 0.0))
 
 
 func _on_node_added(node: Node) -> void:
@@ -187,7 +198,7 @@ func play_music(slot: String) -> void:
 		_music = AudioStreamPlayer.new()
 		add_child(_music)
 	_music.stream = stream
-	_music.volume_db = _db_for("music_volume", MUSIC_VOLUME)
+	_music.volume_db = _music_db(slot)
 	# Bucle: si el archivo es un ogg sin metadatos de loop, se le pone aqui.
 	if stream is AudioStreamOggVorbis:
 		stream.loop = true

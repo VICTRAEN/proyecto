@@ -4,6 +4,7 @@ const NAV := preload("res://scenes/nav.gd")
 const VI := preload("res://ui/visual_identity.gd")
 const ROSTER_CARD := preload("res://ui/roster_card.tscn")
 const Portrait := preload("res://ui/portrait.gd")
+const PickToolbar := preload("res://ui/pick_toolbar.gd")
 const TypeColors := preload("res://ui/type_colors.gd")
 
 ## MUTACIONES: el RITUAL.
@@ -69,6 +70,7 @@ func _ready() -> void:
 	_apply_identity()
 	mutate_button.pressed.connect(_on_mutate_pressed)
 	back_button.pressed.connect(_back)
+	_make_toolbar()
 	_build_focal()
 	_build_modal()
 	# La pantalla se pinta sola al abrirse. App tambien llama a refresh() al
@@ -121,18 +123,89 @@ func _update_mutate_button() -> void:
 
 ## --- Elige personaje (tira horizontal) ------------------------------------------
 
+var toolbar: PickToolbar = null
+
+
+## Buscador y filtros (v11): por nombre, sin mutacion / con mutacion y por rango.
+func _make_toolbar() -> void:
+	toolbar = PickToolbar.new()
+	var main: Node = selector.get_parent().get_parent()
+	main.add_child(toolbar)
+	main.move_child(toolbar, selector.get_parent().get_index())
+	var filters: Array = [
+		{ "key": "all", "label": "TODOS" },
+		{ "key": "none", "label": "SIN MUTACION" },
+		{ "key": "has", "label": "CON MUTACION" },
+	]
+	var ranks := {}
+	for data in GameState.roster_data():
+		var report := GameState.mutation_report(String((data as Dictionary).get("id", "")))
+		if not report.is_empty():
+			ranks[String(report.get("rank", "?"))] = true
+	for rank in ranks.keys():
+		filters.append({ "key": "rank_%s" % rank, "label": "RANGO %s" % rank })
+	toolbar.setup(filters, "Buscar personaje para mutar...")
+	toolbar.changed.connect(_build_selector)
+
+
+## Personajes que pasan buscador y filtro, ordenados: sin mutacion primero (son los
+## que mas interesa tirar), luego mejor rareza y nombre.
+func visible_ids() -> Array:
+	var out: Array = []
+	for raw_data in GameState.roster_data():
+		var id := String((raw_data as Dictionary).get("id", ""))
+		var report := GameState.mutation_report(id)
+		if toolbar != null:
+			if not toolbar.text_matches(GameState.display_name(id)):
+				continue
+			var key := toolbar.filter_key
+			if key == "none" and not report.is_empty():
+				continue
+			if key == "has" and report.is_empty():
+				continue
+			if key.begins_with("rank_") and String(report.get("rank", "")) != key.trim_prefix("rank_"):
+				continue
+		out.append(id)
+	out.sort_custom(func(a, b):
+		var ha := not GameState.mutation_report(String(a)).is_empty()
+		var hb := not GameState.mutation_report(String(b)).is_empty()
+		if ha != hb:
+			return not ha
+		var qa := VI.rarity_rank(GameState.rarity_of(String(a)))
+		var qb := VI.rarity_rank(GameState.rarity_of(String(b)))
+		if qa != qb:
+			return qa > qb
+		return GameState.display_name(String(a)) < GameState.display_name(String(b)))
+	return out
+
+
 func _build_selector() -> void:
 	_clear(selector)
-	for raw_data in GameState.roster_data():
-		var data: Dictionary = raw_data
-		var id := String(data.get("id", ""))
+	var cost := DB.mutation_cost()
+	var can_pay := GameState.coins >= cost
+	var shown := visible_ids()
+	if toolbar != null:
+		toolbar.set_count_text("Mutar cuesta %d monedas: tienes %d (%s)  -  mostrando %d de %d" % [
+			cost, GameState.coins, "alcanza" if can_pay else "NO alcanza", shown.size(), GameState.roster.size()])
+	if shown.is_empty():
+		var none := Label.new()
+		none.text = "Ningun personaje coincide con la busqueda o el filtro."
+		none.add_theme_font_size_override("font_size", VI.FONT_BODY)
+		none.add_theme_color_override("font_color", VI.INK_DIM)
+		selector.add_child(none)
+		return
+	for raw_id in shown:
+		var id := String(raw_id)
+		var data: Dictionary = GameState.character_data(id)
 		var mutation: Dictionary = GameState.mutation_report(id)
-		var extra := "SIN MUTACION"
-		if not mutation.is_empty():
-			extra = "RANGO %s" % String(mutation.get("rank", "?"))
+		# Requisito unico de mutar: las monedas del ritual. Se ve en cada carta.
+		var extra := "SIN MUTACION" if mutation.is_empty() else "RANGO %s" % String(mutation.get("rank", "?"))
+		if not can_pay:
+			extra = "FALTAN MONEDAS"
 		var card = ROSTER_CARD.instantiate()
 		selector.add_child(card)
 		card.bind(data, id == _selected_id, extra, true)
+		card.modulate = Color(1, 1, 1, 1) if can_pay else Color(1, 1, 1, 0.62)
 		card.pressed.connect(_on_card_pressed)
 
 

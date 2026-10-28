@@ -59,6 +59,10 @@ static func build(id: String, editable: bool, confirming: bool, on_ask: Callable
 	var chip := _copies_chip("COPIAS %s DISPONIBLES: %d" % [quality, copies] if not quality.is_empty() else "COPIAS DISPONIBLES: %d" % copies, CYAN if copies > 0 else VI.INK_DIM)
 	chip.name = "DupeCopies"
 	copies_row.add_child(chip)
+	# Libro de copias: total = disponibles + usadas (la unidad cuenta como una).
+	var ledger_label := FichaTabs.note("Copias de este personaje: %s (la unidad cuenta como 1 usada)." % GameState.copy_ledger_text(id))
+	ledger_label.name = "DupeLedger"
+	box.add_child(ledger_label)
 
 	# Tabla de estadisticas.
 	var preview: Array = status.get("preview", [])

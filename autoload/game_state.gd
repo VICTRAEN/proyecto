@@ -1690,6 +1690,34 @@ func dupe_can_receive(id: String) -> bool:
 ## disponibles, siempre en su calidad inicial. { id, name, quality, count, merged }.
 ## "merged" = la unidad esta en esa misma calidad (no evolucionada): entonces la pila
 ## no se pinta aparte, su contador va en la propia carta de la unidad.
+## LIBRO DE COPIAS de un personaje (v11). Una copia es cada vez que te ha salido el
+## personaje. Cuenta TODAS: la que es la unidad (equipada, evolucionada o mejorada),
+## las que se han gastado en Dupes y las que siguen libres. Siempre se cumple
+##   total = disponibles + usadas,   usadas = 1 (la unidad) + gastadas en Dupes
+## asi que 12 invocaciones dan: total 12, disponibles 11, usadas 1.
+func copy_ledger(id: String) -> Dictionary:
+	var key := String(id)
+	if not is_owned(key):
+		return { "id": key, "total": 0, "available": 0, "used": 0, "in_unit": 0, "spent": 0 }
+	var available := dupe_copies_available(key)
+	var spent := _dupe_copies_spent(key)
+	var in_unit := 1
+	return {
+		"id": key,
+		"total": in_unit + available + spent,
+		"available": available,
+		"used": in_unit + spent,
+		"in_unit": in_unit,
+		"spent": spent,
+	}
+
+
+## Texto corto del libro: "12 en total: 11 disponibles, 1 usada".
+func copy_ledger_text(id: String) -> String:
+	var l := copy_ledger(id)
+	return "%d en total: %d disponibles, %d usadas" % [int(l["total"]), int(l["available"]), int(l["used"])]
+
+
 func copy_stacks() -> Array:
 	var out: Array = []
 	for raw_id in roster:
@@ -1703,6 +1731,8 @@ func copy_stacks() -> Array:
 			"quality": copy_quality_of(key),
 			"count": count,
 			"merged": rarity_of(key) == copy_quality_of(key),
+			"total": int(copy_ledger(key)["total"]),
+			"used": int(copy_ledger(key)["used"]),
 		})
 	return out
 

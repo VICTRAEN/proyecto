@@ -195,10 +195,8 @@ func _reveal_x10(summon) -> void:
 			_save("04_x10_%02d_transicion" % (i + 1))
 	await _wait(0.6)
 	_save("05_x10_fin")
-	var b = rv.find_child("SummaryButton", true, false) if is_instance_valid(rv) else null
-	if b != null:
-		b.pressed.emit()
-		await _wait(0.6)
+	# v11: el resumen se abre solo al terminar.
+	if is_instance_valid(rv) and rv.find_child("SummaryGrid", true, false) != null:
 		_save("06_x10_resumen")
 	if is_instance_valid(rv):
 		var back = rv.find_child("ReturnButton", true, false)

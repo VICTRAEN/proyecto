@@ -18,7 +18,7 @@ const DuoFallback := preload("res://ui/duo_fallback_fx.gd")
 ## video o repetir el toque no puede cambiar el estado del juego mas alla del indice.
 ##
 ## Flujo: carta 1/N -> toque -> carta 2/N ... -> N/N -> (x10) pantalla final con
-## VER RESUMEN y VOLVER AL BANNER; (x1) el toque en la carta cierra.
+## el RESUMEN (se abre solo, con VOLVER AL BANNER); (x1) el toque en la carta cierra.
 ## Si el personaje tiene "summon_cinematic" en su JSON (el duo David & Lucy), antes de
 ## su carta se reproduce la cinematica (video opcional, con alternativa si falta).
 ## La primera copia de la secuencia hace la cinematica completa; las demas, un
@@ -533,51 +533,14 @@ func _end_cinematic() -> void:
 ## --- Final y resumen ---------------------------------------------------------------------
 
 func _show_end() -> void:
+	# v11: ya no hay pantalla intermedia (VER RESUMEN / VOLVER AL BANNER). Al terminar
+	# la secuencia se abre DIRECTAMENTE el resumen, y desde el el jugador decide.
 	_phase = "end"
 	_busy = true
-	for child in _content.get_children():
-		_content.remove_child(child)
-		child.queue_free()
 	_content.modulate.a = 1.0
 	(_backdrop as Backdrop).configure("SR", VI.BLUE, VI.GOLD, false)
-	_counter.text = "%d/%d" % [_total, _total]
 	_hint.visible = false
-	var box := VBoxContainer.new()
-	box.name = "EndPanel"
-	box.add_theme_constant_override("separation", 22)
-	_content.add_child(box)
-	box.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
-	box.custom_minimum_size = Vector2(760, 0)
-	box.grow_horizontal = Control.GROW_DIRECTION_BOTH
-	box.grow_vertical = Control.GROW_DIRECTION_BOTH
-	var title := Label.new()
-	title.text = "INVOCACION COMPLETADA"
-	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	VI.style_title(title, VI.FONT_BIG)
-	box.add_child(title)
-	var info := Label.new()
-	info.name = "EndInfo"
-	info.text = "%d tiradas  -  %d gemas  -  %d nuevos, %d repetidos" % [
-		_total, int(GameState.pending_reveal.get("cost", 0)),
-		int(GameState.pending_reveal.get("new_count", 0)), int(GameState.pending_reveal.get("duplicate_count", 0))]
-	info.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	info.add_theme_font_size_override("font_size", VI.FONT_BODY)
-	info.add_theme_color_override("font_color", VI.INK_SOFT)
-	box.add_child(info)
-	var summary_button := Button.new()
-	summary_button.name = "SummaryButton"
-	summary_button.text = "VER RESUMEN"
-	summary_button.custom_minimum_size = Vector2(0, VI.TOUCH)
-	VI.tint_button(summary_button, VI.GOLD)
-	summary_button.pressed.connect(_show_summary)
-	box.add_child(summary_button)
-	var back := Button.new()
-	back.name = "ReturnButton"
-	back.text = "VOLVER AL BANNER"
-	back.custom_minimum_size = Vector2(0, VI.TOUCH)
-	VI.tint_button(back, VI.BLUE)
-	back.pressed.connect(_close)
-	box.add_child(back)
+	_show_summary()
 	_busy = false
 
 
@@ -600,6 +563,16 @@ func _show_summary() -> void:
 	var col := VBoxContainer.new()
 	col.add_theme_constant_override("separation", 14)
 	box.add_child(col)
+	# Los datos de la invocacion (antes estaban en la pantalla intermedia).
+	var info := Label.new()
+	info.name = "EndInfo"
+	info.text = "%d tiradas  -  %d gemas  -  %d nuevos, %d repetidos" % [
+		_total, int(GameState.pending_reveal.get("cost", 0)),
+		int(GameState.pending_reveal.get("new_count", 0)), int(GameState.pending_reveal.get("duplicate_count", 0))]
+	info.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	info.add_theme_font_size_override("font_size", VI.FONT_BODY)
+	info.add_theme_color_override("font_color", VI.INK_SOFT)
+	col.add_child(info)
 	var scroll := ScrollContainer.new()
 	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED

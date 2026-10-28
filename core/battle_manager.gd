@@ -617,6 +617,35 @@ func _build_order() -> void:
 	order.append_array(_alive_only(allies))
 	order.append_array(_alive_only(enemies))
 	order.sort_custom(func(a, b): return a.speed() > b.speed())
+	if randomize_ally_order:
+		_shuffle_allies_in_order()
+
+
+## ORDEN ALEATORIO DEL EQUIPO (v11). La velocidad sigue repartiendo los TURNOS entre
+## bandos (en que posiciones de la ronda actuan aliados y en cuales enemigos), pero
+## QUIEN de tus personajes ocupa cada una de esas posiciones se sortea en cada ronda,
+## para que no ataquen siempre en el mismo orden. Cada aliado vivo actua exactamente
+## una vez por ronda y los enemigos no se tocan.
+var randomize_ally_order := true
+
+
+func _shuffle_allies_in_order() -> void:
+	var slots: Array = []
+	var team: Array = []
+	for i in order.size():
+		if order[i].is_ally:
+			slots.append(i)
+			team.append(order[i])
+	if team.size() < 2:
+		return
+	# Fisher-Yates con el generador del combate.
+	for i in range(team.size() - 1, 0, -1):
+		var j := _rng.randi_range(0, i)
+		var tmp = team[i]
+		team[i] = team[j]
+		team[j] = tmp
+	for k in slots.size():
+		order[slots[k]] = team[k]
 
 
 ## Solo para la verificacion en ejecucion (DEBUG_BATTLE): que modificadores

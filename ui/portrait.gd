@@ -78,6 +78,12 @@ var aura := 0.0
 var rim_screen_px := 3.0
 ## Sin marco ni relleno: el personaje flota sobre el fondo (escaparates).
 var transparent_frame := false
+## Colocacion de sprites SUELTOS (combate): con true los pies quedan en el borde
+## inferior del hueco (todos en la misma linea de suelo) en vez de centrados, y
+## `width_slack` deja que un sprite ancho se pase un poco del ancho antes de encogerlo,
+## para que las alturas de los personajes sean mas parecidas. Nunca deforma ni recorta.
+var feet_down := false
+var width_slack := 0.0
 
 var _frame: StyleBox = null
 var _art_layer: Control = null
@@ -472,9 +478,11 @@ func _fitted_rect() -> Array:
 	var source := source_rect
 	if source.size.x <= 1.0 or source.size.y <= 1.0:
 		source = Rect2(Vector2.ZERO, texture.get_size())
-	var scale := minf(size.x / maxf(source.size.x, 1.0), size.y / maxf(source.size.y, 1.0))
+	var scale := minf(size.x * (1.0 + width_slack) / maxf(source.size.x, 1.0), size.y / maxf(source.size.y, 1.0))
 	var drawn := source.size * scale
 	var position := Vector2((size.x - drawn.x) * 0.5, (size.y - drawn.y) * 0.5)
+	if feet_down:
+		position.y = size.y - drawn.y
 	return [Rect2(position, drawn), source, scale]
 
 
