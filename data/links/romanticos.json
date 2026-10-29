@@ -2,8 +2,121 @@
 	"id": "romanticos",
 	"name": "Romanticos",
 	"description": "Hay alguien a quien volver. Eso afina la punteria y acelera los pies.",
-	"effects": [
-		{ "type": "stat_mod", "stat": "crit_rate", "kind": "flat", "value": 0.03 },
-		{ "type": "stat_mod", "stat": "speed", "kind": "mult", "value": 0.04 }
+	"legacy_effects": [
+		{
+			"type": "stat_mod",
+			"stat": "crit_rate",
+			"kind": "flat",
+			"value": 0.03
+		},
+		{
+			"type": "stat_mod",
+			"stat": "speed",
+			"kind": "mult",
+			"value": 0.04
+		}
+	],
+	"tiers": [
+		{
+			"need": 2,
+			"rules": [
+				{
+					"id": "base",
+					"name": "Vinculo",
+					"who": "holders",
+					"trigger": "static",
+					"condition": {},
+					"effects": [
+						{
+							"type": "stat_mod",
+							"stat": "crit_rate",
+							"kind": "flat",
+							"value": 0.03,
+							"target": "self",
+							"turns": 0
+						},
+						{
+							"type": "stat_mod",
+							"stat": "speed",
+							"kind": "mult",
+							"value": 0.04,
+							"target": "self",
+							"turns": 0
+						}
+					],
+					"description": "Siempre: Propio: CRITICO +3 pts (todo el combate); Propio: VELOCIDAD +4% (todo el combate).",
+					"text": "Siempre: Propio: CRITICO +3 pts (todo el combate); Propio: VELOCIDAD +4% (todo el combate)."
+				},
+				{
+					"id": "corazones",
+					"name": "Dos corazones",
+					"trigger": "on_crit",
+					"condition": {},
+					"effects": [
+						{
+							"type": "stat_mod",
+							"target": "ally_others",
+							"stat": "atk",
+							"kind": "mult",
+							"value": 0.05,
+							"turns": 2,
+							"stacks_max": 3
+						}
+					],
+					"description": "Al asestar un critico: Resto del equipo: ATAQUE +5% (2 turnos), acumulable x3.",
+					"who": "holders",
+					"text": "Al asestar un critico: Resto del equipo: ATAQUE +5% (2 turnos), acumulable x3."
+				}
+			]
+		},
+		{
+			"need": 3,
+			"rules": [
+				{
+					"id": "latido",
+					"name": "Latido",
+					"trigger": "on_hit",
+					"condition": {},
+					"effects": [
+						{
+							"type": "stat_mod",
+							"target": "self",
+							"stat": "crit_rate",
+							"kind": "flat",
+							"value": 0.1,
+							"turns": 2
+						}
+					],
+					"chance": 0.3,
+					"description": "Al recibir un golpe (30% de prob.): Propio: CRITICO +10 pts (2 turnos).",
+					"who": "holders",
+					"text": "Al recibir un golpe (30% de prob.): Propio: CRITICO +10 pts (2 turnos)."
+				}
+			]
+		},
+		{
+			"need": 4,
+			"rules": [
+				{
+					"id": "promesa",
+					"name": "Promesa",
+					"trigger": "static",
+					"condition": {},
+					"effects": [
+						{
+							"type": "stat_mod",
+							"target": "self",
+							"stat": "crit_dmg",
+							"kind": "flat",
+							"value": 0.2,
+							"turns": 0
+						}
+					],
+					"description": "Siempre: Propio: DANO CRITICO +20% (todo el combate).",
+					"who": "holders",
+					"text": "Siempre: Propio: DANO CRITICO +20% (todo el combate)."
+				}
+			]
+		}
 	]
 }

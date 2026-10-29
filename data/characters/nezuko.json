@@ -11,26 +11,54 @@
 		"back": "res://art/characters/nezuko/back.png",
 		"icon": "res://art/characters/nezuko/icon.png"
 	},
-	"roles": ["Tank", "Support"],
+	"roles": [
+		"Tank",
+		"Support"
+	],
 	"stats": {
 		"max_hp": 1940,
 		"atk": 200,
 		"def": 135,
 		"speed": 134,
-		"crit_rate": 0.10,
+		"crit_rate": 0.1,
 		"dodge_rate": 0.06
 	},
-	"categories": ["supernatural", "shonen", "historico", "guardianes"],
-	"links": ["hermanas", "energia-oculta", "heroes"],
+	"categories": [
+		"supernatural",
+		"shonen",
+		"historico",
+		"guardianes"
+	],
+	"links": [
+		"hermanas",
+		"energia-oculta",
+		"heroes"
+	],
 	"passive": {
 		"id": "pas_nezuko_cura",
 		"name": "Sangre que sana",
-		"description": "Al empezar el combate su defensa sube un 45% de forma permanente.",
-		"trigger": "battle_start",
-		"condition": {},
+		"trigger": "turn_start",
+		"condition": {
+			"type": "hp_below",
+			"value": 0.6
+		},
 		"effects": [
-			{ "type": "stat_mod", "target": "self", "stat": "def", "kind": "mult", "value": 0.45, "turns": 0 }
-		]
+			{
+				"type": "heal",
+				"target": "self",
+				"of": "max_hp",
+				"amount": 0.1
+			},
+			{
+				"type": "stat_mod",
+				"target": "self",
+				"stat": "dmg_reduction",
+				"kind": "flat",
+				"value": 0.09,
+				"turns": 1
+			}
+		],
+		"description": "Al empezar su turno, si su vida < 60%: Propio: cura 10% de VIDA MAX; Propio: REDUCCION DE DANO +9% (1 turno)."
 	},
 	"skills": [
 		{
@@ -45,13 +73,28 @@
 		{
 			"id": "sk_nezuko_02",
 			"name": "Fuego de sangre",
-			"description": "Su sangre arde y debilita al rival: le baja un 25% el ataque durante 2 turnos.",
+			"description": "Golpea a un rival: 1 golpe de poder 170. Rival: ATAQUE -25% (2 turnos). Rival: quemadura de 10% de ATAQUE por turno (2 turnos).",
 			"kind": "special",
 			"power": 170,
 			"cost": 3,
 			"target": "enemy",
 			"effects": [
-				{ "type": "stat_mod", "target": "enemy", "stat": "atk", "kind": "mult", "value": -0.25, "turns": 2 }
+				{
+					"type": "stat_mod",
+					"target": "enemy",
+					"stat": "atk",
+					"kind": "mult",
+					"value": -0.25,
+					"turns": 2
+				},
+				{
+					"type": "periodic",
+					"target": "enemy",
+					"kind": "burn",
+					"amount": 0.1,
+					"of": "atk",
+					"turns": 2
+				}
 			]
 		}
 	],

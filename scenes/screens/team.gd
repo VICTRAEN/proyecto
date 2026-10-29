@@ -7,6 +7,7 @@ const Portrait := preload("res://ui/portrait.gd")
 const TypeColors := preload("res://ui/type_colors.gd")
 const CombatUnit := preload("res://core/combat_unit.gd")
 const CARD_TILE := preload("res://ui/card_tile.gd")
+const SavedTeamsPanel := preload("res://ui/saved_teams_panel.gd")
 
 ## EQUIPO: elegir que personajes salen a combatir y en que posicion.
 ##
@@ -42,6 +43,16 @@ var _focused_id := ""
 ## Orden de la lista de personajes (se recuerda mientras dura la sesion).
 static var _sort_mode := 0
 var _sort_option: OptionButton = null
+## v12: fila de herramientas (EQUIPOS / AUTO / favorito / ACTUALIZAR) y estado.
+var _tools_row: HFlowContainer = null
+var _teams_button: Button = null
+var _auto_button: Button = null
+var _fav_button: Button = null
+var _update_button: Button = null
+## Equipo guardado que se esta editando (-1 = ninguno).
+var _editing_id := -1
+## Propuesta de autoconfiguracion pendiente de aplicar (la ve el jugador antes).
+var _auto_proposal: Dictionary = {}
 
 @onready var title_label: Label = $Margin/Main/Title
 @onready var lineup_title: Label = $Margin/Main/LineupTitle
@@ -67,6 +78,7 @@ func _ready() -> void:
 	remove_button.pressed.connect(_on_remove_pressed)
 	play_button.pressed.connect(_play)
 	_build_sort_row()
+	_build_tools_row()
 
 
 ## Aspecto estatico de la pantalla, en un solo sitio: el equipo arriba, el
@@ -112,6 +124,7 @@ func refresh() -> void:
 ## El contador y el estado del boton COMBATIR salen del equipo real y del modo de
 ## la batalla. Nada de "hacen falta 4" escrito aqui.
 func _update_buttons() -> void:
+	_update_tools()
 	var occupied := _selected_slot < GameState.party.size() and not String(GameState.party[_selected_slot]).is_empty()
 	remove_button.text = "QUITAR POS. %d" % (_selected_slot + 1)
 	remove_button.disabled = not occupied
@@ -135,9 +148,127 @@ func _update_links_note() -> void:
 	var names := PackedStringArray()
 	for link_id in active:
 		var link := DB.get_link(String(link_id))
-		names.append(String(link.get("name", link_id)))
+		var tier := GameState.link_tier_reached(String(link_id), GameState.link_holder_count(String(link_id)))
+		names.append("%s (Nv.%d/%d)" % [String(link.get("name", link_id)), tier, GameState.link_tiers(String(link_id)).size()])
 	links_note.text = "LINKS ACTIVOS: %d  -  %s" % [active.size(), ", ".join(names)]
 	links_note.add_theme_color_override("font_color", VI.GOLD)
+
+
+## --- Equipos guardados, autoconfiguracion y favoritos (v12) -----------------
+
+func _build_tools_row() -> void:
+	_tools_row = HFlowContainer.new()
+	_tools_row.name = "ToolsRow"
+	_tools_row.add_theme_constant_override("h_separation", 8)
+	_tools_row.add_theme_constant_override("v_separation", 8)
+	_teams_button = _tool_button("EQUIPOS", VI.GOLD, _open_saved_teams)
+	_teams_button.name = "TeamsButton"
+	_auto_button = _tool_button("AUTO", VI.CYAN, _on_auto_pressed)
+	_auto_button.name = "AutoButton"
+	_fav_button = _tool_button("FAVORITO", VI.MAGENTA, _on_favorite_pressed)
+	_fav_button.name = "FavButton"
+	_update_button = _tool_button("ACTUALIZAR", VI.GREEN, _on_update_saved)
+	_update_button.name = "UpdateButton"
+	for button in [_teams_button, _auto_button, _fav_button, _update_button]:
+		_tools_row.add_child(button)
+	var parent := slot_hint.get_parent()
+	parent.add_child(_tools_row)
+	parent.move_child(_tools_row, slot_hint.get_index() + 1)
+
+
+func _tool_button(text: String, color: Color, handler: Callable) -> Button:
+	var button := Button.new()
+	button.text = text
+	button.custom_minimum_size = Vector2(0, 72)
+	button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	button.add_theme_font_size_override("font_size", VI.FONT_SMALL)
+	VI.tint_button(button, color)
+	button.pressed.connect(handler)
+	return button
+
+
+func _update_tools() -> void:
+	if _tools_row == null:
+		return
+	_teams_button.text = "EQUIPOS (%d)" % GameState.saved_team_count()
+	var focus := _focused_id
+	_fav_button.visible = not focus.is_empty() and GameState.is_owned(focus)
+	_fav_button.text = "QUITAR FAVORITO" if GameState.is_favorite(focus) else "MARCAR FAVORITO"
+	if _editing_id >= 0 and GameState.saved_team_get(_editing_id).is_empty():
+		_editing_id = -1
+	_update_button.visible = _editing_id >= 0
+	if _editing_id >= 0:
+		_update_button.text = "ACTUALIZAR \"%s\"" % String(GameState.saved_team_get(_editing_id).get("name", "?"))
+
+
+func _open_saved_teams() -> void:
+	var panel := SavedTeamsPanel.new()
+	panel.name = "SavedTeamsPanel"
+	panel.setup("party")
+	panel.team_applied.connect(_on_team_applied)
+	panel.edit_requested.connect(_on_edit_requested)
+	panel.closed.connect(refresh)
+	add_child(panel)
+
+
+func _on_team_applied(team_name: String) -> void:
+	_editing_id = -1
+	_cancel_proposal()
+	refresh()
+	slot_hint.text = "Equipo \"%s\" puesto." % team_name
+
+
+func _on_edit_requested(team_id: int) -> void:
+	_editing_id = team_id
+	_cancel_proposal()
+	refresh()
+	slot_hint.text = "Editando un equipo guardado: cambia las posiciones y pulsa ACTUALIZAR."
+
+
+func _on_update_saved() -> void:
+	var result := GameState.saved_team_update(_editing_id)
+	slot_hint.text = "Equipo guardado actualizado." if bool(result["ok"]) else String(result["reason"])
+	if bool(result["ok"]):
+		_editing_id = -1
+	_update_tools()
+
+
+func _on_favorite_pressed() -> void:
+	if _focused_id.is_empty():
+		return
+	GameState.set_favorite(_focused_id, not GameState.is_favorite(_focused_id))
+	_update_tools()
+	_update_info()
+
+
+## AUTO: calcula una propuesta (no toca el equipo) y la ensena con sus razones. Un
+## segundo toque la aplica; el jugador puede cambiar lo que quiera despues.
+func _on_auto_pressed() -> void:
+	if _auto_proposal.is_empty():
+		var proposal := GameState.autoconfigure_team("party")
+		if (proposal.get("members", []) as Array).is_empty():
+			slot_hint.text = String(proposal.get("reason", "No hay propuesta posible con tus personajes."))
+			return
+		_auto_proposal = proposal
+		var names := PackedStringArray()
+		for id in proposal["members"]:
+			names.append(GameState.display_name(String(id)))
+		var reasons := PackedStringArray(proposal.get("parts", []))
+		slot_hint.text = "PROPUESTA: %s.\n%s\nToca AUTO otra vez para aplicarla, o cambia el equipo a mano." % [
+			", ".join(names), "  ".join(reasons)]
+		_auto_button.text = "APLICAR PROPUESTA"
+		return
+	GameState.apply_autoconfigured(_auto_proposal["members"], "party")
+	_cancel_proposal()
+	_editing_id = -1
+	refresh()
+	slot_hint.text = "Equipo autoconfigurado. Puedes modificarlo."
+
+
+func _cancel_proposal() -> void:
+	_auto_proposal = {}
+	if _auto_button != null:
+		_auto_button.text = "AUTO"
 
 
 ## --- Las cuatro posiciones (arriba) ----------------------------------------
@@ -281,12 +412,14 @@ func _on_pool_pressed(data: Dictionary) -> void:
 	_focused_id = String(data.get("id", ""))
 	# Toda la logica de colocar/quitar/mover vive en GameState: aqui solo se pide.
 	GameState.assign_party_slot(_selected_slot, _focused_id)
+	_cancel_proposal()
 	refresh()
 
 
 ## QUITAR POS. N: deja vacia la posicion elegida. Es el mismo camino que tocar
 ## dos veces al personaje, asi que no hay dos formas distintas de vaciar un hueco.
 func _on_remove_pressed() -> void:
+	_cancel_proposal()
 	GameState.assign_party_slot(_selected_slot, "")
 	_focused_id = ""
 	refresh()
@@ -314,8 +447,9 @@ func _update_info() -> void:
 	info_portrait.setup(unit.id, tint, unit.portrait_style, unit.art_for("icon"), "icon")
 	info_name.text = unit.display_name
 	info_name.add_theme_color_override("font_color", tint)
-	info_meta.text = "%s  -  NIVEL %d  -  %s" % [
-		String(data.get("rarity", "R")), GameState.level_of(id), _status_text(id)]
+	info_meta.text = "%s  -  NIVEL %d  -  %s%s" % [
+		String(data.get("rarity", "R")), GameState.level_of(id), _status_text(id),
+		"  -  FAVORITO" if GameState.is_favorite(id) else ""]
 	info_stats.text = "HP %d    ATQ %d    DEF %d    SPD %d\nCRITICO %d%%    ESQUIVA %d%%" % [
 		int(round(unit.max_hp())),
 		int(round(unit.attack())),

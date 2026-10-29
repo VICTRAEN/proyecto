@@ -2,8 +2,115 @@
 	"id": "spokon",
 	"name": "Spokon",
 	"description": "Entrenamiento compartido: los reflejos y la velocidad suben solos.",
-	"effects": [
-		{ "type": "stat_mod", "stat": "speed", "kind": "mult", "value": 0.07 },
-		{ "type": "stat_mod", "stat": "dodge_rate", "kind": "flat", "value": 0.02 }
+	"legacy_effects": [
+		{
+			"type": "stat_mod",
+			"stat": "speed",
+			"kind": "mult",
+			"value": 0.07
+		},
+		{
+			"type": "stat_mod",
+			"stat": "dodge_rate",
+			"kind": "flat",
+			"value": 0.02
+		}
+	],
+	"tiers": [
+		{
+			"need": 2,
+			"rules": [
+				{
+					"id": "base",
+					"name": "Vinculo",
+					"who": "holders",
+					"trigger": "static",
+					"condition": {},
+					"effects": [
+						{
+							"type": "stat_mod",
+							"stat": "speed",
+							"kind": "mult",
+							"value": 0.07,
+							"target": "self",
+							"turns": 0
+						},
+						{
+							"type": "stat_mod",
+							"stat": "dodge_rate",
+							"kind": "flat",
+							"value": 0.02,
+							"target": "self",
+							"turns": 0
+						}
+					],
+					"description": "Siempre: Propio: VELOCIDAD +7% (todo el combate); Propio: ESQUIVA +2 pts (todo el combate).",
+					"text": "Siempre: Propio: VELOCIDAD +7% (todo el combate); Propio: ESQUIVA +2 pts (todo el combate)."
+				},
+				{
+					"id": "jugada",
+					"name": "Jugada en equipo",
+					"trigger": "on_attack",
+					"condition": {},
+					"effects": [
+						{
+							"type": "damage",
+							"target": "trigger_target",
+							"power": 50
+						}
+					],
+					"chance": 0.3,
+					"description": "Al atacar (30% de prob.): Golpe extra de poder 50 a: objetivo.",
+					"who": "holders",
+					"text": "Al atacar (30% de prob.): Golpe extra de poder 50 a: objetivo."
+				}
+			]
+		},
+		{
+			"need": 3,
+			"rules": [
+				{
+					"id": "pase",
+					"name": "Pase",
+					"trigger": "on_attack",
+					"condition": {},
+					"effects": [
+						{
+							"type": "sp_gain",
+							"target": "ally_random",
+							"amount": 1
+						}
+					],
+					"chance": 0.2,
+					"description": "Al atacar (20% de prob.): Un aliado al azar: +1 SP.",
+					"who": "holders",
+					"text": "Al atacar (20% de prob.): Un aliado al azar: +1 SP."
+				}
+			]
+		},
+		{
+			"need": 4,
+			"rules": [
+				{
+					"id": "remate",
+					"name": "Remate",
+					"trigger": "static",
+					"condition": {},
+					"effects": [
+						{
+							"type": "stat_mod",
+							"target": "self",
+							"stat": "crit_rate",
+							"kind": "flat",
+							"value": 0.06,
+							"turns": 0
+						}
+					],
+					"description": "Siempre: Propio: CRITICO +6 pts (todo el combate).",
+					"who": "holders",
+					"text": "Siempre: Propio: CRITICO +6 pts (todo el combate)."
+				}
+			]
+		}
 	]
 }

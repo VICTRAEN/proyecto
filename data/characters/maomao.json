@@ -11,26 +11,42 @@
 		"back": "res://art/characters/maomao/back.png",
 		"icon": "res://art/characters/maomao/icon.png"
 	},
-	"roles": ["Utility", "Support"],
+	"roles": [
+		"Utility",
+		"Support"
+	],
 	"stats": {
 		"max_hp": 1180,
 		"atk": 182,
 		"def": 84,
 		"speed": 108,
 		"crit_rate": 0.12,
-		"dodge_rate": 0.10
+		"dodge_rate": 0.1
 	},
-	"categories": ["historico", "geniuses", "determination"],
-	"links": ["estrategas"],
+	"categories": [
+		"historico",
+		"geniuses",
+		"determination"
+	],
+	"links": [
+		"estrategas"
+	],
 	"passive": {
 		"id": "pas_maomao_ojo",
 		"name": "Ojo clinico",
-		"description": "Ve la debilidad al instante: al comenzar su turno baja un 12% la defensa del rival.",
-		"trigger": "turn_start",
+		"trigger": "on_attack",
 		"condition": {},
 		"effects": [
-			{ "type": "stat_mod", "target": "enemy", "stat": "def", "kind": "mult", "value": -0.12, "turns": 1 }
-		]
+			{
+				"type": "periodic",
+				"target": "trigger_target",
+				"kind": "poison",
+				"amount": 0.08,
+				"of": "atk",
+				"turns": 3
+			}
+		],
+		"description": "Al atacar: Objetivo: veneno de 8% de ATAQUE por turno (3 turnos)."
 	},
 	"skills": [
 		{
@@ -50,10 +66,30 @@
 			"power": 100,
 			"cost": 3,
 			"target": "enemy",
-			"description": "Dosis medida que no se nota: -25% de ataque durante 3 turnos y 1 turno aturdido.",
+			"description": "Golpea a un rival: 1 golpe de poder 100. Rival: ATAQUE -25% (3 turnos). Rival: veneno de 12% de ATAQUE por turno (3 turnos). Rival: aturdido (1 turno).",
 			"effects": [
-				{ "type": "stat_mod", "target": "enemy", "stat": "atk", "kind": "mult", "value": -0.25, "turns": 3 },
-				{ "type": "status", "target": "enemy", "status": "stun", "turns": 1 }
+				{
+					"type": "stat_mod",
+					"target": "enemy",
+					"stat": "atk",
+					"kind": "mult",
+					"value": -0.25,
+					"turns": 3
+				},
+				{
+					"type": "periodic",
+					"target": "enemy",
+					"kind": "poison",
+					"amount": 0.12,
+					"of": "atk",
+					"turns": 3
+				},
+				{
+					"type": "status",
+					"target": "enemy",
+					"status": "stun",
+					"turns": 1
+				}
 			]
 		}
 	],
@@ -62,25 +98,42 @@
 		"passive": {
 			"id": "pas_maomao_ev_ojo",
 			"name": "Ojo clinico certero",
-			"description": "Al comenzar su turno baja un 20% la defensa y un 10% el ataque del rival.",
-			"trigger": "turn_start",
+			"trigger": "on_attack",
 			"condition": {},
 			"effects": [
-				{ "type": "stat_mod", "target": "enemy", "stat": "def", "kind": "mult", "value": -0.2, "turns": 1 },
-				{ "type": "stat_mod", "target": "enemy", "stat": "atk", "kind": "mult", "value": -0.1, "turns": 1 }
-			]
+				{
+					"type": "periodic",
+					"target": "trigger_target",
+					"kind": "poison",
+					"amount": 0.12,
+					"of": "atk",
+					"turns": 3
+				}
+			],
+			"description": "Al atacar: Objetivo: veneno de 12% de ATAQUE por turno (3 turnos)."
 		},
 		"passive_extra": {
 			"id": "pas_maomao_ev_antidoto",
 			"name": "Antidoto preparado",
-			"description": "Al comenzar el combate sube un 20% la defensa de todo el equipo.",
 			"trigger": "battle_start",
 			"condition": {},
 			"effects": [
-				{ "type": "stat_mod", "target": "ally_all", "stat": "def", "kind": "mult", "value": 0.2, "turns": 0 }
-			]
+				{
+					"type": "shield",
+					"target": "ally_all",
+					"amount": 0.08,
+					"of": "max_hp",
+					"turns": 3
+				}
+			],
+			"description": "Al empezar el combate: Equipo: escudo de 8% de VIDA MAX (3 turnos)."
 		},
-		"links": ["veteranos"],
-		"categories": ["despertados", "tacticos"]
+		"links": [
+			"veteranos"
+		],
+		"categories": [
+			"despertados",
+			"tacticos"
+		]
 	}
 }

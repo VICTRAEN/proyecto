@@ -11,7 +11,9 @@
 		"back": "res://art/characters/akaza/back.png",
 		"icon": "res://art/characters/akaza/icon.png"
 	},
-	"roles": ["Damage Dealer"],
+	"roles": [
+		"Damage Dealer"
+	],
 	"stats": {
 		"max_hp": 1400,
 		"atk": 234,
@@ -20,17 +22,32 @@
 		"crit_rate": 0.15,
 		"dodge_rate": 0.09
 	},
-	"categories": ["supernatural", "villains", "rivals"],
-	"links": ["rivales", "villanos"],
+	"categories": [
+		"supernatural",
+		"villains",
+		"rivals"
+	],
+	"links": [
+		"rivales",
+		"villanos"
+	],
 	"passive": {
 		"id": "pas_akaza_instinto",
 		"name": "Instinto de combate",
-		"description": "Cuando el combate se alarga, su instinto se agudiza: desde la ronda 4 sube un 25% su ataque.",
-		"trigger": "turn_start",
-		"condition": { "type": "round_at_least", "value": 4 },
+		"trigger": "on_attack",
+		"condition": {},
 		"effects": [
-			{ "type": "stat_mod", "target": "self", "stat": "atk", "kind": "mult", "value": 0.25, "turns": 1 }
-		]
+			{
+				"type": "stat_mod",
+				"target": "self",
+				"stat": "atk",
+				"kind": "mult",
+				"value": 0.06,
+				"turns": 3,
+				"stacks_max": 5
+			}
+		],
+		"description": "Al atacar: Propio: ATAQUE +6% (3 turnos), acumulable x5."
 	},
 	"skills": [
 		{
@@ -47,13 +64,21 @@
 			"id": "sk_akaza_02",
 			"name": "Aniquilacion",
 			"kind": "special",
-			"power": 260,
+			"power": 90,
 			"cost": 3,
 			"target": "enemy",
-			"description": "Rafaga continua que le sube 15 puntos de critico durante 2 turnos.",
+			"description": "Golpea a un rival: 3 golpes de poder 90. Propio: CRITICO +15 pts (2 turnos).",
 			"effects": [
-				{ "type": "stat_mod", "target": "self", "stat": "crit_rate", "kind": "flat", "value": 0.15, "turns": 2 }
-			]
+				{
+					"type": "stat_mod",
+					"target": "self",
+					"stat": "crit_rate",
+					"kind": "flat",
+					"value": 0.15,
+					"turns": 2
+				}
+			],
+			"hits": 3
 		}
 	],
 	"transformations": [],
@@ -61,24 +86,46 @@
 		"passive": {
 			"id": "pas_akaza_ur_instinto",
 			"name": "Instinto de la luna superior",
-			"description": "Desde la ronda 3 su instinto se agudiza: sube un 40% su ataque.",
-			"trigger": "turn_start",
-			"condition": { "type": "round_at_least", "value": 3 },
+			"trigger": "on_attack",
+			"condition": {},
 			"effects": [
-				{ "type": "stat_mod", "target": "self", "stat": "atk", "kind": "mult", "value": 0.4, "turns": 1 }
-			]
+				{
+					"type": "stat_mod",
+					"target": "self",
+					"stat": "atk",
+					"kind": "mult",
+					"value": 0.09,
+					"turns": 3,
+					"stacks_max": 5
+				}
+			],
+			"description": "Al atacar: Propio: ATAQUE +9% (3 turnos), acumulable x5."
 		},
 		"passive_extra": {
 			"id": "pas_akaza_ur_regeneracion",
 			"name": "Regeneracion demoniaca",
-			"description": "Cuando baja de la mitad de su vida, recupera un 12% de su vida maxima cada turno.",
 			"trigger": "turn_start",
-			"condition": { "type": "hp_below", "who": "self", "value": 0.5 },
+			"condition": {
+				"type": "hp_below",
+				"value": 0.5
+			},
 			"effects": [
-				{ "type": "heal", "target": "self", "amount": 0.12, "of": "max_hp" }
-			]
+				{
+					"type": "heal",
+					"target": "self",
+					"of": "max_hp",
+					"amount": 0.12
+				}
+			],
+			"description": "Al empezar su turno, si su vida < 50%: Propio: cura 12% de VIDA MAX."
 		},
-		"links": ["energia-oculta", "hibridos"],
-		"categories": ["despertados", "aniquiladores"]
+		"links": [
+			"energia-oculta",
+			"hibridos"
+		],
+		"categories": [
+			"despertados",
+			"aniquiladores"
+		]
 	}
 }

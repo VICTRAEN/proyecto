@@ -1,5 +1,7 @@
 extends Node
 
+const TeamPlanner := preload("res://core/team_planner.gd")
+
 ## Autoload GameState: estado del jugador.
 ##
 ## Guarda dos cosas distintas y conviene no mezclarlas:
@@ -2142,11 +2144,11 @@ func mutation_stat_preview(id: String) -> Array:
 	var block: StatBlock = StatBlock.new(data.get("stats", {}), level_of(key))
 	block.set_rarity_multiplier(float(data.get("stat_multiplier", 1.0)))
 	var before: Dictionary = {}
-	for stat_name in StatBlock.LABELS.keys():
+	for stat_name in StatBlock.BASE_STATS:
 		before[stat_name] = block.base_value(stat_name)
 	apply_mutation_mods(block, key)
 	var out: Array = []
-	for stat_name in StatBlock.LABELS.keys():
+	for stat_name in StatBlock.BASE_STATS:
 		var base_value := float(before[stat_name])
 		var final_value := block.get_stat(stat_name)
 		out.append({
@@ -2999,15 +3001,57 @@ func event_status(event_id: String) -> Dictionary:
 
 
 ## --- Links del equipo -------------------------------------------------------
+## v12: un link tiene NIVELES segun cuantos personajes del equipo lo comparten
+## (2, 3, 4...). Cada nivel anade reglas (acumulativas) que pueden ser bonos fijos
+## ("static") o reglas con disparador (al recibir un golpe, al caer un aliado, al
+## bajar de vida...). Todo sale de data/links/*.json; un link antiguo con "effects"
+## sigue funcionando como nivel 2 estatico.
 
-## Un link esta ACTIVO cuando al menos DOS personajes del EQUIPO lo comparten: un
-## link con un solo portador no da bonus. Se mira el equipo (party) y no el
-## roster, porque el bonus es de la formacion que combate.
+## Reglas de un link ya normalizadas: [{ need, rules: [ regla... ] }] ordenadas.
+func link_tiers(link_id: String) -> Array:
+	var link := DB.get_link(String(link_id))
+	var out: Array = []
+	var raw_tiers = link.get("tiers", [])
+	if raw_tiers is Array and not (raw_tiers as Array).is_empty():
+		for tier in raw_tiers:
+			if tier is Dictionary:
+				out.append({ "need": int(tier.get("need", LINK_MIN_HOLDERS)), "rules": tier.get("rules", []) })
+	else:
+		var legacy_rules: Array = []
+		for effect in link.get("effects", []):
+			if effect is Dictionary:
+				legacy_rules.append({ "id": "base", "who": "holders", "trigger": "static", "effects": [effect] })
+		if not legacy_rules.is_empty():
+			out.append({ "need": LINK_MIN_HOLDERS, "rules": legacy_rules })
+	out.sort_custom(func(a, b): return int(a["need"]) < int(b["need"]))
+	return out
+
+
+## Menor numero de portadores con el que el link hace algo.
+func link_min_need(link_id: String) -> int:
+	var tiers := link_tiers(link_id)
+	if tiers.is_empty():
+		return LINK_MIN_HOLDERS
+	return int(tiers[0]["need"])
+
+
+## Cuantos niveles del link estan alcanzados con ese numero de portadores.
+func link_tier_reached(link_id: String, holders: int) -> int:
+	var reached := 0
+	for tier in link_tiers(link_id):
+		if holders >= int(tier["need"]):
+			reached += 1
+	return reached
+
+
+## Un link esta ACTIVO cuando el equipo alcanza su primer nivel (2 portadores).
+## Se mira el equipo (party) y no el roster, porque el bonus es de la formacion
+## que combate.
 func active_link_ids() -> Array:
 	var counts := _link_counts()
 	var out: Array = []
 	for link_id in counts.keys():
-		if int(counts[link_id]) >= LINK_MIN_HOLDERS:
+		if link_tier_reached(String(link_id), int(counts[link_id])) >= 1:
 			out.append(String(link_id))
 	out.sort()
 	return out
@@ -3018,7 +3062,7 @@ func is_link_active(link_id: String) -> bool:
 
 
 ## Cuantos personajes del equipo llevan un link (base + los que aporta la
-## evolucion de cada uno). Es el dato que decide si el link se activa.
+## evolucion de cada uno). Es el dato que decide en que nivel esta.
 func link_holder_count(link_id: String) -> int:
 	return int(_link_counts().get(String(link_id), 0))
 
@@ -3035,9 +3079,50 @@ func _link_counts() -> Dictionary:
 	return counts
 
 
+## Personajes del equipo que llevan un link, en orden de formacion.
+func link_holders(link_id: String) -> Array:
+	var out: Array = []
+	for id in _lead_party():
+		if not String(id).is_empty() and _character_has_link(String(id), String(link_id)):
+			out.append(String(id))
+	return out
+
+
+## Reglas ACTIVAS de un link (niveles alcanzados, acumulados) que afectan a un
+## personaje. who: "holders" (los que llevan el link), "team" (todo el equipo) o
+## "first" (solo el primer portador de la formacion: reglas de un solo disparo
+## para el equipo, asi no se repiten por cada portador).
+func _active_rules_for(id: String, link_id: String) -> Array:
+	var out: Array = []
+	var holders := link_holder_count(link_id)
+	var has_link := _character_has_link(id, link_id)
+	var first_holder := ""
+	var holder_list := link_holders(link_id)
+	if not holder_list.is_empty():
+		first_holder = String(holder_list[0])
+	for tier in link_tiers(link_id):
+		if holders < int(tier["need"]):
+			continue
+		for rule in tier["rules"]:
+			if not (rule is Dictionary):
+				continue
+			var who := String(rule.get("who", "holders"))
+			var applies := false
+			match who:
+				"team":
+					applies = _lead_party().has(id)
+				"first":
+					applies = has_link and id == first_holder
+				_:
+					applies = has_link
+			if applies:
+				out.append(rule)
+	return out
+
+
 ## Estado de los links de un personaje, ya resuelto para pintar: la ficha solo
-## lee "active" y "holders". No se escribe aqui ninguna logica de pintado.
-## Devuelve [{ id, name, description, active, holders, effects }].
+## lee "active", "holders" y "tier". Devuelve
+## [{ id, name, description, active, holders, tier, tiers, effects }].
 func link_status(id: String) -> Array:
 	var counts := _link_counts()
 	var out: Array = []
@@ -3045,16 +3130,26 @@ func link_status(id: String) -> Array:
 		var link_id := String(raw_id)
 		var link := DB.get_link(link_id)
 		var holders := int(counts.get(link_id, 0))
-		out.append({
-			"id": link_id,
-			"name": String(link.get("name", link_id)),
-			"description": String(link.get("description", "")),
-			"effects": link.get("effects", []),
-			"holders": holders,
-			"active": holders >= LINK_MIN_HOLDERS,
-			"defined": not link.is_empty(),
-		})
+		out.append(_link_entry(link_id, link, holders))
 	return out
+
+
+func _link_entry(link_id: String, link: Dictionary, holders: int) -> Dictionary:
+	var tiers := link_tiers(link_id)
+	var reached := link_tier_reached(link_id, holders)
+	return {
+		"id": link_id,
+		"name": String(link.get("name", link_id)),
+		"description": String(link.get("description", "")),
+		"effects": link.get("effects", []),
+		"holders": holders,
+		"active": reached >= 1,
+		"tier": reached,
+		"tier_count": tiers.size(),
+		"tiers": tiers,
+		"need": link_min_need(link_id),
+		"defined": not link.is_empty(),
+	}
 
 
 ## Estado de todos los links que lleva el equipo, activos o no. Es lo que pinta
@@ -3067,40 +3162,102 @@ func team_links_status() -> Array:
 		var holders := int(counts.get(link_id, 0))
 		if holders <= 0:
 			continue
-		out.append({
-			"id": link_id,
-			"name": String(link.get("name", link_id)),
-			"description": String(link.get("description", "")),
-			"effects": link.get("effects", []),
-			"holders": holders,
-			"active": holders >= LINK_MIN_HOLDERS,
-			"defined": true,
-		})
+		out.append(_link_entry(link_id, link, holders))
 	out.sort_custom(func(a, b): return String(a["id"]) < String(b["id"]))
 	return out
 
 
-## Modificadores que los links ACTIVOS aportan a un personaje del equipo. Cada uno
-## se aplica con StatBlock.add_mod y un origen propio ("link:<id>"), asi que
-## core/stat_block.gd sigue siendo el unico sitio que calcula el valor final y
-## reaplicar el mismo link lo sustituye en vez de acumularlo.
+## Informe legible de las sinergias del equipo para la interfaz: por cada link con
+## algun portador, sus niveles (alcanzado o no), el texto de cada regla y A QUIEN
+## beneficia. Es lo que lee el panel de consulta del combate y la pantalla EQUIPO.
+## [{ id, name, holders, tier, tier_count, active, tiers: [{ need, reached,
+##    rules: [{ name, text, who_names }] }] }]
+func team_synergy_report() -> Array:
+	var out: Array = []
+	for entry in team_links_status():
+		var link_id := String(entry["id"])
+		var holders := int(entry["holders"])
+		var tier_rows: Array = []
+		for tier in entry["tiers"]:
+			var rules_out: Array = []
+			for rule in tier["rules"]:
+				if not (rule is Dictionary):
+					continue
+				var names: Array = []
+				for member in _lead_party():
+					var member_id := String(member)
+					if member_id.is_empty():
+						continue
+					for applicable in _active_rules_for_any_tier(member_id, link_id, rule):
+						names.append(String(character_data(member_id).get("name", member_id)))
+						break
+				rules_out.append({
+					"name": String(rule.get("name", entry["name"])),
+					"text": String(rule.get("text", "")),
+					"who_names": names,
+				})
+			tier_rows.append({ "need": int(tier["need"]), "reached": holders >= int(tier["need"]), "rules": rules_out })
+		out.append({
+			"id": link_id,
+			"name": String(entry["name"]),
+			"description": String(entry["description"]),
+			"holders": holders,
+			"tier": int(entry["tier"]),
+			"tier_count": int(entry["tier_count"]),
+			"active": bool(entry["active"]),
+			"tiers": tier_rows,
+		})
+	return out
+
+
+## A quien alcanzaria una regla concreta (sin mirar si su nivel esta alcanzado).
+func _active_rules_for_any_tier(id: String, link_id: String, rule: Dictionary) -> Array:
+	var has_link := _character_has_link(id, link_id)
+	var holder_list := link_holders(link_id)
+	match String(rule.get("who", "holders")):
+		"team":
+			return [rule] if _lead_party().has(id) else []
+		"first":
+			return [rule] if has_link and not holder_list.is_empty() and String(holder_list[0]) == id else []
+	return [rule] if has_link else []
+
+
+## Modificadores FIJOS que los links activos aportan a un personaje: las reglas
+## "static" de los niveles alcanzados. Cada una se aplica con StatBlock.add_mod y
+## un origen propio ("link:<id>:<regla>"), asi que core/stat_block.gd sigue siendo
+## el unico sitio que calcula el valor final y reaplicar un link SUSTITUYE el mod.
 func link_mods_for(id: String) -> Array:
 	var out: Array = []
 	for link_id in active_link_ids():
-		if not _character_has_link(String(id), link_id):
-			continue
-		var link := DB.get_link(link_id)
-		for effect in link.get("effects", []):
-			if not (effect is Dictionary):
+		for rule in _active_rules_for(String(id), String(link_id)):
+			if String(rule.get("trigger", "static")) != "static":
 				continue
-			if String(effect.get("type", "")) != "stat_mod":
+			for effect in rule.get("effects", []):
+				if not (effect is Dictionary) or String(effect.get("type", "")) != "stat_mod":
+					continue
+				out.append({
+					"stat": String(effect.get("stat", "")),
+					"kind": String(effect.get("kind", "mult")),
+					"value": float(effect.get("value", 0.0)),
+					"source": "link:%s:%s" % [link_id, String(rule.get("id", "base"))],
+				})
+	return out
+
+
+## Reglas con DISPARADOR de los links activos para un personaje, en el formato de
+## una pasiva: el BattleManager las dispara igual que las suyas.
+func link_rules_for(id: String) -> Array:
+	var out: Array = []
+	for link_id in active_link_ids():
+		var link := DB.get_link(String(link_id))
+		for rule in _active_rules_for(String(id), String(link_id)):
+			if String(rule.get("trigger", "static")) == "static":
 				continue
-			out.append({
-				"stat": String(effect.get("stat", "")),
-				"kind": String(effect.get("kind", "mult")),
-				"value": float(effect.get("value", 0.0)),
-				"source": "link:%s" % link_id,
-			})
+			var copy: Dictionary = (rule as Dictionary).duplicate(true)
+			copy["id"] = "link_%s_%s" % [link_id, String(rule.get("id", "regla"))]
+			copy["name"] = "%s: %s" % [String(link.get("name", link_id)), String(rule.get("name", ""))]
+			copy["origin"] = "link"
+			out.append(copy)
 	return out
 
 
@@ -3695,6 +3852,8 @@ func can_special_evolve(id: String) -> Dictionary:
 		"event_clears_required": 0,
 		"event_ok": true,
 		"mutation": mutation_report(key),
+		"protected": false,
+		"saved_teams": saved_teams_with(key),
 	}
 	if DB.get_character(key).is_empty():
 		report["reason"] = "Ese personaje no existe."
@@ -3710,6 +3869,12 @@ func can_special_evolve(id: String) -> Dictionary:
 	var to_id := String(route.get("to", ""))
 	report["route"] = route
 	report["to"] = to_id
+	# Favorito = protegido: esta evolucion CONSUME al personaje, asi que hay que
+	# quitarle la marca a proposito antes (nada de consumirlo por un toque de mas).
+	if bool(route.get("consume_from", true)) and is_favorite(key):
+		report["protected"] = true
+		report["reason"] = "%s es FAVORITO: quita la marca para poder consumirlo en esta evolucion." % display_name(key)
+		return report
 	report["to_rarity"] = String(route.get("to_rarity", ""))
 	report["boss"] = String(route.get("boss", ""))
 	report["dialogue"] = String(route.get("dialogue", ""))
@@ -3767,6 +3932,9 @@ func can_special_evolve(id: String) -> Dictionary:
 			return report
 	report["ok"] = true
 	report["reason"] = "Listo para la evolucion especial a %s." % display_name(to_id)
+	var in_teams: Array = report["saved_teams"]
+	if not in_teams.is_empty():
+		report["reason"] += " Aviso: %s esta en los equipos guardados %s; el nuevo personaje ocupara su puesto en ellos." % [display_name(key), ", ".join(PackedStringArray(in_teams))]
 	return report
 
 
@@ -3803,6 +3971,15 @@ func evolve_special(id: String) -> Dictionary:
 	var slot := party.find(key)
 	if bool(route.get("transfer_party", true)) and slot >= 0:
 		party[slot] = to_id
+	# Los equipos guardados y el equipo de torre siguen al personaje, igual que el
+	# equipo activo (el viejo ya no existira si la ruta lo consume).
+	if bool(route.get("transfer_party", true)) and bool(route.get("consume_from", true)):
+		_saved_teams_replace(key, to_id)
+		var tower_slot := tower_team.find(key)
+		if tower_slot >= 0:
+			tower_team[tower_slot] = to_id
+		if favorites.has(key):
+			favorites.erase(key)
 	if not roster.has(to_id):
 		roster.append(to_id)
 	progress[to_id] = inherited
@@ -3862,6 +4039,378 @@ func evolve_special(id: String) -> Dictionary:
 	}
 
 
+## --- Requisitos del contenido y autoconfiguracion (v12) ---------------------------
+## Que pide el combate que se va a jugar (historia, evento, torre o batalla suelta)
+## para un equipo concreto. Devuelve "" si el equipo vale. Es la misma regla que
+## aplica el combate (event_party_ready / tamano del stage), asi que un equipo
+## guardado se comprueba contra el contenido ANTES de entrar, sin cambiarlo.
+func content_problem_for(members: Array) -> String:
+	var ids: Array = []
+	for raw_id in members:
+		if not String(raw_id).is_empty():
+			ids.append(String(raw_id))
+	if battle_source == BATTLE_EVENT:
+		var gate := event_party_ready(String(battle_source_ref.get("event", "")), String(battle_source_ref.get("stage", "")), ids)
+		if not bool(gate["ok"]):
+			return String(gate["reason"])
+	if ids.is_empty():
+		return "El equipo esta vacio: elige al menos un personaje."
+	var wanted := current_min_party_size()
+	if wanted > 1 and ids.size() < wanted:
+		return "Este combate pide al menos %d unidades (ahora hay %d)." % [wanted, ids.size()]
+	return ""
+
+
+## Texto de lo que pide el contenido actual (para mostrarlo junto a los equipos).
+func content_requirement_text() -> String:
+	if battle_source == BATTLE_EVENT:
+		return event_party_requirement_text(String(battle_source_ref.get("event", "")), String(battle_source_ref.get("stage", "")))
+	if battle_source == BATTLE_TOWER:
+		return "Torre: %d activos + %d reservas" % [TOWER_ACTIVE, TOWER_TEAM_SIZE - TOWER_ACTIVE]
+	var wanted := current_min_party_size()
+	return "Equipo de %d unidades" % wanted if wanted > 1 else ""
+
+
+## Tipos de los enemigos del combate actual (para elegir ventaja de tipo).
+func current_enemy_types() -> Array:
+	var types: Array = []
+	var stage := current_stage()
+	for enemy_id in stage.get("enemies", current_stage_enemies):
+		var enemy := DB.get_enemy(String(enemy_id))
+		var enemy_type := String(enemy.get("type", ""))
+		if not enemy_type.is_empty():
+			types.append(enemy_type)
+	return types
+
+
+## Propuesta de equipo para el contenido actual. NO modifica el equipo: devuelve
+## { ok, members, parts, reason, size } y la pantalla decide si la aplica (y el
+## jugador puede cambiarla despues). target: "party" o "tower".
+func autoconfigure_team(target: String = "party") -> Dictionary:
+	var candidates: Array = []
+	for id in roster:
+		candidates.append(String(id))
+	var opts := { "size": TOWER_TEAM_SIZE if target == "tower" else PARTY_SIZE, "enemy_types": [] if target == "tower" else current_enemy_types() }
+	if target == "tower":
+		pass
+	elif battle_source == BATTLE_EVENT:
+		var stage := DB.event_stage(String(battle_source_ref.get("event", "")), String(battle_source_ref.get("stage", "")))
+		opts["required"] = String(stage.get("requires_party_character", ""))
+		var wanted_size := 1 if bool(stage.get("requires_party_solo", false)) else int(stage.get("requires_party_size", 0))
+		if wanted_size > 0:
+			opts["size"] = wanted_size
+		opts["solo"] = bool(stage.get("requires_party_solo", false))
+	else:
+		var wanted := int(current_stage().get("requires_party_size", 0))
+		if wanted > 0:
+			opts["size"] = wanted
+	var result: Dictionary = TeamPlanner.suggest(candidates, opts)
+	result["size"] = int(opts["size"])
+	return result
+
+
+## Aplica una propuesta de autoconfiguracion al equipo ("party" o "tower").
+func apply_autoconfigured(members: Array, target: String = "party") -> void:
+	var padded: Array = []
+	var size := TOWER_TEAM_SIZE if target == "tower" else PARTY_SIZE
+	for i in size:
+		padded.append(String(members[i]) if i < members.size() else "")
+	if target == "tower":
+		tower_team = padded
+		normalize_tower_team()
+	else:
+		party = padded
+		normalize_party()
+	save_game()
+
+
+## --- Equipos guardados y favoritos (v12) ---------------------------------------
+## Hasta SAVED_TEAM_MAX equipos con nombre. Un equipo guardado es una LISTA DE IDS
+## (no una copia de los personajes): si un personaje ya no esta disponible, el
+## equipo sigue guardado tal cual y al elegirlo se AVISA de quien falta; nunca se
+## modifica en silencio. Los equipos de 5 puestos sirven para la torre (3 activos +
+## 2 reservas); en una batalla normal se usan los 4 primeros.
+const SAVED_TEAM_MAX := 20
+const SAVED_TEAM_SLOTS := 5
+const SAVED_TEAM_NAME_MAX := 24
+
+var saved_teams: Array = []
+var _next_team_id := 1
+## Personajes marcados como FAVORITOS: no se pueden consumir por accidente.
+var favorites: Array = []
+
+
+func saved_team_count() -> int:
+	return saved_teams.size()
+
+
+func saved_team_list() -> Array:
+	var out: Array = []
+	for team in saved_teams:
+		out.append((team as Dictionary).duplicate(true))
+	return out
+
+
+func saved_team_get(team_id: int) -> Dictionary:
+	for team in saved_teams:
+		if int((team as Dictionary).get("id", -1)) == team_id:
+			return (team as Dictionary).duplicate(true)
+	return {}
+
+
+func _saved_team_index(team_id: int) -> int:
+	for i in saved_teams.size():
+		if int((saved_teams[i] as Dictionary).get("id", -1)) == team_id:
+			return i
+	return -1
+
+
+## Ids sin duplicados, siempre SAVED_TEAM_SLOTS posiciones ("" = hueco). Conserva la
+## POSICION de cada uno (la 1 es el lider), igual que normalize_party.
+static func _clean_members(raw: Array) -> Array:
+	var out: Array = []
+	var seen: Dictionary = {}
+	for i in SAVED_TEAM_SLOTS:
+		var item = raw[i] if i < raw.size() else ""
+		var key: String = item if item is String else ""
+		if key.is_empty() or seen.has(key):
+			out.append("")
+			continue
+		seen[key] = true
+		out.append(key)
+	return out
+
+
+static func _clean_team_name(raw: String, fallback: String) -> String:
+	var clean := raw.strip_edges()
+	if clean.length() > SAVED_TEAM_NAME_MAX:
+		clean = clean.substr(0, SAVED_TEAM_NAME_MAX)
+	return clean if not clean.is_empty() else fallback
+
+
+## Equipo de un origen: "party" (4 puestos + 1 vacio) o "tower" (los 5 de la torre).
+func current_team_members(source: String = "party") -> Array:
+	if source == "tower":
+		return _clean_members(tower_team)
+	return _clean_members(party)
+
+
+## Crea un equipo guardado. members vacio = el equipo actual del origen indicado.
+## Devuelve { ok, reason, id }.
+func saved_team_create(team_name: String = "", members: Array = [], source: String = "party") -> Dictionary:
+	if saved_teams.size() >= SAVED_TEAM_MAX:
+		return { "ok": false, "reason": "Has llegado al maximo de %d equipos guardados. Borra alguno para guardar otro." % SAVED_TEAM_MAX, "id": -1 }
+	var list: Array = members if not members.is_empty() else current_team_members(source)
+	var clean := _clean_members(list)
+	var has_someone := false
+	for key in clean:
+		if not String(key).is_empty():
+			has_someone = true
+	if not has_someone:
+		return { "ok": false, "reason": "El equipo esta vacio: no hay nada que guardar.", "id": -1 }
+	var new_id := _next_team_id
+	_next_team_id += 1
+	saved_teams.append({
+		"id": new_id,
+		"name": _clean_team_name(team_name, "Equipo %d" % new_id),
+		"members": clean,
+	})
+	save_game()
+	return { "ok": true, "reason": "", "id": new_id }
+
+
+## Sobrescribe la formacion de un equipo guardado (EDITAR: se carga, se cambia en la
+## pantalla EQUIPO y se vuelve a guardar sobre el mismo).
+func saved_team_update(team_id: int, members: Array = [], source: String = "party") -> Dictionary:
+	var index := _saved_team_index(team_id)
+	if index < 0:
+		return { "ok": false, "reason": "Ese equipo guardado ya no existe." }
+	var list: Array = members if not members.is_empty() else current_team_members(source)
+	var clean := _clean_members(list)
+	var has_someone := false
+	for key in clean:
+		if not String(key).is_empty():
+			has_someone = true
+	if not has_someone:
+		return { "ok": false, "reason": "El equipo esta vacio: no se puede guardar asi." }
+	saved_teams[index]["members"] = clean
+	save_game()
+	return { "ok": true, "reason": "" }
+
+
+func saved_team_rename(team_id: int, new_name: String) -> Dictionary:
+	var index := _saved_team_index(team_id)
+	if index < 0:
+		return { "ok": false, "reason": "Ese equipo guardado ya no existe." }
+	if new_name.strip_edges().is_empty():
+		return { "ok": false, "reason": "El nombre no puede estar vacio." }
+	saved_teams[index]["name"] = _clean_team_name(new_name, String(saved_teams[index]["name"]))
+	save_game()
+	return { "ok": true, "reason": "" }
+
+
+func saved_team_duplicate(team_id: int) -> Dictionary:
+	var original := saved_team_get(team_id)
+	if original.is_empty():
+		return { "ok": false, "reason": "Ese equipo guardado ya no existe.", "id": -1 }
+	return saved_team_create("%s (copia)" % String(original["name"]), original["members"])
+
+
+func saved_team_delete(team_id: int) -> bool:
+	var index := _saved_team_index(team_id)
+	if index < 0:
+		return false
+	saved_teams.remove_at(index)
+	save_game()
+	return true
+
+
+## Estado de disponibilidad de un equipo guardado: quien se puede usar y quien no
+## (y por que). Es lo que se ensena ANTES de aplicarlo.
+func saved_team_status(team_id: int) -> Dictionary:
+	var team := saved_team_get(team_id)
+	if team.is_empty():
+		return {}
+	var available: Array = []
+	var missing: Array = []
+	for raw_id in team["members"]:
+		var key := String(raw_id)
+		if key.is_empty():
+			continue
+		if is_owned(key):
+			available.append(key)
+		else:
+			var known := not DB.get_character(key).is_empty()
+			missing.append({
+				"id": key,
+				"name": String(DB.get_character(key).get("name", key)) if known else key,
+				"reason": "ya no lo tienes" if known else "ya no existe en el juego",
+			})
+	team["available"] = available
+	team["missing"] = missing
+	team["complete"] = missing.is_empty()
+	return team
+
+
+## Pone un equipo guardado como equipo activo ("party" o "tower"). Si falta alguien
+## NO toca nada y lo dice (ok=false, missing=...): el equipo solo se aplica a medias
+## si el jugador lo pide expresamente (allow_partial), y entonces los huecos quedan
+## visibles en la pantalla EQUIPO.
+func saved_team_apply(team_id: int, target: String = "party", allow_partial: bool = false) -> Dictionary:
+	var status := saved_team_status(team_id)
+	if status.is_empty():
+		return { "ok": false, "reason": "Ese equipo guardado ya no existe.", "missing": [], "applied": [] }
+	var missing: Array = status["missing"]
+	if not missing.is_empty() and not allow_partial:
+		var names := PackedStringArray()
+		for entry in missing:
+			names.append("%s (%s)" % [String(entry["name"]), String(entry["reason"])])
+		return {
+			"ok": false,
+			"reason": "Al equipo \"%s\" le faltan personajes: %s. No se ha cambiado tu equipo." % [String(status["name"]), ", ".join(names)],
+			"missing": missing,
+			"applied": [],
+		}
+	var wanted: Array = []
+	for raw_id in status["members"]:
+		var key := String(raw_id)
+		wanted.append(key if (not key.is_empty() and is_owned(key)) else "")
+	if target == "tower":
+		tower_team = wanted.slice(0, TOWER_TEAM_SIZE)
+		normalize_tower_team()
+	else:
+		party = wanted.slice(0, PARTY_SIZE)
+		normalize_party()
+	save_game()
+	return { "ok": true, "reason": "", "missing": missing, "applied": status["available"], "name": String(status["name"]) }
+
+
+## Nombres de los equipos guardados donde sale un personaje.
+func saved_teams_with(id: String) -> Array:
+	var out: Array = []
+	for team in saved_teams:
+		if (team["members"] as Array).has(String(id)):
+			out.append(String(team["name"]))
+	return out
+
+
+## Un personaje pasa a otro (evolucion especial): los equipos guardados lo siguen,
+## igual que el equipo activo. Devuelve cuantos equipos se han actualizado.
+func _saved_teams_replace(from_id: String, to_id: String) -> int:
+	var changed := 0
+	for team in saved_teams:
+		var members: Array = team["members"]
+		var at := members.find(from_id)
+		if at >= 0:
+			members[at] = to_id if not members.has(to_id) else ""
+			changed += 1
+	return changed
+
+
+func is_favorite(id: String) -> bool:
+	return favorites.has(String(id))
+
+
+func favorite_ids() -> Array:
+	return favorites.duplicate()
+
+
+func set_favorite(id: String, value: bool) -> void:
+	var key := String(id)
+	if key.is_empty() or not is_owned(key):
+		return
+	if value and not favorites.has(key):
+		favorites.append(key)
+		save_game()
+	elif not value and favorites.has(key):
+		favorites.erase(key)
+		save_game()
+
+
+## Antes de CONSUMIR a un personaje: es favorito (protegido) y en que equipos
+## guardados esta. La interfaz lo usa para bloquear o para avisar.
+func consume_guard(id: String) -> Dictionary:
+	var key := String(id)
+	var teams := saved_teams_with(key)
+	var protected := is_favorite(key)
+	var message := ""
+	if protected:
+		message = "%s es FAVORITO: quita la marca para poder consumirlo." % display_name(key)
+	elif not teams.is_empty():
+		message = "%s esta en %d equipo(s) guardado(s): %s." % [display_name(key), teams.size(), ", ".join(PackedStringArray(teams))]
+	return { "protected": protected, "teams": teams, "message": message }
+
+
+## Equipos guardados y favoritos del archivo. Un guardado antiguo no los trae y se
+## queda con listas vacias; un equipo mal formado se descarta sin romper la carga.
+func _load_saved_teams(data: Dictionary) -> void:
+	saved_teams = []
+	var raw_teams = data.get("saved_teams", [])
+	var highest := 0
+	if raw_teams is Array:
+		for raw in raw_teams:
+			if not (raw is Dictionary) or saved_teams.size() >= SAVED_TEAM_MAX:
+				continue
+			var team_id := int((raw as Dictionary).get("id", 0))
+			if team_id <= 0:
+				continue
+			var members = (raw as Dictionary).get("members", [])
+			saved_teams.append({
+				"id": team_id,
+				"name": _clean_team_name(String((raw as Dictionary).get("name", "")), "Equipo %d" % team_id),
+				"members": _clean_members(members if members is Array else []),
+			})
+			highest = maxi(highest, team_id)
+	_next_team_id = maxi(int(data.get("next_team_id", 1)), highest + 1)
+	favorites = []
+	var raw_favorites = data.get("favorites", [])
+	if raw_favorites is Array:
+		for raw_id in raw_favorites:
+			var fav := String(raw_id)
+			if not fav.is_empty() and not favorites.has(fav) and roster.has(fav):
+				favorites.append(fav)
+
+
 ## --- Guardado --------------------------------------------------------------
 
 func save_game() -> void:
@@ -3892,6 +4441,9 @@ func save_game() -> void:
 		"tower_progress": tower_progress,
 		"tower_team": tower_team,
 		"pending_reveal": pending_reveal,
+		"saved_teams": saved_teams,
+		"next_team_id": _next_team_id,
+		"favorites": favorites,
 	}
 	_write_save_safely(JSON.stringify(payload, "\t"))
 
@@ -3978,6 +4530,7 @@ func load_game() -> bool:
 	if not loaded_party.is_empty():
 		party = loaded_party
 	friend = String(data.get("friend", friend))
+	_load_saved_teams(data)
 	coins = int(data.get("coins", coins))
 	gems = int(data.get("gems", gems))
 	materials = int(data.get("materials", materials))

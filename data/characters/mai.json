@@ -11,7 +11,10 @@
 		"back": "res://art/characters/mai/back.png",
 		"icon": "res://art/characters/mai/icon.png"
 	},
-	"roles": ["Support", "Utility"],
+	"roles": [
+		"Support",
+		"Utility"
+	],
 	"stats": {
 		"max_hp": 1120,
 		"atk": 172,
@@ -20,17 +23,33 @@
 		"crit_rate": 0.16,
 		"dodge_rate": 0.12
 	},
-	"categories": ["romance", "school", "determination"],
-	"links": ["romanticos"],
+	"categories": [
+		"romance",
+		"school",
+		"determination"
+	],
+	"links": [
+		"romanticos"
+	],
 	"passive": {
 		"id": "pas_mai_presencia",
 		"name": "Sindrome de la chica conejo",
-		"description": "A partir de la ronda 3, su presencia sube un 20% el ATK de todo el equipo.",
-		"trigger": "turn_start",
-		"condition": { "type": "round_at_least", "value": 3 },
+		"trigger": "round_start",
+		"condition": {
+			"type": "round_at_least",
+			"value": 3
+		},
 		"effects": [
-			{ "type": "stat_mod", "target": "ally_all", "stat": "atk", "kind": "mult", "value": 0.2, "turns": 1 }
-		]
+			{
+				"type": "stat_mod",
+				"target": "ally_all",
+				"stat": "atk",
+				"kind": "mult",
+				"value": 0.2,
+				"turns": 1
+			}
+		],
+		"description": "Al empezar cada ronda, desde la ronda 3: Equipo: ATAQUE +20% (1 turno)."
 	},
 	"skills": [
 		{
@@ -45,14 +64,28 @@
 		{
 			"id": "sk_mai_02",
 			"name": "No me mires",
-			"description": "Golpea a todos los rivales, les baja un 25% el ataque y sube un 20% la defensa del equipo durante 2 turnos.",
+			"description": "Golpea a todos los rivales: 1 golpe de poder 120. Todos los rivales: ATAQUE -25% (2 turnos). Equipo: DEFENSA +20% (2 turnos).",
 			"kind": "special",
 			"power": 120,
 			"cost": 3,
 			"target": "enemy_all",
 			"effects": [
-				{ "type": "stat_mod", "target": "enemy_all", "stat": "atk", "kind": "mult", "value": -0.25, "turns": 2 },
-				{ "type": "stat_mod", "target": "ally_all", "stat": "def", "kind": "mult", "value": 0.2, "turns": 2 }
+				{
+					"type": "stat_mod",
+					"target": "enemy_all",
+					"stat": "atk",
+					"kind": "mult",
+					"value": -0.25,
+					"turns": 2
+				},
+				{
+					"type": "stat_mod",
+					"target": "ally_all",
+					"stat": "def",
+					"kind": "mult",
+					"value": 0.2,
+					"turns": 2
+				}
 			]
 		}
 	],
@@ -61,25 +94,54 @@
 		"passive": {
 			"id": "pas_mai_ev_presencia",
 			"name": "Presencia inevitable",
-			"description": "Desde la ronda 2 su presencia sube un 30% el ATK de todo el equipo.",
-			"trigger": "turn_start",
-			"condition": { "type": "round_at_least", "value": 2 },
+			"trigger": "round_start",
+			"condition": {
+				"type": "round_at_least",
+				"value": 3
+			},
 			"effects": [
-				{ "type": "stat_mod", "target": "ally_all", "stat": "atk", "kind": "mult", "value": 0.3, "turns": 1 }
-			]
+				{
+					"type": "stat_mod",
+					"target": "ally_all",
+					"stat": "atk",
+					"kind": "mult",
+					"value": 0.3,
+					"turns": 1
+				}
+			],
+			"description": "Al empezar cada ronda, desde la ronda 3: Equipo: ATAQUE +30% (1 turno)."
 		},
 		"passive_extra": {
 			"id": "pas_mai_ev_desaparecer",
 			"name": "Desaparecer",
-			"description": "Al comenzar el combate gana 8 puntos de esquiva y 5 de critico.",
 			"trigger": "battle_start",
 			"condition": {},
 			"effects": [
-				{ "type": "stat_mod", "target": "self", "stat": "dodge_rate", "kind": "flat", "value": 0.08, "turns": 0 },
-				{ "type": "stat_mod", "target": "self", "stat": "crit_rate", "kind": "flat", "value": 0.05, "turns": 0 }
-			]
+				{
+					"type": "stat_mod",
+					"target": "self",
+					"stat": "dodge_rate",
+					"kind": "flat",
+					"value": 0.08,
+					"turns": 0
+				},
+				{
+					"type": "stat_mod",
+					"target": "self",
+					"stat": "crit_rate",
+					"kind": "flat",
+					"value": 0.05,
+					"turns": 0
+				}
+			],
+			"description": "Al empezar el combate: Propio: ESQUIVA +8 pts (todo el combate); Propio: CRITICO +5 pts (todo el combate)."
 		},
-		"links": ["inquebrantables"],
-		"categories": ["despertados", "tacticos"]
+		"links": [
+			"inquebrantables"
+		],
+		"categories": [
+			"despertados",
+			"tacticos"
+		]
 	}
 }

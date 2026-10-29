@@ -11,26 +11,43 @@
 		"back": "res://art/characters/david/back.png",
 		"icon": "res://art/characters/david/icon.png"
 	},
-	"roles": ["Damage Dealer"],
+	"roles": [
+		"Damage Dealer"
+	],
 	"stats": {
 		"max_hp": 1290,
 		"atk": 216,
 		"def": 78,
 		"speed": 130,
 		"crit_rate": 0.14,
-		"dodge_rate": 0.10
+		"dodge_rate": 0.1
 	},
-	"categories": ["cyberpunk", "protagonists", "outlaws", "determination"],
-	"links": ["outlaws"],
+	"categories": [
+		"cyberpunk",
+		"protagonists",
+		"outlaws",
+		"determination"
+	],
+	"links": [
+		"outlaws"
+	],
 	"passive": {
 		"id": "pas_david_sandevistan",
 		"name": "Sandevistan",
-		"description": "El implante le acelera: al comenzar su turno sube un 30% su velocidad.",
-		"trigger": "turn_start",
+		"trigger": "on_attack",
 		"condition": {},
 		"effects": [
-			{ "type": "stat_mod", "target": "self", "stat": "speed", "kind": "mult", "value": 0.3, "turns": 1 }
-		]
+			{
+				"type": "stat_mod",
+				"target": "self",
+				"stat": "crit_rate",
+				"kind": "flat",
+				"value": 0.05,
+				"turns": 3,
+				"stacks_max": 4
+			}
+		],
+		"description": "Al atacar: Propio: CRITICO +5 pts (3 turnos), acumulable x4."
 	},
 	"skills": [
 		{
@@ -47,13 +64,18 @@
 			"id": "sk_david_02",
 			"name": "Rafaga cinetica",
 			"kind": "special",
-			"power": 215,
+			"power": 72,
 			"cost": 3,
 			"target": "enemy",
-			"description": "Avanza y golpea varias veces: recupera 1 SP con el impulso.",
+			"description": "Golpea a un rival: 3 golpes de poder 72. Propio: +1 SP.",
 			"effects": [
-				{ "type": "sp_gain", "target": "self", "amount": 1 }
-			]
+				{
+					"type": "sp_gain",
+					"target": "self",
+					"amount": 1
+				}
+			],
+			"hits": 3
 		}
 	],
 	"transformations": [],
@@ -61,25 +83,48 @@
 		"passive": {
 			"id": "pas_david_ev_sandevistan",
 			"name": "Sandevistan militar",
-			"description": "El implante va al limite: sube un 45% su velocidad y su critico un 10% al comenzar su turno.",
-			"trigger": "turn_start",
+			"trigger": "on_attack",
 			"condition": {},
 			"effects": [
-				{ "type": "stat_mod", "target": "self", "stat": "speed", "kind": "mult", "value": 0.45, "turns": 1 },
-				{ "type": "stat_mod", "target": "self", "stat": "crit_rate", "kind": "flat", "value": 0.1, "turns": 1 }
-			]
+				{
+					"type": "stat_mod",
+					"target": "self",
+					"stat": "crit_rate",
+					"kind": "flat",
+					"value": 0.075,
+					"turns": 3,
+					"stacks_max": 4
+				}
+			],
+			"description": "Al atacar: Propio: CRITICO +8 pts (3 turnos), acumulable x4."
 		},
 		"passive_extra": {
 			"id": "pas_david_ev_cyberpsicosis",
 			"name": "Al filo del cromo",
-			"description": "Cuando baja de la mitad de su vida, su ataque sube un 30%.",
 			"trigger": "turn_start",
-			"condition": { "type": "hp_below", "who": "self", "value": 0.5 },
+			"condition": {
+				"type": "hp_below",
+				"value": 0.5
+			},
 			"effects": [
-				{ "type": "stat_mod", "target": "self", "stat": "atk", "kind": "mult", "value": 0.3, "turns": 1 }
-			]
+				{
+					"type": "stat_mod",
+					"target": "self",
+					"stat": "atk",
+					"kind": "mult",
+					"value": 0.3,
+					"turns": 1
+				}
+			],
+			"description": "Al empezar su turno, si su vida < 50%: Propio: ATAQUE +30% (1 turno)."
 		},
-		"links": ["estrategas", "inquebrantables"],
-		"categories": ["despertados", "leyendas"]
+		"links": [
+			"estrategas",
+			"inquebrantables"
+		],
+		"categories": [
+			"despertados",
+			"leyendas"
+		]
 	}
 }

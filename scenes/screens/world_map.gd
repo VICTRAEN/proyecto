@@ -47,7 +47,11 @@ var _selected_level_id := ""
 var _selected_difficulty_id := ""
 
 
+const SavedTeamsPanel := preload("res://ui/saved_teams_panel.gd")
+
+
 func _ready() -> void:
+	_add_team_button()
 	_apply_identity()
 	back_button.pressed.connect(_back)
 	close_button.pressed.connect(_close_panel)
@@ -397,6 +401,27 @@ func _on_start_pressed() -> void:
 
 
 ## El dialogo ha terminado (o el jugador lo ha saltado): ahora si, al combate.
+## v12: EQUIPO antes de combatir. Fija el origen (historia) para que los equipos se
+## comprueben contra lo que pide ESTE combate, y abre la ventana de equipos.
+func _add_team_button() -> void:
+	var team_button := Button.new()
+	team_button.name = "TeamButton"
+	team_button.text = "EQUIPO"
+	team_button.custom_minimum_size = start_button.custom_minimum_size
+	team_button.add_theme_font_size_override("font_size", VI.FONT_SMALL)
+	VI.tint_button(team_button, VI.GOLD)
+	team_button.pressed.connect(_on_team_pressed)
+	start_button.get_parent().add_child(team_button)
+	start_button.get_parent().move_child(team_button, start_button.get_index())
+
+
+func _on_team_pressed() -> void:
+	if not _selected_level_id.is_empty() and not _selected_difficulty_id.is_empty():
+		GameState.prepare_battle(GameState.BATTLE_STORY, { "level": _selected_level_id, "difficulty": _selected_difficulty_id })
+	var panel := SavedTeamsPanel.open_on(self, "party", true)
+	panel.team_applied.connect(func(team_name): panel_feedback.text = "Equipo \"%s\" listo." % team_name)
+
+
 func _on_dialogue_finished() -> void:
 	dialogue_overlay.visible = false
 	_begin_battle()

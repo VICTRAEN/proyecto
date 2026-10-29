@@ -11,7 +11,10 @@
 		"back": "res://art/characters/edward_elric/back.png",
 		"icon": "res://art/characters/edward_elric/icon.png"
 	},
-	"roles": ["Damage Dealer", "Utility"],
+	"roles": [
+		"Damage Dealer",
+		"Utility"
+	],
 	"stats": {
 		"max_hp": 2100,
 		"atk": 278,
@@ -20,18 +23,34 @@
 		"crit_rate": 0.16,
 		"dodge_rate": 0.08
 	},
-	"categories": ["ciencia", "geniuses", "shonen", "heroes", "protagonists"],
-	"links": ["heroes", "estrategas", "inquebrantables"],
+	"categories": [
+		"ciencia",
+		"geniuses",
+		"shonen",
+		"heroes",
+		"protagonists"
+	],
+	"links": [
+		"heroes",
+		"estrategas",
+		"inquebrantables"
+	],
 	"passive": {
 		"id": "pas_edward_elric_transmutacion",
 		"name": "Transmutacion sin circulo",
-		"description": "Al empezar el combate su defensa sube un 25% y gana 5 puntos de critico de forma permanente.",
-		"trigger": "battle_start",
+		"trigger": "on_attack",
 		"condition": {},
 		"effects": [
-			{ "type": "stat_mod", "target": "self", "stat": "def", "kind": "mult", "value": 0.25, "turns": 0 },
-			{ "type": "stat_mod", "target": "self", "stat": "crit_rate", "kind": "flat", "value": 0.05, "turns": 0 }
-		]
+			{
+				"type": "shield",
+				"target": "self",
+				"amount": 0.08,
+				"of": "max_hp",
+				"turns": 2
+			}
+		],
+		"chance": 0.35,
+		"description": "Al atacar (35% de prob.): Propio: escudo de 8% de VIDA MAX (2 turnos)."
 	},
 	"skills": [
 		{
@@ -46,13 +65,18 @@
 		{
 			"id": "sk_edward_elric_02",
 			"name": "Muro de piedra",
-			"description": "Transmuta el suelo y encierra al rival: le baja un 25% la defensa durante 2 turnos.",
+			"description": "Golpea a un rival: 1 golpe de poder 170. Rival: aturdido (1 turno).",
 			"kind": "special",
-			"power": 200,
+			"power": 170,
 			"cost": 3,
 			"target": "enemy",
 			"effects": [
-				{ "type": "stat_mod", "target": "enemy", "stat": "def", "kind": "mult", "value": -0.25, "turns": 2 }
+				{
+					"type": "status",
+					"target": "enemy",
+					"status": "stun",
+					"turns": 1
+				}
 			]
 		}
 	],

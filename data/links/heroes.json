@@ -2,8 +2,126 @@
 	"id": "heroes",
 	"name": "Heroes",
 	"description": "Los que se ponen delante por los demas. Ninguno deja caer al otro.",
-	"effects": [
-		{ "type": "stat_mod", "stat": "max_hp", "kind": "mult", "value": 0.05 },
-		{ "type": "stat_mod", "stat": "def", "kind": "mult", "value": 0.04 }
+	"legacy_effects": [
+		{
+			"type": "stat_mod",
+			"stat": "max_hp",
+			"kind": "mult",
+			"value": 0.05
+		},
+		{
+			"type": "stat_mod",
+			"stat": "def",
+			"kind": "mult",
+			"value": 0.04
+		}
+	],
+	"tiers": [
+		{
+			"need": 2,
+			"rules": [
+				{
+					"id": "base",
+					"name": "Vinculo",
+					"who": "holders",
+					"trigger": "static",
+					"condition": {},
+					"effects": [
+						{
+							"type": "stat_mod",
+							"stat": "max_hp",
+							"kind": "mult",
+							"value": 0.05,
+							"target": "self",
+							"turns": 0
+						},
+						{
+							"type": "stat_mod",
+							"stat": "def",
+							"kind": "mult",
+							"value": 0.04,
+							"target": "self",
+							"turns": 0
+						}
+					],
+					"description": "Siempre: Propio: VIDA MAX +5% (todo el combate); Propio: DEFENSA +4% (todo el combate).",
+					"text": "Siempre: Propio: VIDA MAX +5% (todo el combate); Propio: DEFENSA +4% (todo el combate)."
+				},
+				{
+					"id": "nadie",
+					"name": "Nadie se queda atras",
+					"trigger": "on_ally_down",
+					"condition": {},
+					"effects": [
+						{
+							"type": "heal",
+							"target": "self",
+							"of": "max_hp",
+							"amount": 0.15
+						},
+						{
+							"type": "stat_mod",
+							"target": "self",
+							"stat": "atk",
+							"kind": "mult",
+							"value": 0.2,
+							"turns": 2
+						}
+					],
+					"cooldown": 1,
+					"description": "Cuando cae un aliado: Propio: cura 15% de VIDA MAX; Propio: ATAQUE +20% (2 turnos).",
+					"who": "holders",
+					"text": "Cuando cae un aliado: Propio: cura 15% de VIDA MAX; Propio: ATAQUE +20% (2 turnos)."
+				}
+			]
+		},
+		{
+			"need": 3,
+			"rules": [
+				{
+					"id": "escudo",
+					"name": "Escudo de heroes",
+					"trigger": "round_start",
+					"condition": {},
+					"effects": [
+						{
+							"type": "shield",
+							"target": "ally_all",
+							"amount": 0.064,
+							"of": "max_hp",
+							"turns": 2
+						}
+					],
+					"cooldown": 3,
+					"description": "Al empezar cada ronda (cada 3 rondas): Equipo: escudo de 6% de VIDA MAX (2 turnos).",
+					"who": "first",
+					"text": "Al empezar cada ronda (cada 3 rondas): Equipo: escudo de 6% de VIDA MAX (2 turnos)."
+				}
+			]
+		},
+		{
+			"need": 4,
+			"rules": [
+				{
+					"id": "postura",
+					"name": "Postura heroica",
+					"trigger": "static",
+					"condition": {},
+					"effects": [
+						{
+							"type": "stat_mod",
+							"target": "self",
+							"stat": "dmg_reduction",
+							"kind": "flat",
+							"value": 0.036,
+							"turns": 0
+						}
+					],
+					"description": "Siempre: Propio: REDUCCION DE DANO +4% (todo el combate).",
+					"who": "holders",
+					"text": "Siempre: Propio: REDUCCION DE DANO +4% (todo el combate)."
+				}
+			]
+		}
 	]
 }

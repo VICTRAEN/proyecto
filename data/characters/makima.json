@@ -11,7 +11,10 @@
 		"back": "res://art/characters/makima/back.png",
 		"icon": "res://art/characters/makima/icon.png"
 	},
-	"roles": ["Utility", "Support"],
+	"roles": [
+		"Utility",
+		"Support"
+	],
 	"stats": {
 		"max_hp": 1420,
 		"atk": 218,
@@ -20,17 +23,31 @@
 		"crit_rate": 0.12,
 		"dodge_rate": 0.06
 	},
-	"categories": ["supernatural", "villains", "geniuses"],
-	"links": ["villanos", "energia-oculta"],
+	"categories": [
+		"supernatural",
+		"villains",
+		"geniuses"
+	],
+	"links": [
+		"villanos",
+		"energia-oculta"
+	],
 	"passive": {
 		"id": "pas_makima_control",
 		"name": "Control absoluto",
-		"description": "Domina la voluntad del rival: al comenzar su turno le baja un 18% el ataque.",
-		"trigger": "turn_start",
+		"trigger": "on_hit",
 		"condition": {},
 		"effects": [
-			{ "type": "stat_mod", "target": "enemy", "stat": "atk", "kind": "mult", "value": -0.18, "turns": 1 }
-		]
+			{
+				"type": "status",
+				"target": "trigger_target",
+				"status": "stun",
+				"turns": 1
+			}
+		],
+		"chance": 0.35,
+		"cooldown": 2,
+		"description": "Al recibir un golpe (35% de prob., cada 2 rondas): Atacante: aturdido (1 turno)."
 	},
 	"skills": [
 		{
@@ -50,9 +67,21 @@
 			"power": 120,
 			"cost": 3,
 			"target": "enemy_all",
-			"description": "Somete a todos los rivales: -20% de ataque durante 2 turnos.",
+			"description": "Golpea a todos los rivales: 1 golpe de poder 120. Todos los rivales: ATAQUE -20% (2 turnos). Todos los rivales: pierde 1 SP.",
 			"effects": [
-				{ "type": "stat_mod", "target": "enemy_all", "stat": "atk", "kind": "mult", "value": -0.2, "turns": 2 }
+				{
+					"type": "stat_mod",
+					"target": "enemy_all",
+					"stat": "atk",
+					"kind": "mult",
+					"value": -0.2,
+					"turns": 2
+				},
+				{
+					"type": "sp_drain",
+					"target": "enemy_all",
+					"amount": 1
+				}
 			]
 		}
 	],
@@ -61,24 +90,44 @@
 		"passive": {
 			"id": "pas_makima_lr_control",
 			"name": "Control total",
-			"description": "Les baja un 30% el ataque a los rivales al comenzar su turno.",
-			"trigger": "turn_start",
+			"trigger": "on_hit",
 			"condition": {},
 			"effects": [
-				{ "type": "stat_mod", "target": "enemy", "stat": "atk", "kind": "mult", "value": -0.3, "turns": 1 }
-			]
+				{
+					"type": "status",
+					"target": "trigger_target",
+					"status": "stun",
+					"turns": 1
+				}
+			],
+			"chance": 0.49,
+			"cooldown": 2,
+			"description": "Al recibir un golpe (49% de prob., cada 2 rondas): Atacante: aturdido (1 turno)."
 		},
 		"passive_extra": {
 			"id": "pas_makima_lr_contratos",
 			"name": "Contratos",
-			"description": "Al comenzar el combate sube un 15% el ataque de todo el equipo.",
 			"trigger": "battle_start",
 			"condition": {},
 			"effects": [
-				{ "type": "stat_mod", "target": "ally_all", "stat": "atk", "kind": "mult", "value": 0.15, "turns": 0 }
-			]
+				{
+					"type": "stat_mod",
+					"target": "ally_all",
+					"stat": "atk",
+					"kind": "mult",
+					"value": 0.15,
+					"turns": 0
+				}
+			],
+			"description": "Al empezar el combate: Equipo: ATAQUE +15% (todo el combate)."
 		},
-		"links": ["estrategas", "veteranos"],
-		"categories": ["despertados", "leyendas"]
+		"links": [
+			"estrategas",
+			"veteranos"
+		],
+		"categories": [
+			"despertados",
+			"leyendas"
+		]
 	}
 }

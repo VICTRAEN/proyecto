@@ -2,8 +2,114 @@
 	"id": "mentores",
 	"name": "Mentores",
 	"description": "El que ensena y el que aprende. Uno cubre al otro y los dos aguantan mas.",
-	"effects": [
-		{ "type": "stat_mod", "stat": "def", "kind": "mult", "value": 0.06 },
-		{ "type": "stat_mod", "stat": "speed", "kind": "mult", "value": 0.03 }
+	"legacy_effects": [
+		{
+			"type": "stat_mod",
+			"stat": "def",
+			"kind": "mult",
+			"value": 0.06
+		},
+		{
+			"type": "stat_mod",
+			"stat": "speed",
+			"kind": "mult",
+			"value": 0.03
+		}
+	],
+	"tiers": [
+		{
+			"need": 2,
+			"rules": [
+				{
+					"id": "base",
+					"name": "Vinculo",
+					"who": "holders",
+					"trigger": "static",
+					"condition": {},
+					"effects": [
+						{
+							"type": "stat_mod",
+							"stat": "def",
+							"kind": "mult",
+							"value": 0.06,
+							"target": "self",
+							"turns": 0
+						},
+						{
+							"type": "stat_mod",
+							"stat": "speed",
+							"kind": "mult",
+							"value": 0.03,
+							"target": "self",
+							"turns": 0
+						}
+					],
+					"description": "Siempre: Propio: DEFENSA +6% (todo el combate); Propio: VELOCIDAD +3% (todo el combate).",
+					"text": "Siempre: Propio: DEFENSA +6% (todo el combate); Propio: VELOCIDAD +3% (todo el combate)."
+				},
+				{
+					"id": "ensenanza",
+					"name": "Ensenanza",
+					"trigger": "on_special",
+					"condition": {},
+					"effects": [
+						{
+							"type": "stat_mod",
+							"target": "ally_others",
+							"stat": "atk",
+							"kind": "mult",
+							"value": 0.12,
+							"turns": 2
+						}
+					],
+					"description": "Al usar su especial: Resto del equipo: ATAQUE +12% (2 turnos).",
+					"who": "holders",
+					"text": "Al usar su especial: Resto del equipo: ATAQUE +12% (2 turnos)."
+				}
+			]
+		},
+		{
+			"need": 3,
+			"rules": [
+				{
+					"id": "guia",
+					"name": "Guia",
+					"trigger": "on_special",
+					"condition": {},
+					"effects": [
+						{
+							"type": "shield",
+							"target": "ally_lowest",
+							"amount": 0.048,
+							"of": "max_hp",
+							"turns": 2
+						}
+					],
+					"description": "Al usar su especial: Aliado mas herido: escudo de 5% de VIDA MAX (2 turnos).",
+					"who": "holders",
+					"text": "Al usar su especial: Aliado mas herido: escudo de 5% de VIDA MAX (2 turnos)."
+				}
+			]
+		},
+		{
+			"need": 4,
+			"rules": [
+				{
+					"id": "legado",
+					"name": "Legado",
+					"trigger": "on_special",
+					"condition": {},
+					"effects": [
+						{
+							"type": "cleanse",
+							"target": "ally_others"
+						}
+					],
+					"description": "Al usar su especial: Resto del equipo: purga los efectos negativos.",
+					"who": "holders",
+					"text": "Al usar su especial: Resto del equipo: purga los efectos negativos."
+				}
+			]
+		}
 	]
 }

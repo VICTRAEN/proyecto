@@ -2,8 +2,128 @@
 	"id": "hibridos",
 	"name": "Hibridos",
 	"description": "Cuerpos que aguantan mas de lo humano. Se curten los unos a los otros.",
-	"effects": [
-		{ "type": "stat_mod", "stat": "max_hp", "kind": "mult", "value": 0.05 },
-		{ "type": "stat_mod", "stat": "atk", "kind": "mult", "value": 0.04 }
+	"legacy_effects": [
+		{
+			"type": "stat_mod",
+			"stat": "max_hp",
+			"kind": "mult",
+			"value": 0.05
+		},
+		{
+			"type": "stat_mod",
+			"stat": "atk",
+			"kind": "mult",
+			"value": 0.04
+		}
+	],
+	"tiers": [
+		{
+			"need": 2,
+			"rules": [
+				{
+					"id": "base",
+					"name": "Vinculo",
+					"who": "holders",
+					"trigger": "static",
+					"condition": {},
+					"effects": [
+						{
+							"type": "stat_mod",
+							"stat": "max_hp",
+							"kind": "mult",
+							"value": 0.05,
+							"target": "self",
+							"turns": 0
+						},
+						{
+							"type": "stat_mod",
+							"stat": "atk",
+							"kind": "mult",
+							"value": 0.04,
+							"target": "self",
+							"turns": 0
+						}
+					],
+					"description": "Siempre: Propio: VIDA MAX +5% (todo el combate); Propio: ATAQUE +4% (todo el combate).",
+					"text": "Siempre: Propio: VIDA MAX +5% (todo el combate); Propio: ATAQUE +4% (todo el combate)."
+				},
+				{
+					"id": "doble",
+					"name": "Doble naturaleza",
+					"trigger": "low_hp",
+					"condition": {},
+					"effects": [
+						{
+							"type": "heal",
+							"target": "self",
+							"of": "max_hp",
+							"amount": 0.12
+						},
+						{
+							"type": "stat_mod",
+							"target": "self",
+							"stat": "lifesteal",
+							"kind": "flat",
+							"value": 0.15,
+							"turns": 3
+						}
+					],
+					"once": true,
+					"threshold": 0.5,
+					"description": "Al bajar del 50% de vida (1 vez por combate): Propio: cura 12% de VIDA MAX; Propio: ROBO DE VIDA +15% (3 turnos).",
+					"who": "holders",
+					"text": "Al bajar del 50% de vida (1 vez por combate): Propio: cura 12% de VIDA MAX; Propio: ROBO DE VIDA +15% (3 turnos)."
+				}
+			]
+		},
+		{
+			"need": 3,
+			"rules": [
+				{
+					"id": "bestia",
+					"name": "Bestia",
+					"trigger": "on_crit",
+					"condition": {},
+					"effects": [
+						{
+							"type": "stat_mod",
+							"target": "self",
+							"stat": "atk",
+							"kind": "mult",
+							"value": 0.08,
+							"turns": 3,
+							"stacks_max": 3
+						}
+					],
+					"description": "Al asestar un critico: Propio: ATAQUE +8% (3 turnos), acumulable x3.",
+					"who": "holders",
+					"text": "Al asestar un critico: Propio: ATAQUE +8% (3 turnos), acumulable x3."
+				}
+			]
+		},
+		{
+			"need": 4,
+			"rules": [
+				{
+					"id": "instinto",
+					"name": "Instinto",
+					"trigger": "static",
+					"condition": {},
+					"effects": [
+						{
+							"type": "stat_mod",
+							"target": "self",
+							"stat": "max_hp",
+							"kind": "mult",
+							"value": 0.06,
+							"turns": 0
+						}
+					],
+					"description": "Siempre: Propio: VIDA MAX +6% (todo el combate).",
+					"who": "holders",
+					"text": "Siempre: Propio: VIDA MAX +6% (todo el combate)."
+				}
+			]
+		}
 	]
 }

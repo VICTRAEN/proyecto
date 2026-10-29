@@ -46,6 +46,12 @@ El campo `art` puede ir vacio: mientras falte el PNG se dibuja una silueta con
 | cost | int | Puntos de SP que consume (el "sp_cost"). |
 | target | string | self, enemy, enemy_all, ally, ally_all, ally_lowest. Es el "target_type". |
 | effects | array | Se aplican despues del golpe principal. |
+| hits | int | (v12) Golpes del ataque; el poder se reparte entre ellos. |
+| pierce | number | (v12) Fraccion de DEF del objetivo que se ignora (tope en `BattleMath.MAX_PIERCE`). |
+| lifesteal | number | (v12) Fraccion del dano hecho que cura al atacante (tope en `MAX_LIFESTEAL`). |
+| recoil | number | (v12) Fraccion del dano hecho que el atacante se inflige. |
+| sp_refund | int | (v12) SP que devuelve el uso de la habilidad. |
+| bonus | array | (v12) `[{ condition, power_mult }]`: multiplica el poder si se cumple la condicion (ejecutar, aprovechar debuffs...). |
 
 ## Efecto (vocabulario cerrado, lo interpreta `core/effect_engine.gd`)
 
@@ -57,7 +63,21 @@ Todos los efectos aceptan un `condition` opcional.
 | heal | amount, of (max_hp), target | Cura una cantidad o un porcentaje del HP maximo. |
 | stat_mod | stat, kind (mult/flat), value, turns, target | Modifica una stat. turns 0 = permanente. Reaplicar el mismo origen lo sustituye, no lo acumula. |
 | sp_gain | amount, target | Suma SP. |
-| status | status (stun), turns, target | Aplica un estado. stun hace perder el turno. |
+| status | status (stun, taunt), turns, target | Aplica un estado. stun hace perder el turno; taunt (v12) obliga a los rivales a atacar a quien lo lleva. |
+| shield | amount, of (max_hp), turns, target | (v12) Escudo que absorbe dano antes que la vida. Mismo origen = se sustituye. Caduca por rondas. |
+| periodic | kind (bleed/burn/poison/regen), amount, of, turns, target | (v12) Dano o curacion al INICIO del turno de quien lo lleva. |
+| cleanse | count, target | (v12) Quita debuffs temporales (nunca los permanentes). |
+| dispel | count, target | (v12) Quita buffs temporales del rival. |
+| sp_drain | amount, target | (v12) Resta SP al rival. |
+| undying | charges, heal, target | (v12) Sobrevive a un golpe mortal con 1 HP y se cura (cargas limitadas). |
+
+`stat_mod` admite ademas (v12) `stacks_max`: se acumula hasta N veces. Las
+estadisticas de combate nuevas (`dmg_dealt`, `dmg_taken`, `dmg_reduction`, `pierce`,
+`lifesteal`, `crit_dmg`) son siempre `flat`, se leen en puntos porcentuales y se
+calculan en `core/stat_block.gd` como cualquier otra.
+
+Objetivos nuevos (v12): `ally_others`, `ally_random`, `random_enemy`,
+`enemy_strongest`, `enemy_lowest`, `trigger_target` (quien provoco el disparador).
 
 ## Condiciones (`core/effect_engine.gd`)
 
@@ -67,6 +87,51 @@ Todos los efectos aceptan un `condition` opcional.
 | hp_above | who, value | El ratio de HP esta por encima. |
 | round_at_least | value | La ronda actual es mayor o igual. |
 | team_has_category | value | Algun aliado tiene esa categoria. |
+| round_at_most | value | (v12) La ronda actual es menor o igual. |
+| team_category_count_at_least | category, value | (v12) Al menos N aliados con esa categoria. |
+| team_has_role | value | (v12) Algun aliado tiene ese rol. |
+| allies_alive_at_most / allies_alive_at_least | value | (v12) Aliados vivos. |
+| allies_fallen_at_least | value | (v12) Aliados caidos. |
+| enemies_alive_at_most / enemies_alive_at_least | value | (v12) Rivales vivos. |
+| sp_at_least | value | (v12) SP propio. |
+| self_shielded / self_debuffed | - | (v12) Estado propio. |
+| target_debuffed / target_shielded | - | (v12) Estado del objetivo. |
+| target_has_status | value | (v12) El objetivo tiene ese estado. |
+| target_type_is / self_type_is | value | (v12) Tipo del objetivo / propio. |
+| target_hp_below / target_hp_above | value | (v12) HP del objetivo. |
+| hp_below.who | self, team_lowest, target | (v12) `target` anadido. |
+
+## Pasivas y disparadores (v12)
+
+Una pasiva es una regla `{ id, name, trigger, condition, effects, chance, once, cooldown, threshold }`.
+Disparadores: `battle_start`, `round_start` (antes de ordenar los turnos), `turn_start`,
+`on_attack`, `on_special`, `on_hit`, `on_crit`, `on_kill`, `on_dodge`, `on_ally_down`,
+`low_hp` (con `threshold`). `chance` = probabilidad, `once` = una vez por combate,
+`cooldown` = rondas entre disparos. La descripcion se genera desde estos datos.
+
+## Links por niveles (v12)
+
+El link v12 ya NO es un unico bonus: tiene `tiers` por numero de portadores en el equipo.
+
+```json
+{ "id": "heroes", "name": "Heroes", "description": "...",
+  "legacy_effects": [ ... ],
+  "tiers": [ { "need": 2, "rules": [ { "id": "base", "name": "Vinculo", "who": "holders",
+      "trigger": "static", "condition": {}, "effects": [ ... ], "text": "..." } ] },
+    { "need": 3, "rules": [ ... ] }, { "need": 4, "rules": [ ... ] } ] }
+```
+
+- `who`: `holders` (quien lleva el link), `team` (todo el equipo) o `first` (solo el primer portador).
+- `trigger`: `static` (modificador fijo todo el combate) o cualquier disparador de arriba.
+- Un nivel incluye las reglas de los niveles inferiores. `legacy_effects` es el bonus plano
+  del esquema antiguo, que sigue vivo como la regla `base` del nivel 2 (los datos antiguos no se pierden).
+- `GameState.team_synergy_report()` devuelve niveles, textos y A QUIEN benefician (lo pinta la ficha).
+
+## Equipos guardados y favoritos (v12, `user://save.json`)
+
+`saved_teams`: hasta 20 `{ id, name, members[5] }` (puesto 1 = lider; 5 puestos para la torre),
+`next_team_id`, `favorites`: ids protegidos de consumo. Claves opcionales: un guardado
+anterior carga con listas vacias.
 
 ## Elegir objetivo
 

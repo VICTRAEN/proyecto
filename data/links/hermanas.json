@@ -2,8 +2,124 @@
 	"id": "hermanas",
 	"name": "Hermanas",
 	"description": "Se conocen de memoria y se protegen sin hablar. Nadie las mueve de ahi.",
-	"effects": [
-		{ "type": "stat_mod", "stat": "def", "kind": "mult", "value": 0.06 },
-		{ "type": "stat_mod", "stat": "max_hp", "kind": "mult", "value": 0.03 }
+	"legacy_effects": [
+		{
+			"type": "stat_mod",
+			"stat": "def",
+			"kind": "mult",
+			"value": 0.06
+		},
+		{
+			"type": "stat_mod",
+			"stat": "max_hp",
+			"kind": "mult",
+			"value": 0.03
+		}
+	],
+	"tiers": [
+		{
+			"need": 2,
+			"rules": [
+				{
+					"id": "base",
+					"name": "Vinculo",
+					"who": "holders",
+					"trigger": "static",
+					"condition": {},
+					"effects": [
+						{
+							"type": "stat_mod",
+							"stat": "def",
+							"kind": "mult",
+							"value": 0.06,
+							"target": "self",
+							"turns": 0
+						},
+						{
+							"type": "stat_mod",
+							"stat": "max_hp",
+							"kind": "mult",
+							"value": 0.03,
+							"target": "self",
+							"turns": 0
+						}
+					],
+					"description": "Siempre: Propio: DEFENSA +6% (todo el combate); Propio: VIDA MAX +3% (todo el combate).",
+					"text": "Siempre: Propio: DEFENSA +6% (todo el combate); Propio: VIDA MAX +3% (todo el combate)."
+				},
+				{
+					"id": "lazo",
+					"name": "Lazo de hermanas",
+					"trigger": "on_hit",
+					"condition": {},
+					"effects": [
+						{
+							"type": "heal",
+							"target": "self",
+							"of": "max_hp",
+							"amount": 0.06
+						}
+					],
+					"chance": 0.3,
+					"description": "Al recibir un golpe (30% de prob.): Propio: cura 6% de VIDA MAX.",
+					"who": "holders",
+					"text": "Al recibir un golpe (30% de prob.): Propio: cura 6% de VIDA MAX."
+				}
+			]
+		},
+		{
+			"need": 3,
+			"rules": [
+				{
+					"id": "venganza",
+					"name": "Venganza",
+					"trigger": "on_ally_down",
+					"condition": {},
+					"effects": [
+						{
+							"type": "stat_mod",
+							"target": "self",
+							"stat": "atk",
+							"kind": "mult",
+							"value": 0.2,
+							"turns": 3
+						},
+						{
+							"type": "stat_mod",
+							"target": "self",
+							"stat": "def",
+							"kind": "mult",
+							"value": 0.2,
+							"turns": 3
+						}
+					],
+					"description": "Cuando cae un aliado: Propio: ATAQUE +20% (3 turnos); Propio: DEFENSA +20% (3 turnos).",
+					"who": "holders",
+					"text": "Cuando cae un aliado: Propio: ATAQUE +20% (3 turnos); Propio: DEFENSA +20% (3 turnos)."
+				}
+			]
+		},
+		{
+			"need": 4,
+			"rules": [
+				{
+					"id": "cuidado",
+					"name": "Cuidado mutuo",
+					"trigger": "round_start",
+					"condition": {},
+					"effects": [
+						{
+							"type": "heal",
+							"target": "self",
+							"of": "max_hp",
+							"amount": 0.04
+						}
+					],
+					"description": "Al empezar cada ronda: Propio: cura 4% de VIDA MAX.",
+					"who": "holders",
+					"text": "Al empezar cada ronda: Propio: cura 4% de VIDA MAX."
+				}
+			]
+		}
 	]
 }

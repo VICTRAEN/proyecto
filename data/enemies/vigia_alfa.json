@@ -9,5 +9,23 @@
 		"speed": 96,
 		"crit_rate": 0.06,
 		"dodge_rate": 0.02
-	}
+	},
+	"passive": {
+		"id": "pas_itadori_energia",
+		"name": "Energia maldita",
+		"description": "Envuelve sus punos en energia: al comenzar su turno sube un 20% su ataque.",
+		"trigger": "turn_start",
+		"condition": {},
+		"effects": [
+			{
+				"type": "stat_mod",
+				"target": "self",
+				"stat": "atk",
+				"kind": "mult",
+				"value": 0.2,
+				"turns": 1
+			}
+		]
+	},
+	"_note_v12": "v12: el jefe conserva la pasiva de combate de v11 (turn_start/battle_start de estadisticas) para que la dificultad del contenido no cambie al rediseñar las pasivas del roster; sus habilidades si usan las nuevas mecanicas."
 }

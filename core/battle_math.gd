@@ -27,6 +27,10 @@ const VARIANCE_MAX := 1.05
 ## Verificacion en ejecucion: imprime cada tirada (probabilidad de critico usada,
 ## dado, si ha salido critico, base y variacion). Se deja en false en el juego.
 const DEBUG_ROLLS := false
+## Topes de las estadisticas de combate v12 (evitan intocables o dano gratis).
+const MAX_PIERCE := 0.6
+const MAX_REDUCTION := 0.6
+const MAX_LIFESTEAL := 0.6
 
 
 static func type_multiplier(attacker_type: String, defender_type: String) -> float:
@@ -58,15 +62,21 @@ static func deal_damage(attacker: CombatUnit, defender: CombatUnit, power: float
 			"crit": false,
 			"type_mult": 1.0,
 		}
-	var raw := attacker.attack() * (power / 100.0)
-	var mitigated := maxf(1.0, raw - defender.defense() * DEF_FACTOR)
+	var raw := attacker.attack() * (power / 100.0) * float(ctx.get("power_mult", 1.0))
+	# v12: perforacion (ignora parte de la defensa), dano hecho/recibido, reduccion
+	# y dano critico extra. Todo vale 0 por defecto, asi que sin efectos nuevos la
+	# formula es EXACTAMENTE la de antes.
+	var pierce := clampf(float(ctx.get("pierce", 0.0)) + attacker.stats.get_stat("pierce"), 0.0, MAX_PIERCE)
+	var mitigated := maxf(1.0, raw - defender.defense() * DEF_FACTOR * (1.0 - pierce))
 	var type_mult := type_multiplier(attacker.type, defender.type)
 	var total := mitigated * type_mult
+	total *= (1.0 + attacker.stats.get_stat("dmg_dealt")) * (1.0 + defender.stats.get_stat("dmg_taken"))
+	total *= 1.0 - clampf(defender.stats.get_stat("dmg_reduction"), 0.0, MAX_REDUCTION)
 	var chance := crit_chance(attacker)
 	var roll := rng.randf()
 	var crit := roll < chance
 	if crit:
-		total *= CRIT_MULTIPLIER
+		total *= CRIT_MULTIPLIER + attacker.stats.get_stat("crit_dmg")
 	# La variacion se aplica al RESULTADO, nunca a las estadisticas: el ATQ de la
 	# ficha no cambia por tirar el dado.
 	var variance := rng.randf_range(VARIANCE_MIN, VARIANCE_MAX)
@@ -85,6 +95,13 @@ static func deal_damage(attacker: CombatUnit, defender: CombatUnit, power: float
 			variance,
 			int(round(total)),
 		])
+	var absorbed := defender.last_absorbed
+	var survived := defender.last_survived
+	# Robo de vida: fraccion del dano REAL (vida perdida) que cura a quien golpea.
+	var steal := clampf(float(ctx.get("lifesteal", 0.0)) + attacker.stats.get_stat("lifesteal"), 0.0, MAX_LIFESTEAL)
+	var stolen := 0.0
+	if steal > 0.0 and dealt > 0.0:
+		stolen = attacker.heal(dealt * steal)
 	return {
 		"kind": "damage",
 		"target_key": defender.source_key,
@@ -93,4 +110,8 @@ static func deal_damage(attacker: CombatUnit, defender: CombatUnit, power: float
 		"dodged": false,
 		"crit": crit,
 		"type_mult": type_mult,
+		"absorbed": absorbed,
+		"survived": survived,
+		"lifesteal": stolen,
+		"attacker_key": attacker.source_key,
 	}

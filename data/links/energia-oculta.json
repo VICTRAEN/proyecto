@@ -2,7 +2,120 @@
 	"id": "energia-oculta",
 	"name": "Energia oculta",
 	"description": "Poderes que no se ven a simple vista. Juntos se retroalimentan.",
-	"effects": [
-		{ "type": "stat_mod", "stat": "atk", "kind": "mult", "value": 0.06 }
+	"legacy_effects": [
+		{
+			"type": "stat_mod",
+			"stat": "atk",
+			"kind": "mult",
+			"value": 0.06
+		}
+	],
+	"tiers": [
+		{
+			"need": 2,
+			"rules": [
+				{
+					"id": "base",
+					"name": "Vinculo",
+					"who": "holders",
+					"trigger": "static",
+					"condition": {},
+					"effects": [
+						{
+							"type": "stat_mod",
+							"stat": "atk",
+							"kind": "mult",
+							"value": 0.06,
+							"target": "self",
+							"turns": 0
+						}
+					],
+					"description": "Siempre: Propio: ATAQUE +6% (todo el combate).",
+					"text": "Siempre: Propio: ATAQUE +6% (todo el combate)."
+				},
+				{
+					"id": "despertar",
+					"name": "Despertar",
+					"trigger": "low_hp",
+					"condition": {},
+					"effects": [
+						{
+							"type": "stat_mod",
+							"target": "self",
+							"stat": "atk",
+							"kind": "mult",
+							"value": 0.25,
+							"turns": 3
+						}
+					],
+					"once": true,
+					"threshold": 0.4,
+					"description": "Al bajar del 40% de vida (1 vez por combate): Propio: ATAQUE +25% (3 turnos).",
+					"who": "holders",
+					"text": "Al bajar del 40% de vida (1 vez por combate): Propio: ATAQUE +25% (3 turnos)."
+				}
+			]
+		},
+		{
+			"need": 3,
+			"rules": [
+				{
+					"id": "chispa",
+					"name": "Chispa",
+					"trigger": "low_hp",
+					"condition": {},
+					"effects": [
+						{
+							"type": "sp_gain",
+							"target": "self",
+							"amount": 1
+						},
+						{
+							"type": "cleanse",
+							"target": "self"
+						}
+					],
+					"once": true,
+					"threshold": 0.4,
+					"description": "Al bajar del 40% de vida (1 vez por combate): Propio: +1 SP; Propio: purga los efectos negativos.",
+					"who": "holders",
+					"text": "Al bajar del 40% de vida (1 vez por combate): Propio: +1 SP; Propio: purga los efectos negativos."
+				}
+			]
+		},
+		{
+			"need": 4,
+			"rules": [
+				{
+					"id": "explosion",
+					"name": "Explosion",
+					"trigger": "low_hp",
+					"condition": {},
+					"effects": [
+						{
+							"type": "stat_mod",
+							"target": "self",
+							"stat": "crit_rate",
+							"kind": "flat",
+							"value": 0.15,
+							"turns": 3
+						},
+						{
+							"type": "stat_mod",
+							"target": "self",
+							"stat": "crit_dmg",
+							"kind": "flat",
+							"value": 0.3,
+							"turns": 3
+						}
+					],
+					"once": true,
+					"threshold": 0.4,
+					"description": "Al bajar del 40% de vida (1 vez por combate): Propio: CRITICO +15 pts (3 turnos); Propio: DANO CRITICO +30% (3 turnos).",
+					"who": "holders",
+					"text": "Al bajar del 40% de vida (1 vez por combate): Propio: CRITICO +15 pts (3 turnos); Propio: DANO CRITICO +30% (3 turnos)."
+				}
+			]
+		}
 	]
 }

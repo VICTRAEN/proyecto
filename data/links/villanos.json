@@ -2,7 +2,109 @@
 	"id": "villanos",
 	"name": "Villanos",
 	"description": "Poderes que nadie queria tener cerca. Compiten por ver quien intimida mas.",
-	"effects": [
-		{ "type": "stat_mod", "stat": "atk", "kind": "mult", "value": 0.07 }
+	"legacy_effects": [
+		{
+			"type": "stat_mod",
+			"stat": "atk",
+			"kind": "mult",
+			"value": 0.07
+		}
+	],
+	"tiers": [
+		{
+			"need": 2,
+			"rules": [
+				{
+					"id": "base",
+					"name": "Vinculo",
+					"who": "holders",
+					"trigger": "static",
+					"condition": {},
+					"effects": [
+						{
+							"type": "stat_mod",
+							"stat": "atk",
+							"kind": "mult",
+							"value": 0.07,
+							"target": "self",
+							"turns": 0
+						}
+					],
+					"description": "Siempre: Propio: ATAQUE +7% (todo el combate).",
+					"text": "Siempre: Propio: ATAQUE +7% (todo el combate)."
+				},
+				{
+					"id": "sabotaje",
+					"name": "Sabotaje",
+					"trigger": "on_attack",
+					"condition": {},
+					"effects": [
+						{
+							"type": "stat_mod",
+							"target": "trigger_target",
+							"stat": "def",
+							"kind": "mult",
+							"value": -0.15,
+							"turns": 2
+						}
+					],
+					"chance": 0.25,
+					"description": "Al atacar (25% de prob.): Objetivo: DEFENSA -15% (2 turnos).",
+					"who": "holders",
+					"text": "Al atacar (25% de prob.): Objetivo: DEFENSA -15% (2 turnos)."
+				}
+			]
+		},
+		{
+			"need": 3,
+			"rules": [
+				{
+					"id": "botin",
+					"name": "Botin de guerra",
+					"trigger": "on_kill",
+					"condition": {},
+					"effects": [
+						{
+							"type": "heal",
+							"target": "self",
+							"of": "max_hp",
+							"amount": 0.15
+						},
+						{
+							"type": "sp_gain",
+							"target": "self",
+							"amount": 1
+						}
+					],
+					"description": "Al derrotar a un rival: Propio: cura 15% de VIDA MAX; Propio: +1 SP.",
+					"who": "holders",
+					"text": "Al derrotar a un rival: Propio: cura 15% de VIDA MAX; Propio: +1 SP."
+				}
+			]
+		},
+		{
+			"need": 4,
+			"rules": [
+				{
+					"id": "dominio",
+					"name": "Dominio",
+					"trigger": "static",
+					"condition": {},
+					"effects": [
+						{
+							"type": "stat_mod",
+							"target": "self",
+							"stat": "dmg_dealt",
+							"kind": "flat",
+							"value": 0.08,
+							"turns": 0
+						}
+					],
+					"description": "Siempre: Propio: DANO HECHO +8% (todo el combate).",
+					"who": "holders",
+					"text": "Siempre: Propio: DANO HECHO +8% (todo el combate)."
+				}
+			]
+		}
 	]
 }

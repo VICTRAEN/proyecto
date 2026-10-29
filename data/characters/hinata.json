@@ -11,7 +11,9 @@
 		"back": "res://art/characters/hinata/back.png",
 		"icon": "res://art/characters/hinata/icon.png"
 	},
-	"roles": ["Damage Dealer"],
+	"roles": [
+		"Damage Dealer"
+	],
 	"stats": {
 		"max_hp": 1140,
 		"atk": 210,
@@ -20,17 +22,30 @@
 		"crit_rate": 0.14,
 		"dodge_rate": 0.12
 	},
-	"categories": ["spokon", "protagonists", "teamwork", "determination"],
-	"links": ["spokon", "inquebrantables"],
+	"categories": [
+		"spokon",
+		"protagonists",
+		"teamwork",
+		"determination"
+	],
+	"links": [
+		"spokon",
+		"inquebrantables"
+	],
 	"passive": {
 		"id": "pas_hinata_salto",
 		"name": "Salto imposible",
-		"description": "No deja de saltar: al comenzar su turno sube un 20% su velocidad.",
-		"trigger": "turn_start",
+		"trigger": "on_attack",
 		"condition": {},
 		"effects": [
-			{ "type": "stat_mod", "target": "self", "stat": "speed", "kind": "mult", "value": 0.2, "turns": 1 }
-		]
+			{
+				"type": "damage",
+				"target": "trigger_target",
+				"power": 50
+			}
+		],
+		"chance": 0.3,
+		"description": "Al atacar (30% de prob.): Golpe extra de poder 50 a: objetivo."
 	},
 	"skills": [
 		{
@@ -50,10 +65,18 @@
 			"power": 225,
 			"cost": 3,
 			"target": "enemy",
-			"description": "Se fia del instante: +15 puntos de critico durante 2 turnos.",
+			"description": "Golpea a un rival: 1 golpe de poder 225. Propio: CRITICO +15 pts (2 turnos). ignora 15% de la DEFENSA.",
 			"effects": [
-				{ "type": "stat_mod", "target": "self", "stat": "crit_rate", "kind": "flat", "value": 0.15, "turns": 2 }
-			]
+				{
+					"type": "stat_mod",
+					"target": "self",
+					"stat": "crit_rate",
+					"kind": "flat",
+					"value": 0.15,
+					"turns": 2
+				}
+			],
+			"pierce": 0.15
 		}
 	],
 	"transformations": [],
@@ -61,25 +84,42 @@
 		"passive": {
 			"id": "pas_hinata_ev_salto",
 			"name": "Salto del pequeño gigante",
-			"description": "Sube un 35% su velocidad y 5 puntos su esquiva al comenzar su turno.",
-			"trigger": "turn_start",
+			"trigger": "on_attack",
 			"condition": {},
 			"effects": [
-				{ "type": "stat_mod", "target": "self", "stat": "speed", "kind": "mult", "value": 0.35, "turns": 1 },
-				{ "type": "stat_mod", "target": "self", "stat": "dodge_rate", "kind": "flat", "value": 0.05, "turns": 1 }
-			]
+				{
+					"type": "damage",
+					"target": "trigger_target",
+					"power": 75
+				}
+			],
+			"chance": 0.45,
+			"description": "Al atacar (45% de prob.): Golpe extra de poder 75 a: objetivo."
 		},
 		"passive_extra": {
 			"id": "pas_hinata_ev_instinto",
 			"name": "Instinto en la red",
-			"description": "Gana 10 puntos de critico al comenzar su turno.",
 			"trigger": "turn_start",
 			"condition": {},
 			"effects": [
-				{ "type": "stat_mod", "target": "self", "stat": "crit_rate", "kind": "flat", "value": 0.1, "turns": 1 }
-			]
+				{
+					"type": "stat_mod",
+					"target": "self",
+					"stat": "crit_rate",
+					"kind": "flat",
+					"value": 0.1,
+					"turns": 1
+				}
+			],
+			"description": "Al empezar su turno: Propio: CRITICO +10 pts (1 turno)."
 		},
-		"links": ["mentores", "veteranos"],
-		"categories": ["despertados", "leyendas"]
+		"links": [
+			"mentores",
+			"veteranos"
+		],
+		"categories": [
+			"despertados",
+			"leyendas"
+		]
 	}
 }

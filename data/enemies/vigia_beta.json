@@ -9,5 +9,26 @@
 		"speed": 118,
 		"crit_rate": 0.08,
 		"dodge_rate": 0.05
-	}
+	},
+	"passive": {
+		"id": "pas_reze_detonante",
+		"name": "Bomba detonante",
+		"description": "Desde la ronda 3 su carga es imparable: sube un 35% su ataque al comenzar su turno.",
+		"trigger": "turn_start",
+		"condition": {
+			"type": "round_at_least",
+			"value": 3
+		},
+		"effects": [
+			{
+				"type": "stat_mod",
+				"target": "self",
+				"stat": "atk",
+				"kind": "mult",
+				"value": 0.35,
+				"turns": 1
+			}
+		]
+	},
+	"_note_v12": "v12: el jefe conserva la pasiva de combate de v11 (turn_start/battle_start de estadisticas) para que la dificultad del contenido no cambie al rediseñar las pasivas del roster; sus habilidades si usan las nuevas mecanicas."
 }

@@ -1061,6 +1061,11 @@ func _play_feedback(payload: Dictionary) -> void:
 			pass
 		elif kind == "passive":
 			_spawn_banner("PASIVA  %s" % skill_name, Color(1.0, 0.86, 0.5, 1.0))
+		elif kind == "rule" and cards.has(actor_key):
+			# Reglas con disparador (al recibir un golpe, al caer un aliado...): aviso
+			# pequeno sobre quien las activa, para no tapar el escenario.
+			var rule_card: UnitCard = cards[actor_key]
+			_spawn_popup(rule_card.global_position + Vector2(rule_card.size.x * 0.5, -10.0), skill_name, Color(1.0, 0.86, 0.5, 1.0), 26)
 
 	if cards.has(actor_key):
 		var actor_card: UnitCard = cards[actor_key]
@@ -1131,6 +1136,23 @@ func _play_feedback(payload: Dictionary) -> void:
 				_spawn_popup(middle, String(hit.get("value", "")).to_upper(), Color(0.95, 0.6, 0.95, 1.0))
 			"sp_gain":
 				pass
+			"shield":
+				_spawn_popup(middle, "ESCUDO %d" % int(round(float(hit.get("value", 0.0)))), Color(0.55, 0.85, 1.0, 1.0))
+			"periodic":
+				var periodic_names := { "bleed": "SANGRADO", "burn": "QUEMADURA", "poison": "VENENO", "regen": "REGENERACION" }
+				_spawn_popup(middle, String(periodic_names.get(String(hit.get("status", "")), "EFECTO")), Color(0.95, 0.6, 0.95, 1.0) if String(hit.get("status", "")) != "regen" else HEAL_COLOR)
+			"dot":
+				_spawn_popup(middle, "-%d" % int(round(float(hit.get("value", 0.0)))), Color(0.95, 0.55, 0.35, 1.0))
+			"cleanse":
+				_spawn_popup(middle, "PURIFICADO", HEAL_COLOR)
+			"dispel":
+				_spawn_popup(middle, "DISIPADO", EFFECT_COLOR)
+			"sp_drain":
+				_spawn_popup(middle, "-%d SP" % int(hit.get("value", 0)), Color(0.95, 0.6, 0.95, 1.0))
+			"undying":
+				_spawn_popup(middle, "ULTIMO ALIENTO", GOLD)
+			"recoil":
+				_spawn_popup(middle, "RETROCESO -%d" % int(round(float(hit.get("value", 0.0)))), DAMAGE_COLOR)
 		stack += 1
 
 

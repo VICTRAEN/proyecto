@@ -1,6 +1,7 @@
 extends Control
 
 const NAV := preload("res://scenes/nav.gd")
+const SavedTeamsPanel := preload("res://ui/saved_teams_panel.gd")
 const VI := preload("res://ui/visual_identity.gd")
 const Portrait := preload("res://ui/portrait.gd")
 const TypeColors := preload("res://ui/type_colors.gd")
@@ -362,7 +363,24 @@ func _make_stage_card(event_id: String, stage: Dictionary) -> Control:
 		button.text = "JUGAR"
 		button.pressed.connect(_on_play_pressed.bind(event_id, stage_id))
 	VI.tint_button(button, VI.BLUE if playable else VI.INK_DIM)
-	box.add_child(button)
+	if unlocked:
+		# v12: EQUIPO antes de combatir (equipo guardado, AUTO o uno hecho a mano).
+		var row := HBoxContainer.new()
+		row.add_theme_constant_override("separation", 8)
+		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		row.add_child(button)
+		var team_button := Button.new()
+		team_button.name = "TeamButton"
+		team_button.text = "EQUIPO"
+		team_button.custom_minimum_size = Vector2(0.0, VI.TOUCH)
+		team_button.add_theme_font_size_override("font_size", VI.FONT_SMALL)
+		team_button.focus_mode = Control.FOCUS_NONE
+		VI.tint_button(team_button, VI.GOLD)
+		team_button.pressed.connect(_on_team_pressed.bind(event_id, stage_id))
+		row.add_child(team_button)
+		box.add_child(row)
+	else:
+		box.add_child(button)
 
 	return card
 
@@ -456,6 +474,14 @@ func _on_play_pressed(event_id: String, stage_id: String) -> void:
 	var app := NAV.app_of(self)
 	if app != null and app.has_method("open_battle"):
 		app.call("open_battle")
+
+
+## EQUIPO antes de un stage de evento: se fija el origen para que la ventana compare
+## cada equipo guardado con lo que pide ESTE stage (unidad concreta, forma, 1 VS 1).
+func _on_team_pressed(event_id: String, stage_id: String) -> void:
+	GameState.prepare_battle(GameState.BATTLE_EVENT, { "event": event_id, "stage": stage_id })
+	var panel := SavedTeamsPanel.open_on(self, "party", true)
+	panel.closed.connect(refresh)
 
 
 ## RECLAMAR la unidad del evento. GameState.claim_event_character es el unico

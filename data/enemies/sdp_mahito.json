@@ -9,5 +9,23 @@
 		"speed": 118,
 		"crit_rate": 0.08,
 		"dodge_rate": 0.05
-	}
+	},
+	"passive": {
+		"id": "pas_mahito_transfiguracion",
+		"name": "Transfiguracion ociosa",
+		"description": "Al comenzar su turno su ataque sube un 30%: le encanta jugar con las almas.",
+		"trigger": "turn_start",
+		"condition": {},
+		"effects": [
+			{
+				"type": "stat_mod",
+				"target": "self",
+				"stat": "atk",
+				"kind": "mult",
+				"value": 0.3,
+				"turns": 1
+			}
+		]
+	},
+	"_note_v12": "v12: el jefe conserva la pasiva de combate de v11 (turn_start/battle_start de estadisticas) para que la dificultad del contenido no cambie al rediseñar las pasivas del roster; sus habilidades si usan las nuevas mecanicas."
 }

@@ -109,6 +109,20 @@ func _ready() -> void:
 		_debug_v15()
 	elif dbg_args.has("--dbg18"):
 		_start_hito_d()
+	elif dbg_args.has("--sim"):
+		var sim_script: GDScript = load("res://scenes/debug/sim_balance.gd")
+		var sim_node := Node.new()
+		sim_node.set_script(sim_script)
+		sim_node.name = "SimBalance"
+		add_child(sim_node)
+		sim_node.call_deferred("run", self)
+	elif dbg_args.has("--dbg24"):
+		var hito_j: GDScript = load("res://scenes/debug/hito_j_checks.gd")
+		var hito_j_node := Node.new()
+		hito_j_node.set_script(hito_j)
+		hito_j_node.name = "HitoJChecks"
+		add_child(hito_j_node)
+		hito_j_node.call_deferred("run", self)
 	elif dbg_args.has("--dbg23"):
 		var hito_i: GDScript = load("res://scenes/debug/hito_i_checks.gd")
 		var hito_i_node := Node.new()

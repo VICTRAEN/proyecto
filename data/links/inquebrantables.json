@@ -2,8 +2,121 @@
 	"id": "inquebrantables",
 	"name": "Inquebrantables",
 	"description": "Se caen y se levantan. Al lado de otro igual, aguantan el doble.",
-	"effects": [
-		{ "type": "stat_mod", "stat": "atk", "kind": "mult", "value": 0.05 },
-		{ "type": "stat_mod", "stat": "max_hp", "kind": "mult", "value": 0.04 }
+	"legacy_effects": [
+		{
+			"type": "stat_mod",
+			"stat": "atk",
+			"kind": "mult",
+			"value": 0.05
+		},
+		{
+			"type": "stat_mod",
+			"stat": "max_hp",
+			"kind": "mult",
+			"value": 0.04
+		}
+	],
+	"tiers": [
+		{
+			"need": 2,
+			"rules": [
+				{
+					"id": "base",
+					"name": "Vinculo",
+					"who": "holders",
+					"trigger": "static",
+					"condition": {},
+					"effects": [
+						{
+							"type": "stat_mod",
+							"stat": "atk",
+							"kind": "mult",
+							"value": 0.05,
+							"target": "self",
+							"turns": 0
+						},
+						{
+							"type": "stat_mod",
+							"stat": "max_hp",
+							"kind": "mult",
+							"value": 0.04,
+							"target": "self",
+							"turns": 0
+						}
+					],
+					"description": "Siempre: Propio: ATAQUE +5% (todo el combate); Propio: VIDA MAX +4% (todo el combate).",
+					"text": "Siempre: Propio: ATAQUE +5% (todo el combate); Propio: VIDA MAX +4% (todo el combate)."
+				},
+				{
+					"id": "voluntad",
+					"name": "Voluntad de hierro",
+					"trigger": "low_hp",
+					"condition": {},
+					"effects": [
+						{
+							"type": "shield",
+							"target": "self",
+							"amount": 0.12,
+							"of": "max_hp",
+							"turns": 3
+						}
+					],
+					"once": true,
+					"threshold": 0.35,
+					"description": "Al bajar del 35% de vida (1 vez por combate): Propio: escudo de 12% de VIDA MAX (3 turnos).",
+					"who": "holders",
+					"text": "Al bajar del 35% de vida (1 vez por combate): Propio: escudo de 12% de VIDA MAX (3 turnos)."
+				}
+			]
+		},
+		{
+			"need": 3,
+			"rules": [
+				{
+					"id": "aguante",
+					"name": "Aguante",
+					"trigger": "round_start",
+					"condition": {
+						"type": "hp_below",
+						"value": 0.5
+					},
+					"effects": [
+						{
+							"type": "stat_mod",
+							"target": "self",
+							"stat": "dmg_reduction",
+							"kind": "flat",
+							"value": 0.06,
+							"turns": 1
+						}
+					],
+					"description": "Al empezar cada ronda, si su vida < 50%: Propio: REDUCCION DE DANO +6% (1 turno).",
+					"who": "holders",
+					"text": "Al empezar cada ronda, si su vida < 50%: Propio: REDUCCION DE DANO +6% (1 turno)."
+				}
+			]
+		},
+		{
+			"need": 4,
+			"rules": [
+				{
+					"id": "aliento",
+					"name": "Ultimo aliento",
+					"trigger": "battle_start",
+					"condition": {},
+					"effects": [
+						{
+							"type": "undying",
+							"target": "self",
+							"charges": 1,
+							"heal": 0.15
+						}
+					],
+					"description": "Al empezar el combate: Propio: sobrevive a un golpe mortal con 15% de vida.",
+					"who": "holders",
+					"text": "Al empezar el combate: Propio: sobrevive a un golpe mortal con 15% de vida."
+				}
+			]
+		}
 	]
 }

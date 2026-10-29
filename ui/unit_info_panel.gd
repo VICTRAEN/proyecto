@@ -61,6 +61,7 @@ const GROUP_COLORS := {
 
 const STATUS_LABELS := {
 	"stun": "ATURDIDO",
+	"taunt": "PROVOCA",
 }
 
 ## Etiqueta de cada pestana. Las cinco se construyen siempre; BATALLA solo tiene
@@ -539,11 +540,24 @@ func _fill_links() -> void:
 	# Dentro de una batalla, los links que cuentan son los DEL EQUIPO que ha
 	# salido a combatir; fuera, los del equipo configurado en la pantalla EQUIPO.
 	if not _is_ficha:
+		# Informe de sinergias del equipo (solo los links ACTIVOS): nivel alcanzado,
+		# que hace cada regla y A QUIEN beneficia. Bajo demanda: vive en la ficha, no
+		# en la pantalla de combate.
 		var active := 0
-		for link in GameState.team_links_status():
-			if bool(link.get("active", false)):
-				active += 1
+		var lines := PackedStringArray()
+		for row in GameState.team_synergy_report():
+			if not bool(row.get("active", false)):
+				continue
+			active += 1
+			lines.append("%s  (Nv.%d/%d, %d portadores)" % [String(row["name"]).to_upper(), int(row["tier"]), int(row["tier_count"]), int(row["holders"])])
+			for tier in row["tiers"]:
+				if not bool(tier["reached"]):
+					continue
+				for rule in tier["rules"]:
+					lines.append("  - %s: %s  [%s]" % [String(rule["name"]), String(rule["text"]), ", ".join(PackedStringArray(rule["who_names"]))])
 		tab_links.add_child(FichaTabs.note("Links activos del equipo en combate: %d." % active))
+		if not lines.is_empty():
+			tab_links.add_child(FichaTabs.note("\n".join(lines)))
 
 
 ## --- DUPES -------------------------------------------------------------------------
@@ -697,8 +711,16 @@ func _make_effect_row(effect: Dictionary) -> Control:
 ## dicen cosas distintas del mismo efecto.
 func _effect_value_text(effect: Dictionary) -> String:
 	var key := String(effect.get("key", ""))
-	if String(effect.get("source_kind", "")) == "status":
-		return String(STATUS_LABELS.get(key, key.to_upper()))
+	match String(effect.get("source_kind", "")):
+		"status":
+			return String(STATUS_LABELS.get(key, key.to_upper()))
+		"shield":
+			return "ESCUDO %d" % int(round(float(effect.get("value", 0.0))))
+		"periodic":
+			var names := { "bleed": "SANGRADO", "burn": "QUEMADURA", "poison": "VENENO", "regen": "REGENERACION" }
+			return "%s %d por turno" % [String(names.get(key, key.to_upper())), int(round(float(effect.get("value", 0.0))))]
+		"undying":
+			return "ULTIMO ALIENTO (sobrevive a un golpe mortal)"
 	return "%s %s" % [
 		StatBlock.label(key),
 		StatBlock.mod_value_text(

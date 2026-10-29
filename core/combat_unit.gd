@@ -49,6 +49,27 @@ var source_key := ""
 var slot := 0
 ## Contadores dinamicos de esta batalla (core/battle_stats.gd).
 var battle: BattleStats = null
+## --- Estado de combate v12 -------------------------------------------------
+## Escudos: absorben dano ANTES que la vida. [{ amount, turns, source }]
+var shields: Array = []
+## Efectos periodicos: sangrado/quemadura/veneno (dano) y regeneracion (cura) al
+## empezar el turno del portador. [{ kind, per_turn, turns, source }]
+var periodics: Array = []
+## Cargas de "ultimo aliento": cuando un golpe lo mataria, sobrevive. Cada carga se
+## gasta una vez; undying_heal es la fraccion de vida maxima con la que se queda.
+var undying := 0
+var undying_heal := 0.0
+## Reglas de LINKS que lleva esta unidad en ESTE combate (mismo formato que una
+## pasiva con disparador). Las pone el BattleManager al empezar; no son pasivas del
+## personaje, asi que no salen en su ficha.
+var link_rules: Array = []
+## Control de las reglas con disparador: id -> { used, next_round }.
+var rule_state: Dictionary = {}
+## True cuando ya se han resuelto las consecuencias de su caida (no se repiten).
+var death_handled := false
+## Lo que absorbio el escudo y si el ultimo golpe se sobrevivio por "ultimo aliento".
+var last_absorbed := 0.0
+var last_survived := false
 
 
 func setup(data: Dictionary, ally_flag: bool, slot_index: int) -> void:
@@ -179,11 +200,144 @@ func hp_ratio() -> float:
 
 
 func take_damage(amount: float) -> float:
-	var dealt := minf(amount, hp)
-	hp = maxf(0.0, hp - amount)
+	last_absorbed = 0.0
+	last_survived = false
+	var left := amount
+	var index := 0
+	while left > 0.0 and index < shields.size():
+		var shield: Dictionary = shields[index]
+		var absorbed := minf(float(shield["amount"]), left)
+		shield["amount"] = float(shield["amount"]) - absorbed
+		left -= absorbed
+		last_absorbed += absorbed
+		if float(shield["amount"]) <= 0.0:
+			shields.remove_at(index)
+		else:
+			index += 1
+	var dealt := minf(left, hp)
+	hp = maxf(0.0, hp - left)
 	if hp <= 0.0:
-		alive = false
+		if undying > 0:
+			undying -= 1
+			hp = maxf(1.0, max_hp() * undying_heal)
+			last_survived = true
+		else:
+			alive = false
 	return dealt
+
+
+## --- Escudos y efectos periodicos --------------------------------------------
+
+func shield_total() -> float:
+	var total := 0.0
+	for shield in shields:
+		total += float(shield["amount"])
+	return total
+
+
+## Un escudo del mismo origen se SUSTITUYE (no se acumula): reaplicar la misma
+## fuente refresca, igual que los modificadores de estadistica.
+func add_shield(amount: float, turns: int, source: String) -> void:
+	var kept: Array = []
+	for shield in shields:
+		if String(shield["source"]) != source:
+			kept.append(shield)
+	kept.append({ "amount": maxf(0.0, amount), "turns": turns, "source": source })
+	shields = kept
+
+
+func add_periodic(kind: String, per_turn: float, turns: int, source: String) -> void:
+	var kept: Array = []
+	for entry in periodics:
+		if not (String(entry["source"]) == source and String(entry["kind"]) == kind):
+			kept.append(entry)
+	kept.append({ "kind": kind, "per_turn": per_turn, "turns": turns, "source": source })
+	periodics = kept
+
+
+const DAMAGE_PERIODICS := ["bleed", "burn", "poison"]
+## Estados que BENEFICIAN a quien los lleva (la purga no los toca).
+const BENEFICIAL_STATUSES := ["taunt"]
+
+
+## Quita lo malo que caduca: debuffs de estadistica, estados (aturdimiento,
+## provocacion...) y sangrado/quemadura/veneno. Devuelve cuantas cosas ha quitado.
+func cleanse() -> int:
+	var removed := stats.remove_temporary(false)
+	var kept_statuses: Array = []
+	for status in statuses:
+		if BENEFICIAL_STATUSES.has(String(status["name"])):
+			kept_statuses.append(status)
+		else:
+			removed += 1
+	statuses = kept_statuses
+	var kept: Array = []
+	for entry in periodics:
+		if DAMAGE_PERIODICS.has(String(entry["kind"])):
+			removed += 1
+		else:
+			kept.append(entry)
+	periodics = kept
+	return removed
+
+
+## Quita los buffs temporales (y escudos) de un rival.
+func dispel() -> int:
+	var removed := stats.remove_temporary(true)
+	removed += shields.size()
+	shields = []
+	var kept: Array = []
+	for entry in periodics:
+		if String(entry["kind"]) == "regen":
+			removed += 1
+		else:
+			kept.append(entry)
+	periodics = kept
+	return removed
+
+
+func has_debuff() -> bool:
+	for status in statuses:
+		if not BENEFICIAL_STATUSES.has(String(status["name"])):
+			return true
+	for entry in periodics:
+		if DAMAGE_PERIODICS.has(String(entry["kind"])):
+			return true
+	for mod in stats.mods:
+		if int(mod["turns"]) > 0 and not StatBlock.mod_is_beneficial(String(mod["stat"]), float(mod["value"])):
+			return true
+	return false
+
+
+func has_status(status_name: String) -> bool:
+	for status in statuses:
+		if String(status["name"]) == status_name:
+			return true
+	return false
+
+
+## Fin de ronda: los escudos con duracion se gastan.
+func tick_round() -> void:
+	var kept: Array = []
+	for shield in shields:
+		var turns := int(shield["turns"])
+		if turns <= 0:
+			kept.append(shield)
+			continue
+		turns -= 1
+		if turns > 0:
+			shield["turns"] = turns
+			kept.append(shield)
+	shields = kept
+
+
+## Reglas con disparador: las pasivas del personaje y las de sus links activos.
+func rules_for_trigger(trigger: String) -> Array:
+	var out: Array = passives_for_trigger(trigger)
+	for rule in link_rules:
+		if String(rule.get("trigger", "")) == trigger:
+			out.append(rule)
+	return out
 
 
 func heal(amount: float) -> float:
@@ -296,8 +450,27 @@ func active_effects() -> Array:
 			"value": value,
 			"mod_kind": String(mod.get("kind", "mult")),
 			"turns": int(mod.get("turns", 0)),
-			"positive": value >= 0.0,
+			"positive": StatBlock.mod_is_beneficial(String(mod.get("stat", "")), value),
 			"origin": _origin_label(source),
+		})
+	if shield_total() > 0.0:
+		var longest := 0
+		for shield in shields:
+			longest = maxi(longest, int(shield["turns"]))
+		effects.append({
+			"source_kind": "shield", "key": "shield", "value": shield_total(),
+			"mod_kind": "shield", "turns": longest, "positive": true, "origin": "",
+		})
+	for entry in periodics:
+		effects.append({
+			"source_kind": "periodic", "key": String(entry["kind"]), "value": float(entry["per_turn"]),
+			"mod_kind": "periodic", "turns": int(entry["turns"]),
+			"positive": String(entry["kind"]) == "regen", "origin": "",
+		})
+	if undying > 0:
+		effects.append({
+			"source_kind": "undying", "key": "undying", "value": float(undying),
+			"mod_kind": "undying", "turns": 0, "positive": true, "origin": "",
 		})
 	for status in statuses:
 		effects.append({
@@ -306,7 +479,7 @@ func active_effects() -> Array:
 			"value": 0.0,
 			"mod_kind": "status",
 			"turns": int(status.get("turns", 0)),
-			"positive": false,
+			"positive": BENEFICIAL_STATUSES.has(String(status.get("name", ""))),
 			"origin": "",
 		})
 	return effects
@@ -319,6 +492,8 @@ func _origin_label(source: String) -> String:
 		return "Pasiva"
 	if source.begins_with("skill:"):
 		return "Habilidad"
+	if source.begins_with("link:"):
+		return "Link"
 	return ""
 
 

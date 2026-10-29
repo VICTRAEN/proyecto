@@ -79,11 +79,41 @@ const LABELS := {
 	"speed": "VELOCIDAD",
 	"crit_rate": "CRITICO",
 	"dodge_rate": "ESQUIVA",
+	# Estadisticas de COMBATE (v12). No existen en el JSON de los personajes (base 0):
+	# solo las crean pasivas, links y habilidades con modificadores "flat", asi que
+	# caducan, se sustituyen por origen y se pintan igual que cualquier otra.
+	"dmg_dealt": "DANO HECHO",
+	"dmg_taken": "DANO RECIBIDO",
+	"dmg_reduction": "REDUCCION DE DANO",
+	"pierce": "PERFORACION",
+	"lifesteal": "ROBO DE VIDA",
+	"crit_dmg": "DANO CRITICO",
 }
 
 ## Estadisticas que son PROBABILIDADES: se leen en puntos porcentuales, no como
 ## porcentaje del valor base. Un +0.2 de critico son +20 puntos, no un 20% mas.
-const RATE_STATS := ["crit_rate", "dodge_rate"]
+## Las 6 estadisticas del personaje (las que tienen valor base en el JSON). Las
+## pantallas que listan "stats base" recorren ESTA lista, no LABELS.
+const BASE_STATS := ["max_hp", "atk", "def", "speed", "crit_rate", "dodge_rate"]
+
+const RATE_STATS := ["crit_rate", "dodge_rate", "dmg_dealt", "dmg_taken", "dmg_reduction", "pierce", "lifesteal", "crit_dmg"]
+
+## Estadisticas que solo existen como modificador (base 0, siempre "flat").
+const EXTRA_STATS := ["dmg_dealt", "dmg_taken", "dmg_reduction", "pierce", "lifesteal", "crit_dmg"]
+## De estas, SUBIR el valor es malo para quien las lleva.
+const HARMFUL_WHEN_POSITIVE := ["dmg_taken"]
+
+
+static func is_extra_stat(stat_name: String) -> bool:
+	return EXTRA_STATS.has(stat_name)
+
+
+## True si el modificador BENEFICIA a quien lo lleva (un buff). Es el unico sitio que
+## lo decide: la UI, la purga de debuffs y las estadisticas del combate lo usan.
+static func mod_is_beneficial(stat_name: String, value: float) -> bool:
+	if HARMFUL_WHEN_POSITIVE.has(stat_name):
+		return value <= 0.0
+	return value >= 0.0
 
 
 static func label(stat_name: String) -> String:
@@ -148,6 +178,23 @@ func tick() -> void:
 			mod["turns"] = turns
 			kept.append(mod)
 	mods = kept
+
+
+## Quita los modificadores TEMPORALES buenos (buffs) o malos (debuffs). Los
+## permanentes (turns 0: pasivas de inicio, links, lider, dupes, mutacion) no se
+## tocan nunca: limpiar o disipar solo afecta a lo que caduca.
+func remove_temporary(beneficial: bool) -> int:
+	var kept: Array = []
+	var removed := 0
+	for mod in mods:
+		var temporary: bool = int(mod["turns"]) > 0
+		var is_good: bool = mod_is_beneficial(String(mod["stat"]), float(mod["value"]))
+		if temporary and is_good == beneficial:
+			removed += 1
+			continue
+		kept.append(mod)
+	mods = kept
+	return removed
 
 
 func active_mods() -> Array:

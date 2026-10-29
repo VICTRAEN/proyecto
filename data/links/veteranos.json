@@ -2,8 +2,122 @@
 	"id": "veteranos",
 	"name": "Veteranos",
 	"description": "Ya han visto de todo. Saber donde ponerse es media defensa.",
-	"effects": [
-		{ "type": "stat_mod", "stat": "def", "kind": "mult", "value": 0.05 },
-		{ "type": "stat_mod", "stat": "crit_rate", "kind": "flat", "value": 0.02 }
+	"legacy_effects": [
+		{
+			"type": "stat_mod",
+			"stat": "def",
+			"kind": "mult",
+			"value": 0.05
+		},
+		{
+			"type": "stat_mod",
+			"stat": "crit_rate",
+			"kind": "flat",
+			"value": 0.02
+		}
+	],
+	"tiers": [
+		{
+			"need": 2,
+			"rules": [
+				{
+					"id": "base",
+					"name": "Vinculo",
+					"who": "holders",
+					"trigger": "static",
+					"condition": {},
+					"effects": [
+						{
+							"type": "stat_mod",
+							"stat": "def",
+							"kind": "mult",
+							"value": 0.05,
+							"target": "self",
+							"turns": 0
+						},
+						{
+							"type": "stat_mod",
+							"stat": "crit_rate",
+							"kind": "flat",
+							"value": 0.02,
+							"target": "self",
+							"turns": 0
+						}
+					],
+					"description": "Siempre: Propio: DEFENSA +5% (todo el combate); Propio: CRITICO +2 pts (todo el combate).",
+					"text": "Siempre: Propio: DEFENSA +5% (todo el combate); Propio: CRITICO +2 pts (todo el combate)."
+				},
+				{
+					"id": "experiencia",
+					"name": "Experiencia",
+					"trigger": "static",
+					"condition": {},
+					"effects": [
+						{
+							"type": "stat_mod",
+							"target": "self",
+							"stat": "dmg_reduction",
+							"kind": "flat",
+							"value": 0.036,
+							"turns": 0
+						}
+					],
+					"description": "Siempre: Propio: REDUCCION DE DANO +4% (todo el combate).",
+					"who": "holders",
+					"text": "Siempre: Propio: REDUCCION DE DANO +4% (todo el combate)."
+				}
+			]
+		},
+		{
+			"need": 3,
+			"rules": [
+				{
+					"id": "frialdad",
+					"name": "Sangre fria",
+					"trigger": "round_start",
+					"condition": {
+						"type": "round_at_least",
+						"value": 3
+					},
+					"effects": [
+						{
+							"type": "stat_mod",
+							"target": "ally_all",
+							"stat": "atk",
+							"kind": "mult",
+							"value": 0.12,
+							"turns": 1
+						}
+					],
+					"description": "Al empezar cada ronda, desde la ronda 3: Equipo: ATAQUE +12% (1 turno).",
+					"who": "first",
+					"text": "Al empezar cada ronda, desde la ronda 3: Equipo: ATAQUE +12% (1 turno)."
+				}
+			]
+		},
+		{
+			"need": 4,
+			"rules": [
+				{
+					"id": "instinto",
+					"name": "Instinto veterano",
+					"trigger": "static",
+					"condition": {},
+					"effects": [
+						{
+							"type": "stat_mod",
+							"target": "self",
+							"stat": "crit_rate",
+							"kind": "flat",
+							"value": 0.04,
+							"turns": 0
+						}
+					],
+					"description": "Siempre: Propio: CRITICO +4 pts (todo el combate).",
+					"who": "holders",
+					"text": "Siempre: Propio: CRITICO +4 pts (todo el combate)."
+				}
+			]
+		}
 	]
 }

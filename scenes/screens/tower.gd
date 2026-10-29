@@ -6,6 +6,7 @@ const Portrait := preload("res://ui/portrait.gd")
 const TypeColors := preload("res://ui/type_colors.gd")
 const ROSTER_CARD := preload("res://ui/roster_card.tscn")
 const THEME := preload("res://ui/theme.tres")
+const SavedTeamsPanel := preload("res://ui/saved_teams_panel.gd")
 
 ## TORRE: el desafio vertical. Composicion propia, distinta de las pantallas de
 ## lista: una TORRE de pisos que se lee de arriba (jefe final) a abajo (piso 1),
@@ -90,6 +91,22 @@ func _build() -> void:
 	_reserve_row = HBoxContainer.new()
 	_reserve_row.add_theme_constant_override("separation", 10)
 	main.add_child(_reserve_row)
+
+	# v12: equipos guardados y propuesta automatica tambien para la torre (5 puestos).
+	var tools := HBoxContainer.new()
+	tools.name = "ToolsRow"
+	tools.add_theme_constant_override("separation", 8)
+	main.add_child(tools)
+	for spec in [["EQUIPOS", "TeamsButton", VI.GOLD, "_open_saved_teams"], ["AUTO", "AutoButton", VI.CYAN, "_on_auto_pressed"]]:
+		var tool_button := Button.new()
+		tool_button.name = String(spec[1])
+		tool_button.text = String(spec[0])
+		tool_button.custom_minimum_size = Vector2(0, 72)
+		tool_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		tool_button.add_theme_font_size_override("font_size", VI.FONT_SMALL)
+		VI.tint_button(tool_button, spec[2])
+		tool_button.pressed.connect(Callable(self, String(spec[3])))
+		tools.add_child(tool_button)
 
 	_hint = Label.new()
 	_hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -411,6 +428,26 @@ func _update_fight_button() -> void:
 	_hint.text = problem if not problem.is_empty() else "Equipo: %d / %d  (%d activos, %d en reserva)" % [
 		GameState.tower_team_count(), GameState.TOWER_TEAM_SIZE,
 		GameState.tower_active_ids().size(), GameState.tower_reserve_ids().size()]
+
+
+func _open_saved_teams() -> void:
+	var panel := SavedTeamsPanel.new()
+	panel.name = "SavedTeamsPanel"
+	panel.setup("tower")
+	panel.closed.connect(refresh)
+	add_child(panel)
+
+
+## AUTO en la torre: aplica la mejor formacion de 5 (3 activos + 2 reservas). El
+## jugador puede cambiar cualquier puesto despues tocandolo.
+func _on_auto_pressed() -> void:
+	var proposal := GameState.autoconfigure_team("tower")
+	if (proposal.get("members", []) as Array).is_empty():
+		_hint.text = String(proposal.get("reason", "No hay propuesta posible."))
+		return
+	GameState.apply_autoconfigured(proposal["members"], "tower")
+	refresh()
+	_hint.text = "Equipo autoconfigurado: %s" % "  ".join(PackedStringArray(proposal.get("parts", [])))
 
 
 func _on_fight() -> void:

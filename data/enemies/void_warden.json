@@ -9,5 +9,23 @@
 		"speed": 104,
 		"crit_rate": 0.05,
 		"dodge_rate": 0.03
-	}
+	},
+	"passive": {
+		"id": "pas_makima_control",
+		"name": "Control absoluto",
+		"description": "Domina la voluntad del rival: al comenzar su turno le baja un 18% el ataque.",
+		"trigger": "turn_start",
+		"condition": {},
+		"effects": [
+			{
+				"type": "stat_mod",
+				"target": "enemy",
+				"stat": "atk",
+				"kind": "mult",
+				"value": -0.18,
+				"turns": 1
+			}
+		]
+	},
+	"_note_v12": "v12: el jefe conserva la pasiva de combate de v11 (turn_start/battle_start de estadisticas) para que la dificultad del contenido no cambie al rediseñar las pasivas del roster; sus habilidades si usan las nuevas mecanicas."
 }

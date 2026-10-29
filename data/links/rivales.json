@@ -2,8 +2,128 @@
 	"id": "rivales",
 	"name": "Rivales",
 	"description": "Dos rivales empujandose hacia delante. Comparten banquillo y se exigen el maximo.",
-	"effects": [
-		{ "type": "stat_mod", "stat": "atk", "kind": "mult", "value": 0.05 },
-		{ "type": "stat_mod", "stat": "def", "kind": "mult", "value": 0.05 }
+	"legacy_effects": [
+		{
+			"type": "stat_mod",
+			"stat": "atk",
+			"kind": "mult",
+			"value": 0.05
+		},
+		{
+			"type": "stat_mod",
+			"stat": "def",
+			"kind": "mult",
+			"value": 0.05
+		}
+	],
+	"tiers": [
+		{
+			"need": 2,
+			"rules": [
+				{
+					"id": "base",
+					"name": "Vinculo",
+					"who": "holders",
+					"trigger": "static",
+					"condition": {},
+					"effects": [
+						{
+							"type": "stat_mod",
+							"stat": "atk",
+							"kind": "mult",
+							"value": 0.05,
+							"target": "self",
+							"turns": 0
+						},
+						{
+							"type": "stat_mod",
+							"stat": "def",
+							"kind": "mult",
+							"value": 0.05,
+							"target": "self",
+							"turns": 0
+						}
+					],
+					"description": "Siempre: Propio: ATAQUE +5% (todo el combate); Propio: DEFENSA +5% (todo el combate).",
+					"text": "Siempre: Propio: ATAQUE +5% (todo el combate); Propio: DEFENSA +5% (todo el combate)."
+				},
+				{
+					"id": "competicion",
+					"name": "Competicion",
+					"trigger": "on_kill",
+					"condition": {},
+					"effects": [
+						{
+							"type": "stat_mod",
+							"target": "ally_others",
+							"stat": "atk",
+							"kind": "mult",
+							"value": 0.15,
+							"turns": 3
+						},
+						{
+							"type": "sp_gain",
+							"target": "self",
+							"amount": 1
+						}
+					],
+					"description": "Al derrotar a un rival: Resto del equipo: ATAQUE +15% (3 turnos); Propio: +1 SP.",
+					"who": "holders",
+					"text": "Al derrotar a un rival: Resto del equipo: ATAQUE +15% (3 turnos); Propio: +1 SP."
+				}
+			]
+		},
+		{
+			"need": 3,
+			"rules": [
+				{
+					"id": "pique",
+					"name": "Pique",
+					"trigger": "on_attack",
+					"condition": {},
+					"effects": [
+						{
+							"type": "stat_mod",
+							"target": "self",
+							"stat": "atk",
+							"kind": "mult",
+							"value": 0.04,
+							"turns": 4,
+							"stacks_max": 5
+						}
+					],
+					"description": "Al atacar: Propio: ATAQUE +4% (4 turnos), acumulable x5.",
+					"who": "holders",
+					"text": "Al atacar: Propio: ATAQUE +4% (4 turnos), acumulable x5."
+				}
+			]
+		},
+		{
+			"need": 4,
+			"rules": [
+				{
+					"id": "todo",
+					"name": "Todo o nada",
+					"trigger": "round_start",
+					"condition": {
+						"type": "allies_alive_at_most",
+						"value": 2
+					},
+					"effects": [
+						{
+							"type": "stat_mod",
+							"target": "self",
+							"stat": "atk",
+							"kind": "mult",
+							"value": 0.2,
+							"turns": 1
+						}
+					],
+					"description": "Al empezar cada ronda, si quedan 2 aliados o menos: Propio: ATAQUE +20% (1 turno).",
+					"who": "holders",
+					"text": "Al empezar cada ronda, si quedan 2 aliados o menos: Propio: ATAQUE +20% (1 turno)."
+				}
+			]
+		}
 	]
 }

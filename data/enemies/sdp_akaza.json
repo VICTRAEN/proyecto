@@ -9,5 +9,26 @@
 		"speed": 104,
 		"crit_rate": 0.05,
 		"dodge_rate": 0.03
-	}
+	},
+	"passive": {
+		"id": "pas_akaza_instinto",
+		"name": "Instinto de combate",
+		"description": "Cuando el combate se alarga, su instinto se agudiza: desde la ronda 4 sube un 25% su ataque.",
+		"trigger": "turn_start",
+		"condition": {
+			"type": "round_at_least",
+			"value": 4
+		},
+		"effects": [
+			{
+				"type": "stat_mod",
+				"target": "self",
+				"stat": "atk",
+				"kind": "mult",
+				"value": 0.25,
+				"turns": 1
+			}
+		]
+	},
+	"_note_v12": "v12: el jefe conserva la pasiva de combate de v11 (turn_start/battle_start de estadisticas) para que la dificultad del contenido no cambie al rediseñar las pasivas del roster; sus habilidades si usan las nuevas mecanicas."
 }

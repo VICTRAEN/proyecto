@@ -9,5 +9,23 @@
 		"speed": 155,
 		"crit_rate": 0.16,
 		"dodge_rate": 0.08
-	}
+	},
+	"passive": {
+		"id": "pas_goku_saiyan",
+		"name": "Super Saiyan",
+		"description": "Cada turno su poder crece: sube un 20% su ataque.",
+		"trigger": "turn_start",
+		"condition": {},
+		"effects": [
+			{
+				"type": "stat_mod",
+				"target": "self",
+				"stat": "atk",
+				"kind": "mult",
+				"value": 0.2,
+				"turns": 1
+			}
+		]
+	},
+	"_note_v12": "v12: el jefe conserva la pasiva de combate de v11 (turn_start/battle_start de estadisticas) para que la dificultad del contenido no cambie al rediseñar las pasivas del roster; sus habilidades si usan las nuevas mecanicas."
 }

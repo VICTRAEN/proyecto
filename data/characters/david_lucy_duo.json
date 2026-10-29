@@ -42,27 +42,20 @@
 	"passive": {
 		"id": "pas_duo_netrunner_sandevistan",
 		"name": "Netrunner y Sandevistan",
-		"description": "Al empezar el combate gana un 12% de velocidad y 6 puntos de critico de forma permanente.",
-		"trigger": "battle_start",
+		"trigger": "on_attack",
 		"condition": {},
 		"effects": [
-			{
-				"type": "stat_mod",
-				"target": "self",
-				"stat": "speed",
-				"kind": "mult",
-				"value": 0.12,
-				"turns": 0
-			},
 			{
 				"type": "stat_mod",
 				"target": "self",
 				"stat": "crit_rate",
 				"kind": "flat",
 				"value": 0.06,
-				"turns": 0
+				"turns": 3,
+				"stacks_max": 4
 			}
-		]
+		],
+		"description": "Al atacar: Propio: CRITICO +6 pts (3 turnos), acumulable x4."
 	},
 	"skills": [
 		{
@@ -79,17 +72,18 @@
 			"id": "sk_duo_02",
 			"name": "Sobrecarga sincronizada",
 			"kind": "special",
-			"power": 235,
+			"power": 120,
 			"cost": 3,
 			"target": "enemy",
-			"description": "Golpe conjunto de los dos. Recupera 1 SP con el impulso.",
+			"description": "Golpea a un rival: 2 golpes de poder 120. Propio: +1 SP.",
 			"effects": [
 				{
 					"type": "sp_gain",
 					"target": "self",
 					"amount": 1
 				}
-			]
+			],
+			"hits": 2
 		}
 	],
 	"transformations": [],
@@ -97,33 +91,25 @@
 		"passive": {
 			"id": "pas_duo_ur_sandevistan_total",
 			"name": "Sandevistan total",
-			"description": "Al empezar el combate gana un 18% de velocidad y 8 puntos de critico de forma permanente.",
-			"trigger": "battle_start",
+			"trigger": "on_attack",
 			"condition": {},
 			"effects": [
 				{
 					"type": "stat_mod",
 					"target": "self",
-					"stat": "speed",
-					"kind": "mult",
-					"value": 0.18,
-					"turns": 0
-				},
-				{
-					"type": "stat_mod",
-					"target": "self",
 					"stat": "crit_rate",
 					"kind": "flat",
-					"value": 0.08,
-					"turns": 0
+					"value": 0.09,
+					"turns": 3,
+					"stacks_max": 4
 				}
-			]
+			],
+			"description": "Al atacar: Propio: CRITICO +9 pts (3 turnos), acumulable x4."
 		},
 		"passive_extra": {
 			"id": "pas_duo_ur_red_de_apoyo",
 			"name": "Red de apoyo",
-			"description": "Desde la ronda 2 su hackeo sube un 15% el ataque de todo el equipo.",
-			"trigger": "turn_start",
+			"trigger": "round_start",
 			"condition": {
 				"type": "round_at_least",
 				"value": 2
@@ -137,7 +123,8 @@
 					"value": 0.15,
 					"turns": 1
 				}
-			]
+			],
+			"description": "Al empezar cada ronda, desde la ronda 2: Equipo: ATAQUE +15% (1 turno)."
 		},
 		"links": [
 			"inquebrantables"

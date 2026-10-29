@@ -9,5 +9,21 @@
 		"speed": 142,
 		"crit_rate": 0.14,
 		"dodge_rate": 0.06
-	}
+	},
+	"passive": {
+		"id": "pas_denji_motosierra",
+		"name": "Motosierra",
+		"description": "Siempre vuelve a levantarse: al comenzar su turno recupera un 7% de su vida maxima.",
+		"trigger": "turn_start",
+		"condition": {},
+		"effects": [
+			{
+				"type": "heal",
+				"target": "self",
+				"amount": 0.07,
+				"of": "max_hp"
+			}
+		]
+	},
+	"_note_v12": "v12: el jefe conserva la pasiva de combate de v11 (turn_start/battle_start de estadisticas) para que la dificultad del contenido no cambie al rediseñar las pasivas del roster; sus habilidades si usan las nuevas mecanicas."
 }

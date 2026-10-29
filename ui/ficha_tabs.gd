@@ -299,7 +299,7 @@ static func build_links(unit: CombatUnit, party_ids: Array) -> Control:
 		if bool(link.get("active", false)):
 			active_count += 1
 
-	box.add_child(note("Un link se enciende cuando DOS personajes del equipo lo comparten. Activos ahora: %d / %d." % [active_count, status.size()]))
+	box.add_child(note("Un link se enciende con DOS personajes del equipo y mejora con 3 y 4. Activos ahora: %d / %d." % [active_count, status.size()]))
 
 	for link in status:
 		box.add_child(_link_card(link, unit, party_ids))
@@ -339,11 +339,26 @@ static func _link_card(link: Dictionary, unit: CombatUnit, party_ids: Array) -> 
 		var description_label := body_text(description, VI.INK_SOFT if active else VI.INK_DIM)
 		inner.add_child(description_label)
 
-	for effect in link.get("effects", []):
-		if effect is Dictionary:
-			inner.add_child(body_text(effect_text(effect), accent if active else VI.INK_DIM))
+	# v12: los links tienen NIVELES (2, 3 y 4 portadores). Cada nivel muestra sus
+	# reglas, si esta alcanzado y a quien beneficia.
+	var beneficiaries := {}
+	for row in GameState.team_synergy_report():
+		if String(row.get("id", "")) == String(link.get("id", "")):
+			for tier_row in row["tiers"]:
+				for rule_row in tier_row["rules"]:
+					beneficiaries[String(rule_row.get("name", ""))] = rule_row.get("who_names", [])
+	var holders := int(link.get("holders", 0))
+	for tier in link.get("tiers", []):
+		var reached := holders >= int(tier["need"])
+		var tier_color := accent if reached else VI.INK_DIM
+		inner.add_child(body_text("NIVEL con %d en el equipo%s" % [int(tier["need"]), "  (ALCANZADO)" if reached else ""], tier_color))
+		for rule in tier["rules"]:
+			inner.add_child(body_text("- %s: %s" % [String(rule.get("name", "")), String(rule.get("text", ""))], VI.INK_SOFT if reached else VI.INK_DIM))
+			var who: Array = beneficiaries.get(String(rule.get("name", "")), [])
+			if reached and not who.is_empty():
+				inner.add_child(note("   Beneficia a: %s." % ", ".join(PackedStringArray(who))))
 
-	inner.add_child(note("En el equipo: %d." % int(link.get("holders", 0))))
+	inner.add_child(note("En el equipo: %d." % holders))
 
 	# Con quien se comparte. Barato de obtener y es justo lo que el jugador
 	# necesita para decidir a quien poner al lado.

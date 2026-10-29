@@ -11,26 +11,40 @@
 		"back": "res://art/characters/yuno/back.png",
 		"icon": "res://art/characters/yuno/icon.png"
 	},
-	"roles": ["Damage Dealer"],
+	"roles": [
+		"Damage Dealer"
+	],
 	"stats": {
 		"max_hp": 1240,
 		"atk": 214,
 		"def": 82,
 		"speed": 128,
 		"crit_rate": 0.15,
-		"dodge_rate": 0.10
+		"dodge_rate": 0.1
 	},
-	"categories": ["shonen", "fantasy", "rivals", "geniuses"],
-	"links": ["rivales", "energia-oculta"],
+	"categories": [
+		"shonen",
+		"fantasy",
+		"rivals",
+		"geniuses"
+	],
+	"links": [
+		"rivales",
+		"energia-oculta"
+	],
 	"passive": {
 		"id": "pas_yuno_viento",
 		"name": "Bendicion del viento",
-		"description": "El mana le rodea: al comenzar su turno gana 15 puntos de probabilidad de critico.",
-		"trigger": "turn_start",
+		"trigger": "on_crit",
 		"condition": {},
 		"effects": [
-			{ "type": "stat_mod", "target": "self", "stat": "crit_rate", "kind": "flat", "value": 0.15, "turns": 1 }
-		]
+			{
+				"type": "damage",
+				"target": "random_enemy",
+				"power": 70
+			}
+		],
+		"description": "Al asestar un critico: Golpe extra de poder 70 a: un rival al azar."
 	},
 	"skills": [
 		{
@@ -50,9 +64,16 @@
 			"power": 180,
 			"cost": 3,
 			"target": "enemy_all",
-			"description": "Barre a todos los rivales y afila su instinto: +15 puntos de critico durante 2 turnos.",
+			"description": "Golpea a todos los rivales: 1 golpe de poder 180. Propio: CRITICO +15 pts (2 turnos).",
 			"effects": [
-				{ "type": "stat_mod", "target": "self", "stat": "crit_rate", "kind": "flat", "value": 0.15, "turns": 2 }
+				{
+					"type": "stat_mod",
+					"target": "self",
+					"stat": "crit_rate",
+					"kind": "flat",
+					"value": 0.15,
+					"turns": 2
+				}
 			]
 		}
 	],
@@ -61,25 +82,41 @@
 		"passive": {
 			"id": "pas_yuno_ur_viento",
 			"name": "Bendicion del espiritu del viento",
-			"description": "Al comenzar su turno gana 25 puntos de critico y sube un 15% su velocidad.",
-			"trigger": "turn_start",
+			"trigger": "on_crit",
 			"condition": {},
 			"effects": [
-				{ "type": "stat_mod", "target": "self", "stat": "crit_rate", "kind": "flat", "value": 0.25, "turns": 1 },
-				{ "type": "stat_mod", "target": "self", "stat": "speed", "kind": "mult", "value": 0.15, "turns": 1 }
-			]
+				{
+					"type": "damage",
+					"target": "random_enemy",
+					"power": 98
+				}
+			],
+			"description": "Al asestar un critico: Golpe extra de poder 98 a: un rival al azar."
 		},
 		"passive_extra": {
 			"id": "pas_yuno_ur_mana",
 			"name": "Mana desbordante",
-			"description": "Al comenzar el combate sube un 20% su ataque.",
 			"trigger": "battle_start",
 			"condition": {},
 			"effects": [
-				{ "type": "stat_mod", "target": "self", "stat": "atk", "kind": "mult", "value": 0.2, "turns": 0 }
-			]
+				{
+					"type": "stat_mod",
+					"target": "self",
+					"stat": "atk",
+					"kind": "mult",
+					"value": 0.2,
+					"turns": 0
+				}
+			],
+			"description": "Al empezar el combate: Propio: ATAQUE +20% (todo el combate)."
 		},
-		"links": ["estrategas", "veteranos"],
-		"categories": ["despertados", "leyendas"]
+		"links": [
+			"estrategas",
+			"veteranos"
+		],
+		"categories": [
+			"despertados",
+			"leyendas"
+		]
 	}
 }

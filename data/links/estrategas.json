@@ -2,8 +2,117 @@
 	"id": "estrategas",
 	"name": "Estrategas",
 	"description": "Dos cabezas leyendo el combate: encuentran el hueco antes que nadie.",
-	"effects": [
-		{ "type": "stat_mod", "stat": "crit_rate", "kind": "flat", "value": 0.04 },
-		{ "type": "stat_mod", "stat": "speed", "kind": "mult", "value": 0.03 }
+	"legacy_effects": [
+		{
+			"type": "stat_mod",
+			"stat": "crit_rate",
+			"kind": "flat",
+			"value": 0.04
+		},
+		{
+			"type": "stat_mod",
+			"stat": "speed",
+			"kind": "mult",
+			"value": 0.03
+		}
+	],
+	"tiers": [
+		{
+			"need": 2,
+			"rules": [
+				{
+					"id": "base",
+					"name": "Vinculo",
+					"who": "holders",
+					"trigger": "static",
+					"condition": {},
+					"effects": [
+						{
+							"type": "stat_mod",
+							"stat": "crit_rate",
+							"kind": "flat",
+							"value": 0.04,
+							"target": "self",
+							"turns": 0
+						},
+						{
+							"type": "stat_mod",
+							"stat": "speed",
+							"kind": "mult",
+							"value": 0.03,
+							"target": "self",
+							"turns": 0
+						}
+					],
+					"description": "Siempre: Propio: CRITICO +4 pts (todo el combate); Propio: VELOCIDAD +3% (todo el combate).",
+					"text": "Siempre: Propio: CRITICO +4 pts (todo el combate); Propio: VELOCIDAD +3% (todo el combate)."
+				},
+				{
+					"id": "plan",
+					"name": "Plan de batalla",
+					"trigger": "round_start",
+					"condition": {},
+					"effects": [
+						{
+							"type": "stat_mod",
+							"target": "enemy_strongest",
+							"stat": "dmg_taken",
+							"kind": "flat",
+							"value": 0.12,
+							"turns": 2
+						}
+					],
+					"cooldown": 3,
+					"description": "Al empezar cada ronda (cada 3 rondas): Rival mas fuerte: DANO RECIBIDO +12% (2 turnos).",
+					"who": "first",
+					"text": "Al empezar cada ronda (cada 3 rondas): Rival mas fuerte: DANO RECIBIDO +12% (2 turnos)."
+				}
+			]
+		},
+		{
+			"need": 3,
+			"rules": [
+				{
+					"id": "preparativos",
+					"name": "Preparativos",
+					"trigger": "battle_start",
+					"condition": {},
+					"effects": [
+						{
+							"type": "sp_gain",
+							"target": "ally_all",
+							"amount": 1
+						}
+					],
+					"description": "Al empezar el combate: Equipo: +1 SP.",
+					"who": "first",
+					"text": "Al empezar el combate: Equipo: +1 SP."
+				}
+			]
+		},
+		{
+			"need": 4,
+			"rules": [
+				{
+					"id": "punto",
+					"name": "Punto debil",
+					"trigger": "static",
+					"condition": {},
+					"effects": [
+						{
+							"type": "stat_mod",
+							"target": "self",
+							"stat": "pierce",
+							"kind": "flat",
+							"value": 0.12,
+							"turns": 0
+						}
+					],
+					"description": "Siempre: Propio: PERFORACION +12% (todo el combate).",
+					"who": "holders",
+					"text": "Siempre: Propio: PERFORACION +12% (todo el combate)."
+				}
+			]
+		}
 	]
 }

@@ -2,8 +2,121 @@
 	"id": "outlaws",
 	"name": "Proscritos",
 	"description": "Fuera de la ley se sobrevive esquivando. Se cubren las espaldas.",
-	"effects": [
-		{ "type": "stat_mod", "stat": "dodge_rate", "kind": "flat", "value": 0.05 },
-		{ "type": "stat_mod", "stat": "speed", "kind": "mult", "value": 0.04 }
+	"legacy_effects": [
+		{
+			"type": "stat_mod",
+			"stat": "dodge_rate",
+			"kind": "flat",
+			"value": 0.05
+		},
+		{
+			"type": "stat_mod",
+			"stat": "speed",
+			"kind": "mult",
+			"value": 0.04
+		}
+	],
+	"tiers": [
+		{
+			"need": 2,
+			"rules": [
+				{
+					"id": "base",
+					"name": "Vinculo",
+					"who": "holders",
+					"trigger": "static",
+					"condition": {},
+					"effects": [
+						{
+							"type": "stat_mod",
+							"stat": "dodge_rate",
+							"kind": "flat",
+							"value": 0.05,
+							"target": "self",
+							"turns": 0
+						},
+						{
+							"type": "stat_mod",
+							"stat": "speed",
+							"kind": "mult",
+							"value": 0.04,
+							"target": "self",
+							"turns": 0
+						}
+					],
+					"description": "Siempre: Propio: ESQUIVA +5 pts (todo el combate); Propio: VELOCIDAD +4% (todo el combate).",
+					"text": "Siempre: Propio: ESQUIVA +5 pts (todo el combate); Propio: VELOCIDAD +4% (todo el combate)."
+				},
+				{
+					"id": "sinreglas",
+					"name": "Sin reglas",
+					"trigger": "on_dodge",
+					"condition": {},
+					"effects": [
+						{
+							"type": "damage",
+							"target": "trigger_target",
+							"power": 70
+						}
+					],
+					"description": "Al esquivar: Golpe extra de poder 70 a: atacante.",
+					"who": "holders",
+					"text": "Al esquivar: Golpe extra de poder 70 a: atacante."
+				}
+			]
+		},
+		{
+			"need": 3,
+			"rules": [
+				{
+					"id": "calle",
+					"name": "Ley de la calle",
+					"trigger": "static",
+					"condition": {},
+					"effects": [
+						{
+							"type": "stat_mod",
+							"target": "self",
+							"stat": "dodge_rate",
+							"kind": "flat",
+							"value": 0.05,
+							"turns": 0
+						},
+						{
+							"type": "stat_mod",
+							"target": "self",
+							"stat": "speed",
+							"kind": "mult",
+							"value": 0.05,
+							"turns": 0
+						}
+					],
+					"description": "Siempre: Propio: ESQUIVA +5 pts (todo el combate); Propio: VELOCIDAD +5% (todo el combate).",
+					"who": "holders",
+					"text": "Siempre: Propio: ESQUIVA +5 pts (todo el combate); Propio: VELOCIDAD +5% (todo el combate)."
+				}
+			]
+		},
+		{
+			"need": 4,
+			"rules": [
+				{
+					"id": "botin",
+					"name": "Botin",
+					"trigger": "on_kill",
+					"condition": {},
+					"effects": [
+						{
+							"type": "sp_gain",
+							"target": "self",
+							"amount": 1
+						}
+					],
+					"description": "Al derrotar a un rival: Propio: +1 SP.",
+					"who": "holders",
+					"text": "Al derrotar a un rival: Propio: +1 SP."
+				}
+			]
+		}
 	]
 }

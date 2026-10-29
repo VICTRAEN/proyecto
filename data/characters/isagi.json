@@ -11,26 +11,51 @@
 		"back": "res://art/characters/isagi/back.png",
 		"icon": "res://art/characters/isagi/icon.png"
 	},
-	"roles": ["Damage Dealer"],
+	"roles": [
+		"Damage Dealer"
+	],
 	"stats": {
 		"max_hp": 1180,
 		"atk": 208,
 		"def": 80,
 		"speed": 118,
 		"crit_rate": 0.14,
-		"dodge_rate": 0.10
+		"dodge_rate": 0.1
 	},
-	"categories": ["protagonists", "spokon", "geniuses", "teamwork"],
-	"links": ["spokon", "estrategas"],
+	"categories": [
+		"protagonists",
+		"spokon",
+		"geniuses",
+		"teamwork"
+	],
+	"links": [
+		"spokon",
+		"estrategas"
+	],
 	"passive": {
 		"id": "pas_isagi_metavision",
 		"name": "Metavision",
-		"description": "Al comenzar su turno su instinto le da 20 puntos de critico. No se acumula.",
 		"trigger": "turn_start",
 		"condition": {},
 		"effects": [
-			{ "type": "stat_mod", "target": "self", "stat": "crit_rate", "kind": "flat", "value": 0.2, "turns": 1 }
-		]
+			{
+				"type": "stat_mod",
+				"target": "self",
+				"stat": "crit_rate",
+				"kind": "flat",
+				"value": 0.2,
+				"turns": 1
+			},
+			{
+				"type": "stat_mod",
+				"target": "self",
+				"stat": "crit_dmg",
+				"kind": "flat",
+				"value": 0.3,
+				"turns": 1
+			}
+		],
+		"description": "Al empezar su turno: Propio: CRITICO +20 pts (1 turno); Propio: DANO CRITICO +30% (1 turno)."
 	},
 	"skills": [
 		{
@@ -45,13 +70,29 @@
 		{
 			"id": "sk_isagi_02",
 			"name": "Gol directo",
-			"description": "Dano alto a un rival y sube 20 puntos su propio critico durante 2 turnos.",
+			"description": "Golpea a un rival: 1 golpe de poder 215. Propio: CRITICO +20 pts (2 turnos). x1.4 de poder si el objetivo tiene < 50% de vida.",
 			"kind": "special",
-			"power": 240,
+			"power": 215,
 			"cost": 3,
 			"target": "enemy",
 			"effects": [
-				{ "type": "stat_mod", "target": "self", "stat": "crit_rate", "kind": "flat", "value": 0.2, "turns": 2 }
+				{
+					"type": "stat_mod",
+					"target": "self",
+					"stat": "crit_rate",
+					"kind": "flat",
+					"value": 0.2,
+					"turns": 2
+				}
+			],
+			"bonus": [
+				{
+					"condition": {
+						"type": "target_hp_below",
+						"value": 0.5
+					},
+					"power_mult": 1.35
+				}
 			]
 		}
 	],
@@ -60,24 +101,52 @@
 		"passive": {
 			"id": "pas_isagi_ur_metavision",
 			"name": "Metavision total",
-			"description": "Ve el campo entero: al comenzar su turno gana 30 puntos de critico.",
 			"trigger": "turn_start",
 			"condition": {},
 			"effects": [
-				{ "type": "stat_mod", "target": "self", "stat": "crit_rate", "kind": "flat", "value": 0.3, "turns": 1 }
-			]
+				{
+					"type": "stat_mod",
+					"target": "self",
+					"stat": "crit_rate",
+					"kind": "flat",
+					"value": 0.3,
+					"turns": 1
+				},
+				{
+					"type": "stat_mod",
+					"target": "self",
+					"stat": "crit_dmg",
+					"kind": "flat",
+					"value": 0.45,
+					"turns": 1
+				}
+			],
+			"description": "Al empezar su turno: Propio: CRITICO +30 pts (1 turno); Propio: DANO CRITICO +45% (1 turno)."
 		},
 		"passive_extra": {
 			"id": "pas_isagi_ur_olfato",
 			"name": "Olfato de gol",
-			"description": "Lee al rival desde el primer minuto: al comenzar el combate le baja un 15% el ataque.",
 			"trigger": "battle_start",
 			"condition": {},
 			"effects": [
-				{ "type": "stat_mod", "target": "enemy", "stat": "atk", "kind": "mult", "value": -0.15, "turns": 2 }
-			]
+				{
+					"type": "stat_mod",
+					"target": "enemy_all",
+					"stat": "atk",
+					"kind": "mult",
+					"value": -0.15,
+					"turns": 3
+				}
+			],
+			"description": "Al empezar el combate: Todos los rivales: ATAQUE -15% (3 turnos)."
 		},
-		"links": ["rivales", "inquebrantables"],
-		"categories": ["despertados", "tacticos"]
+		"links": [
+			"rivales",
+			"inquebrantables"
+		],
+		"categories": [
+			"despertados",
+			"tacticos"
+		]
 	}
 }

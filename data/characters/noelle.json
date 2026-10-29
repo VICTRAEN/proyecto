@@ -11,7 +11,10 @@
 		"back": "res://art/characters/noelle/back.png",
 		"icon": "res://art/characters/noelle/icon.png"
 	},
-	"roles": ["Damage Dealer", "Support"],
+	"roles": [
+		"Damage Dealer",
+		"Support"
+	],
 	"stats": {
 		"max_hp": 1600,
 		"atk": 235,
@@ -20,17 +23,42 @@
 		"crit_rate": 0.13,
 		"dodge_rate": 0.06
 	},
-	"categories": ["fantasy", "shonen", "geniuses", "guardianes"],
-	"links": ["hermanas", "energia-oculta", "heroes"],
+	"categories": [
+		"fantasy",
+		"shonen",
+		"geniuses",
+		"guardianes"
+	],
+	"links": [
+		"hermanas",
+		"energia-oculta",
+		"heroes"
+	],
 	"passive": {
 		"id": "pas_noelle_orgullo",
 		"name": "Orgullo Silva",
-		"description": "Al comenzar su turno su ataque sube un 30%: no piensa perder ante nadie.",
-		"trigger": "turn_start",
+		"trigger": "low_hp",
 		"condition": {},
 		"effects": [
-			{ "type": "stat_mod", "target": "self", "stat": "atk", "kind": "mult", "value": 0.3, "turns": 1 }
-		]
+			{
+				"type": "stat_mod",
+				"target": "self",
+				"stat": "atk",
+				"kind": "mult",
+				"value": 0.35,
+				"turns": 3
+			},
+			{
+				"type": "shield",
+				"target": "self",
+				"amount": 0.12,
+				"of": "max_hp",
+				"turns": 3
+			}
+		],
+		"once": true,
+		"threshold": 0.5,
+		"description": "Al bajar del 50% de vida (1 vez por combate): Propio: ATAQUE +35% (3 turnos); Propio: escudo de 12% de VIDA MAX (3 turnos)."
 	},
 	"skills": [
 		{
@@ -45,14 +73,28 @@
 		{
 			"id": "sk_noelle_02",
 			"name": "Valquiria del mar",
-			"description": "Blinda su armadura de agua: sube un 25% su defensa durante 2 turnos y baja un 15% el ataque del rival.",
+			"description": "Golpea a un rival: 1 golpe de poder 185. Propio: REDUCCION DE DANO +12% (2 turnos). Rival: ATAQUE -15% (2 turnos).",
 			"kind": "special",
 			"power": 185,
 			"cost": 3,
 			"target": "enemy",
 			"effects": [
-				{ "type": "stat_mod", "target": "self", "stat": "def", "kind": "mult", "value": 0.25, "turns": 2 },
-				{ "type": "stat_mod", "target": "enemy", "stat": "atk", "kind": "mult", "value": -0.15, "turns": 2 }
+				{
+					"type": "stat_mod",
+					"target": "self",
+					"stat": "dmg_reduction",
+					"kind": "flat",
+					"value": 0.12,
+					"turns": 2
+				},
+				{
+					"type": "stat_mod",
+					"target": "enemy",
+					"stat": "atk",
+					"kind": "mult",
+					"value": -0.15,
+					"turns": 2
+				}
 			]
 		}
 	],

@@ -11,7 +11,10 @@
 		"back": "res://art/characters/yami/back.png",
 		"icon": "res://art/characters/yami/icon.png"
 	},
-	"roles": ["Damage Dealer", "Tank"],
+	"roles": [
+		"Damage Dealer",
+		"Tank"
+	],
 	"stats": {
 		"max_hp": 1520,
 		"atk": 226,
@@ -20,17 +23,31 @@
 		"crit_rate": 0.11,
 		"dodge_rate": 0.05
 	},
-	"categories": ["shonen", "fantasy", "veterans", "determination"],
-	"links": ["mentores", "inquebrantables", "veteranos"],
+	"categories": [
+		"shonen",
+		"fantasy",
+		"veterans",
+		"determination"
+	],
+	"links": [
+		"mentores",
+		"inquebrantables",
+		"veteranos"
+	],
 	"passive": {
 		"id": "pas_yami_presencia",
 		"name": "Presencia oscura",
-		"description": "Aguanta de pie lo que haga falta: al comenzar su turno sube un 30% su defensa.",
-		"trigger": "turn_start",
+		"trigger": "on_hit",
 		"condition": {},
 		"effects": [
-			{ "type": "stat_mod", "target": "self", "stat": "def", "kind": "mult", "value": 0.3, "turns": 1 }
-		]
+			{
+				"type": "damage",
+				"target": "trigger_target",
+				"power": 90
+			}
+		],
+		"chance": 0.5,
+		"description": "Al recibir un golpe (50% de prob.): Golpe extra de poder 90 a: atacante."
 	},
 	"skills": [
 		{
@@ -50,10 +67,9 @@
 			"power": 300,
 			"cost": 3,
 			"target": "enemy",
-			"description": "Corta el espacio y le devuelve un 8% de su vida maxima.",
-			"effects": [
-				{ "type": "heal", "target": "self", "amount": 0.08, "of": "max_hp" }
-			]
+			"description": "Golpea a un rival: 1 golpe de poder 300. roba 25% del dano como vida.",
+			"effects": [],
+			"lifesteal": 0.25
 		}
 	],
 	"transformations": [],
@@ -61,25 +77,41 @@
 		"passive": {
 			"id": "pas_yami_ur_presencia",
 			"name": "Presencia de capitan",
-			"description": "Aguanta aun mas: al comenzar su turno sube un 45% su defensa y recupera un 6% de su vida maxima.",
-			"trigger": "turn_start",
+			"trigger": "on_hit",
 			"condition": {},
 			"effects": [
-				{ "type": "stat_mod", "target": "self", "stat": "def", "kind": "mult", "value": 0.45, "turns": 1 },
-				{ "type": "heal", "target": "self", "amount": 0.06, "of": "max_hp" }
-			]
+				{
+					"type": "damage",
+					"target": "trigger_target",
+					"power": 126
+				}
+			],
+			"chance": 0.7,
+			"description": "Al recibir un golpe (70% de prob.): Golpe extra de poder 126 a: atacante."
 		},
 		"passive_extra": {
 			"id": "pas_yami_ur_espiritu_lobo",
 			"name": "Espiritu del lobo",
-			"description": "Al comenzar el combate sube un 25% su ataque.",
 			"trigger": "battle_start",
 			"condition": {},
 			"effects": [
-				{ "type": "stat_mod", "target": "self", "stat": "atk", "kind": "mult", "value": 0.25, "turns": 0 }
-			]
+				{
+					"type": "stat_mod",
+					"target": "self",
+					"stat": "atk",
+					"kind": "mult",
+					"value": 0.25,
+					"turns": 0
+				}
+			],
+			"description": "Al empezar el combate: Propio: ATAQUE +25% (todo el combate)."
 		},
-		"links": ["energia-oculta"],
-		"categories": ["despertados", "guardianes"]
+		"links": [
+			"energia-oculta"
+		],
+		"categories": [
+			"despertados",
+			"guardianes"
+		]
 	}
 }
