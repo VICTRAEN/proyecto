@@ -1,0 +1,13 @@
+{
+	"id": "wk_invocar",
+	"name": "FIEBRE DEL GACHA",
+	"description": "Realiza 10 invocaciones.",
+	"period": "weekly",
+	"objective": {
+		"type": "summon"
+	},
+	"target": 10,
+	"reward_coins": 600,
+	"reward_gems": 20,
+	"category": "SEMANALES"
+}

@@ -1,0 +1,13 @@
+{
+	"id": "day_batallas",
+	"name": "CALENTAMIENTO",
+	"description": "Completa 3 combates.",
+	"period": "daily",
+	"objective": {
+		"type": "battle_played"
+	},
+	"target": 3,
+	"reward_coins": 120,
+	"reward_gems": 0,
+	"category": "DIARIAS"
+}

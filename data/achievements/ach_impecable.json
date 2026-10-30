@@ -1,0 +1,17 @@
+{
+	"id": "ach_impecable",
+	"name": "SIN BAJAS",
+	"description": "Gana 10 combates sin que caiga ningun aliado.",
+	"category": "RETOS",
+	"condition": {
+		"type": "challenge",
+		"stat": "flawless_wins",
+		"target": 10
+	},
+	"reward_coins": 900,
+	"reward_gems": 20,
+	"title": {
+		"id": "title_impecable",
+		"name": "Impecable"
+	}
+}

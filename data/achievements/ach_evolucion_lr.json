@@ -1,0 +1,17 @@
+{
+	"id": "ach_evolucion_lr",
+	"name": "LEYENDA VIVA",
+	"description": "Evoluciona un personaje hasta LR.",
+	"category": "EVOLUCION",
+	"condition": {
+		"type": "evolved_rarity",
+		"rarity": "LR",
+		"target": 1
+	},
+	"reward_coins": 2500,
+	"reward_gems": 60,
+	"title": {
+		"id": "title_lr",
+		"name": "Leyenda viva"
+	}
+}

@@ -1,0 +1,16 @@
+{
+	"id": "ach_coleccionista",
+	"name": "COLECCIONISTA",
+	"description": "Ten 20 personajes.",
+	"category": "COLECCION",
+	"condition": {
+		"type": "roster_count",
+		"target": 20
+	},
+	"reward_coins": 800,
+	"reward_gems": 20,
+	"title": {
+		"id": "title_coleccionista",
+		"name": "Coleccionista"
+	}
+}

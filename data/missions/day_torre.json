@@ -1,0 +1,13 @@
+{
+	"id": "day_torre",
+	"name": "ESCALAR",
+	"description": "Supera 1 piso de la torre.",
+	"period": "daily",
+	"objective": {
+		"type": "tower_floor"
+	},
+	"target": 1,
+	"reward_coins": 200,
+	"reward_gems": 5,
+	"category": "DIARIAS"
+}

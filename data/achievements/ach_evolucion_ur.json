@@ -1,0 +1,17 @@
+{
+	"id": "ach_evolucion_ur",
+	"name": "DESPERTAR UR",
+	"description": "Evoluciona un personaje hasta UR.",
+	"category": "EVOLUCION",
+	"condition": {
+		"type": "evolved_rarity",
+		"rarity": "UR",
+		"target": 1
+	},
+	"reward_coins": 1000,
+	"reward_gems": 25,
+	"title": {
+		"id": "title_ur",
+		"name": "Despertado"
+	}
+}

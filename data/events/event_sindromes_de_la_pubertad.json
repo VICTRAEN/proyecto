@@ -3,19 +3,27 @@
 	"name": "SINDROMES DE LA PUBERTAD",
 	"description": "Tres stages contra los celadores que se alimentan del sindrome. Sakuta y Mai lo paran juntos.",
 	"background": "stages",
-	"position": { "x": 0.30, "y": 0.40 },
+	"position": {
+		"x": 0.3,
+		"y": 0.4
+	},
 	"counter": "eventos_completados",
 	"character_reward": "sakuta_mai",
 	"stages": [
 		{
 			"id": "evt_sdp_01",
 			"name": "El primer sintoma",
-			"position": { "x": 0.2, "y": 0.16 },
+			"position": {
+				"x": 0.2,
+				"y": 0.16
+			},
 			"next": "evt_sdp_02",
 			"background": "battle_plain",
 			"dialogue": "dlg_event_sdp_001",
 			"difficulty": "NORMAL",
-			"enemies": ["sdp_todo"],
+			"enemies": [
+				"sdp_todo"
+			],
 			"xp_reward": 240,
 			"coin_reward": 120,
 			"grant_character": "sakuta_mai",
@@ -24,28 +32,43 @@
 		{
 			"id": "evt_sdp_02",
 			"name": "El celador de la visibilidad",
-			"position": { "x": 0.5, "y": 0.34 },
+			"position": {
+				"x": 0.5,
+				"y": 0.34
+			},
 			"next": "evt_sdp_03",
 			"background": "battle_plain",
 			"dialogue": "",
 			"difficulty": "NORMAL",
-			"enemies": ["sdp_mahito", "sdp_todo"],
+			"enemies": [
+				"sdp_mahito",
+				"sdp_todo"
+			],
 			"xp_reward": 320,
 			"coin_reward": 150,
 			"requires_party_character": "sakuta_mai",
 			"drops": [
-				{ "item": "rabbit_costume", "min": 1, "max": 3 }
+				{
+					"item": "rabbit_costume",
+					"min": 1,
+					"max": 3
+				}
 			]
 		},
 		{
 			"id": "evt_sdp_03",
 			"name": "La pubertad se rompe",
-			"position": { "x": 0.74, "y": 0.56 },
+			"position": {
+				"x": 0.74,
+				"y": 0.56
+			},
 			"next": "",
 			"background": "battle_plain",
 			"dialogue": "",
 			"difficulty": "HARD",
-			"enemies": ["sdp_akaza"],
+			"enemies": [
+				"sdp_akaza"
+			],
 			"xp_reward": 460,
 			"coin_reward": 220,
 			"requires_party_character": "sakuta",
@@ -53,7 +76,21 @@
 			"requires_party_size": 1,
 			"requires_party_rarity": "UR",
 			"drops": [
-				{ "item": "rabbit_costume", "min": 1, "max": 3 }, { "item": "mai_token", "min": 1, "max": 1 }]
+				{
+					"item": "rabbit_costume",
+					"min": 1,
+					"max": 3
+				},
+				{
+					"item": "mai_token",
+					"min": 1,
+					"max": 1
+				}
+			]
 		}
+	],
+	"story": [
+		"Los celadores se alimentan del sindrome de quienes dejan de ser vistos.",
+		"Sakuta y Mai tienen que pararlos juntos."
 	]
 }

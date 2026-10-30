@@ -1,0 +1,16 @@
+{
+	"id": "ach_jefe_10",
+	"name": "CAZAJEFES",
+	"description": "Derrota a 10 jefes.",
+	"category": "JEFES",
+	"condition": {
+		"type": "boss_kills",
+		"target": 10
+	},
+	"reward_coins": 1200,
+	"reward_gems": 30,
+	"title": {
+		"id": "title_cazajefes",
+		"name": "Cazajefes"
+	}
+}

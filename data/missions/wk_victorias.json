@@ -1,0 +1,13 @@
+{
+	"id": "wk_victorias",
+	"name": "SEMANA DE GUERRA",
+	"description": "Gana 15 combates.",
+	"period": "weekly",
+	"objective": {
+		"type": "battle_won"
+	},
+	"target": 15,
+	"reward_coins": 900,
+	"reward_gems": 15,
+	"category": "SEMANALES"
+}

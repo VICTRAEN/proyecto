@@ -51,6 +51,7 @@ const ResultPanel := preload("res://ui/result_panel.gd")
 const VisualIdentity := preload("res://ui/visual_identity.gd")
 const NAV := preload("res://scenes/nav.gd")
 const CombatFx := preload("res://ui/combat_fx.gd")
+const BossFx := preload("res://ui/boss_fx.gd")
 
 ## Todo lo que ya existe en la identidad visual se toma de alli, para que el HUD
 ## no invente colores. Los dos avisos que no existen en ella (critico y
@@ -162,6 +163,8 @@ func _ready() -> void:
 	manager.log_added.connect(_on_log_added)
 	manager.battle_finished.connect(_on_battle_finished)
 	manager.ultimate_started.connect(_on_ultimate_started)
+	manager.boss_intro.connect(_on_boss_intro)
+	manager.phase_changed.connect(_on_phase_changed)
 	_build_ultimate_button()
 	_build_speed_auto_buttons()
 
@@ -198,6 +201,7 @@ func _ready() -> void:
 	# decide esto: lo fija GameState al preparar la batalla.
 	manager.setup(GameState.battle_party_data(), GameState.enemy_data(), GameState.battle_reserve_data())
 	manager.reserve_entered.connect(_on_reserve_entered)
+	manager.survive_rounds = int(GameState.current_stage().get("survive_rounds", 0))
 	if manager.allies.is_empty() or manager.enemies.is_empty():
 		_on_log_added("No se han podido cargar los datos de personajes o enemigos.", "system")
 		return
@@ -345,6 +349,32 @@ func _show_link_notice() -> void:
 	var tween := create_tween().set_parallel(true)
 	tween.tween_property(label, "modulate:a", 0.0, 0.5).set_delay(1.5)
 	tween.finished.connect(label.queue_free)
+
+
+## Presentacion de jefe (v14): se salta tocando. Mientras dura, el combate espera.
+func _on_boss_intro(unit: CombatUnit, info: Dictionary) -> void:
+	GameAudio.play("special")
+	var art := unit.art_for("front")
+	var layer: Control = BossFx.intro(self, unit.id, art, info, manager.close_intro)
+	if layer == null:
+		manager.close_intro()
+	boss_intro_count += 1
+	BossFx.ambient(self, BossFx.color_of(info, GOLD))
+
+
+## Cambio de fase de un jefe: aviso grande y onda desde su tarjeta.
+func _on_phase_changed(unit: CombatUnit, _index: int, phase: Dictionary) -> void:
+	var card: Control = cards.get(unit.source_key, null)
+	var banner := String(phase.get("banner", phase.get("name", "")))
+	BossFx.phase(self, card, banner, BossFx.color_of(phase, GOLD))
+	GameAudio.play("special")
+	phase_fx_count += 1
+	if card != null:
+		_refresh_all()
+
+
+var boss_intro_count := 0
+var phase_fx_count := 0
 
 
 func _on_round_started(round_number: int, _order_names: Array) -> void:
@@ -786,6 +816,15 @@ func _make_dialog_button(label_text: String) -> Button:
 ## GameState: una batalla no paga dos veces. Quien paga es siempre
 ## GameState.grant_battle_rewards, nunca la interfaz.
 func _grant_rewards(victory: bool) -> Dictionary:
+	# v14: lo que el combate sabe y el estado del jugador no (rondas y aliados caidos)
+	# viaja a GameState para los logros de reto; se consume al cobrar.
+	if manager != null:
+		var alive_now := 0
+		for ally in manager.allies:
+			if ally.alive:
+				alive_now += 1
+		var fallen := manager.participant_ids().size() - alive_now
+		GameState.last_battle_info = { "rounds": manager.round_number, "fallen": fallen }
 	if _rewards_claimed:
 		return { "xp": 0, "coins": 0, "characters": [], "granted": false, "unlocked": [] }
 	_rewards_claimed = true
@@ -1051,6 +1090,8 @@ func _play_feedback(payload: Dictionary) -> void:
 	var actor_key := String(payload.get("actor_key", ""))
 	var kind := String(payload.get("kind", "basic"))
 	var skill_name := String(payload.get("skill_name", ""))
+	var actor_unit: CombatUnit = manager.find_unit(actor_key) if manager != null else null
+	var actor_type := actor_unit.type if actor_unit != null else ""
 
 	# Que se ha usado, antes que cuanto ha hecho: una Super o una pasiva se
 	# anuncian con su nombre.
@@ -1112,6 +1153,12 @@ func _play_feedback(payload: Dictionary) -> void:
 							34
 						)
 					card.flash(Color(1.0, 0.35, 0.35), 0.9)
+					# v14: chispas en el punto de impacto; el enemigo reacciona con
+					# un golpe (hit_shake). Critico y especial pegan mas fuerte.
+					var strong := bool(hit.get("crit", false)) or kind in ["special", "ultimate"]
+					BossFx.impact(self, card.global_position + card.size * 0.5, TypeColors.color_for(actor_type) if actor_type != "" else DAMAGE_COLOR, strong)
+					if not card.unit.is_ally:
+						CombatFx.hit_shake(card, 22.0 if strong else 12.0)
 			"heal":
 				var healed := int(round(float(hit.get("value", 0.0))))
 				if healed > 0:

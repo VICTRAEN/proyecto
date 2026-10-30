@@ -1,0 +1,13 @@
+{
+	"id": "ach_torre_10",
+	"name": "SUBIENDO",
+	"description": "Llega al piso 10 de la torre.",
+	"category": "TORRE",
+	"condition": {
+		"type": "tower_floor",
+		"tower": "tower_001",
+		"target": 10
+	},
+	"reward_coins": 500,
+	"reward_gems": 10
+}

@@ -1,0 +1,15 @@
+{
+	"id": "day_equipo_shonen",
+	"name": "ESPIRITU SHONEN",
+	"description": "Gana un combate con 2 personajes Shonen en el equipo.",
+	"period": "daily",
+	"objective": {
+		"type": "category_win",
+		"category": "shonen",
+		"min": 2
+	},
+	"target": 1,
+	"reward_coins": 180,
+	"reward_gems": 0,
+	"category": "DIARIAS"
+}

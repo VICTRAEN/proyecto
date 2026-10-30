@@ -1,0 +1,17 @@
+{
+	"id": "ach_celador",
+	"name": "FIN DEL SINDROME",
+	"description": "Derrota al Celador del Sindrome.",
+	"category": "JEFES",
+	"condition": {
+		"type": "boss_kills",
+		"boss": "boss_sakuta",
+		"target": 1
+	},
+	"reward_coins": 1500,
+	"reward_gems": 40,
+	"title": {
+		"id": "title_celador",
+		"name": "Roto el sindrome"
+	}
+}

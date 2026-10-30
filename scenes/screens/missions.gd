@@ -33,9 +33,81 @@ const RING := preload("res://ui/progress_ring.gd")
 @onready var back_button: Button = $Margin/Main/BackButton
 
 
+## v14: pestanas. DIARIAS y SEMANALES salen de core/meta_progress.gd (se reinician
+## solas por fecha), PERMANENTES son las de siempre y LOGROS lleva ademas los titulos.
+const TABS := [["daily", "DIARIAS"], ["weekly", "SEMANALES"], ["permanent", "PERMANENTES"], ["achievements", "LOGROS"]]
+var _tab := "daily"
+var _tab_buttons: Dictionary = {}
+
+
 func _ready() -> void:
 	_apply_identity()
 	back_button.pressed.connect(_back)
+	_build_tabs()
+
+
+func _build_tabs() -> void:
+	var row := HBoxContainer.new()
+	row.name = "Tabs"
+	row.add_theme_constant_override("separation", 6)
+	var main_box := list.get_parent().get_parent()
+	main_box.add_child(row)
+	main_box.move_child(row, list.get_parent().get_index())
+	for entry in TABS:
+		var button := Button.new()
+		button.text = String(entry[1])
+		button.toggle_mode = true
+		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		button.custom_minimum_size = Vector2(0, 56)
+		button.add_theme_font_size_override("font_size", VI.FONT_SMALL)
+		button.pressed.connect(_select_tab.bind(String(entry[0])))
+		row.add_child(button)
+		_tab_buttons[String(entry[0])] = button
+
+
+func _select_tab(tab: String) -> void:
+	_tab = tab
+	feedback.text = ""
+	_build_list()
+	_sync_tabs()
+
+
+func _sync_tabs() -> void:
+	for key in _tab_buttons:
+		var button: Button = _tab_buttons[key]
+		button.button_pressed = key == _tab
+		var ready_n := _ready_count(String(key))
+		var base := ""
+		for entry in TABS:
+			if entry[0] == key:
+				base = String(entry[1])
+		button.text = "%s (%d)" % [base, ready_n] if ready_n > 0 else base
+		VI.tint_button(button, VI.GOLD if key == _tab else VI.INK_DIM)
+
+
+func _ready_count(tab: String) -> int:
+	var n := 0
+	for m in _entries_for(tab):
+		if bool(m["completed"]) and not bool(m["claimed"]):
+			n += 1
+	return n
+
+
+func _entries_for(tab: String) -> Array:
+	match tab:
+		"daily":
+			return GameState.meta.periodic_list("daily")
+		"weekly":
+			return GameState.meta.periodic_list("weekly")
+		"achievements":
+			var out: Array = []
+			for id in GameState.meta.achievement_ids():
+				var st: Dictionary = GameState.meta.achievement_state(String(id))
+				st["kind"] = "achievement"
+				# Un logro cumplido sin reclamar se puede cobrar; check lo marca.
+				out.append(st)
+			return out
+	return GameState.all_missions_state()
 
 
 ## Aspecto estatico de la pantalla, con los tokens de la identidad visual.
@@ -50,8 +122,10 @@ func _apply_identity() -> void:
 
 func refresh() -> void:
 	feedback.text = ""
+	GameState.meta.check_achievements()
 	_build_counters()
 	_build_list()
+	_sync_tabs()
 
 
 ## Contadores globales del jugador, como CHIPS en una fila (no un parrafo). Son los
@@ -101,7 +175,12 @@ func _build_counters() -> void:
 ## primero las que se pueden RECLAMAR, luego las activas y al final las cobradas.
 func _build_list() -> void:
 	_clear(list)
-	var missions: Array = GameState.all_missions_state()
+	var missions: Array = _entries_for(_tab)
+	if _tab == "achievements":
+		list.add_child(_make_titles_row())
+	elif _tab != "permanent":
+		var period := "daily" if _tab == "daily" else "weekly"
+		list.add_child(_make_reset_label(period))
 	if missions.is_empty():
 		var empty := Label.new()
 		empty.text = "No hay misiones disponibles."
@@ -217,6 +296,8 @@ func _make_card(mission: Dictionary) -> Control:
 	reward.text = "+%d monedas" % reward_coins
 	if reward_gems > 0:
 		reward.text += "\n+%d gemas" % reward_gems
+	if not String(mission.get("title_name", "")).is_empty():
+		reward.text += "\nTitulo: %s" % String(mission["title_name"])
 	reward.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	reward.add_theme_font_size_override("font_size", VI.FONT_TINY)
 	reward.add_theme_color_override("font_color", VI.GOLD if not claimed else VI.INK_DIM)
@@ -229,7 +310,10 @@ func _make_card(mission: Dictionary) -> Control:
 		button.disabled = true
 	elif completed:
 		button.text = "RECLAMAR"
-		button.pressed.connect(_on_claim_pressed.bind(String(mission.get("id", ""))))
+		if String(mission.get("kind", "")) == "achievement":
+			button.pressed.connect(_on_claim_achievement.bind(String(mission.get("id", ""))))
+		else:
+			button.pressed.connect(_on_claim_pressed.bind(String(mission.get("id", ""))))
 	else:
 		button.text = "EN CURSO"
 		button.disabled = true
@@ -273,6 +357,57 @@ func _on_claim_pressed(id: String) -> void:
 		parts.append("%d gemas" % gems_earned)
 	refresh()
 	feedback.text = "%s reclamada: %s" % [String(result.get("name", "Mision")), ", ".join(parts)]
+
+
+## Cobra un logro: el unico sitio que paga es meta.claim_achievement.
+func _on_claim_achievement(id: String) -> void:
+	var result: Dictionary = GameState.meta.claim_achievement(id)
+	if result.is_empty():
+		feedback.text = "Ese logro ya se ha reclamado."
+		refresh()
+		return
+	refresh()
+	feedback.text = "%s reclamado: %d monedas, %d gemas" % [String(result.get("name", "Logro")), int(result.get("coins", 0)), int(result.get("gems", 0))]
+
+
+func _make_reset_label(period: String) -> Control:
+	var l := Label.new()
+	var left := GameState.meta.seconds_left(period)
+	var hours := left / 3600
+	l.text = "Se reinicia en %dd %dh" % [hours / 24, hours % 24] if period == "weekly" else "Se reinicia en %dh %dmin" % [hours, (left % 3600) / 60]
+	l.add_theme_font_size_override("font_size", VI.FONT_TINY)
+	l.add_theme_color_override("font_color", VI.INK_DIM)
+	return l
+
+
+## Titulos conseguidos: el equipado se muestra en dorado; tocar otro lo equipa.
+func _make_titles_row() -> Control:
+	var box := VBoxContainer.new()
+	box.name = "TitlesRow"
+	var head := Label.new()
+	head.text = "TITULO: %s" % GameState.meta.equipped_title_name()
+	head.add_theme_font_size_override("font_size", VI.FONT_BODY)
+	head.add_theme_color_override("font_color", VI.GOLD)
+	box.add_child(head)
+	var flow := HFlowContainer.new()
+	flow.add_theme_constant_override("h_separation", 6)
+	box.add_child(flow)
+	var catalog: Dictionary = GameState.meta.title_catalog()
+	for id in GameState.meta.owned_titles():
+		var b := Button.new()
+		b.text = String(catalog.get(id, id))
+		b.add_theme_font_size_override("font_size", VI.FONT_TINY)
+		b.custom_minimum_size = Vector2(0, 44)
+		VI.tint_button(b, VI.GOLD if id == GameState.meta.equipped_title() else VI.INK_DIM)
+		b.pressed.connect(_on_equip_title.bind(String(id)))
+		flow.add_child(b)
+	return box
+
+
+func _on_equip_title(id: String) -> void:
+	if GameState.meta.equip_title(id):
+		GameState.save_game()
+	_build_list()
 
 
 func _back() -> void:

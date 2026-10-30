@@ -1,0 +1,16 @@
+{
+	"id": "ach_torre_completa",
+	"name": "REY DE LA TORRE",
+	"description": "Completa la torre.",
+	"category": "TORRE",
+	"condition": {
+		"type": "tower_complete",
+		"tower": "tower_001"
+	},
+	"reward_coins": 2500,
+	"reward_gems": 60,
+	"title": {
+		"id": "title_rey_torre",
+		"name": "Rey de la torre"
+	}
+}

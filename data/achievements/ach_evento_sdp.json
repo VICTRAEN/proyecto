@@ -1,0 +1,17 @@
+{
+	"id": "ach_evento_sdp",
+	"name": "SINDROMES DE LA PUBERTAD",
+	"description": "Completa el evento Sindromes de la Pubertad.",
+	"category": "EVENTOS",
+	"condition": {
+		"type": "event_completed",
+		"event": "event_sindromes_de_la_pubertad",
+		"target": 1
+	},
+	"reward_coins": 1000,
+	"reward_gems": 30,
+	"title": {
+		"id": "title_sakuta",
+		"name": "Pareja de conejitos"
+	}
+}

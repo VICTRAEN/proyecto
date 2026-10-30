@@ -1,0 +1,13 @@
+{
+	"id": "day_invocar",
+	"name": "UN POCO DE SUERTE",
+	"description": "Realiza 1 invocacion.",
+	"period": "daily",
+	"objective": {
+		"type": "summon"
+	},
+	"target": 1,
+	"reward_coins": 100,
+	"reward_gems": 5,
+	"category": "DIARIAS"
+}

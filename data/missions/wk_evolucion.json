@@ -1,0 +1,13 @@
+{
+	"id": "wk_evolucion",
+	"name": "DESPERTAR",
+	"description": "Evoluciona 1 personaje.",
+	"period": "weekly",
+	"objective": {
+		"type": "evolve"
+	},
+	"target": 1,
+	"reward_coins": 800,
+	"reward_gems": 15,
+	"category": "SEMANALES"
+}

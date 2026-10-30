@@ -1,0 +1,14 @@
+{
+	"id": "wk_equipo_usado",
+	"name": "EQUIPO EN FORMA",
+	"description": "Juega 10 combates con algun personaje de la categoria Heroes.",
+	"period": "weekly",
+	"objective": {
+		"type": "use_character",
+		"category": "heroes"
+	},
+	"target": 10,
+	"reward_coins": 800,
+	"reward_gems": 10,
+	"category": "SEMANALES"
+}

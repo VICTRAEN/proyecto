@@ -1,0 +1,13 @@
+{
+	"id": "day_victorias",
+	"name": "GANAR EL DIA",
+	"description": "Gana 2 combates.",
+	"period": "daily",
+	"objective": {
+		"type": "battle_won"
+	},
+	"target": 2,
+	"reward_coins": 150,
+	"reward_gems": 5,
+	"category": "DIARIAS"
+}

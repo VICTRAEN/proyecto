@@ -35,11 +35,29 @@ signal reserve_entered(out_unit, in_unit, slot_index: int)
 ## Una ULTIMATE de forma (LR) empieza a resolverse. La UI cambia la musica y lanza su
 ## presentacion; la logica del golpe ya se resuelve en la misma llamada.
 signal ultimate_started(unit)
+## v14. Presentacion de un jefe al empezar el combate. La UI la pinta y avisa con
+## close_intro() (o el jugador la salta); sin UI conectada no se espera nada.
+signal boss_intro(unit, intro: Dictionary)
+signal intro_closed
+## Un jefe entra en una fase nueva (index = numero de fase, 1 = la primera).
+signal phase_changed(unit, index: int, phase: Dictionary)
 
 const ENEMY_THINK_TIME := 0.7
 const TURN_PAUSE := 0.15
 
 const STUN_PAUSE := 0.4
+## Pausa breve tras un cambio de fase (solo si hay UI que la pinte) y limite de
+## seguridad de una presentacion: nunca puede dejar el combate colgado.
+const PHASE_PAUSE := 1.0
+const INTRO_MAX_SECONDS := 7.0
+var _intro_open := false
+var _phase_pause := 0.0
+## Fases activadas en esta batalla: [{ unit, index, name }]. La leen las pruebas y
+## las misiones de "derrotar jefes" no dependen de ello.
+var phase_log: Array = []
+## Reto de SUPERVIVENCIA (eventos): si es > 0, el combate se gana al terminar esa
+## ronda con algun aliado en pie. 0 = combate normal.
+var survive_rounds := 0
 
 ## Multiplicador de las PAUSAS entre turnos. Sale de GameSettings (autoload
 ## AJUSTES): velocidad normal = 1.0, rapida = menos espera. Las pausas del combate
@@ -224,6 +242,7 @@ func next_actor() -> CombatUnit:
 
 
 func _run() -> void:
+	await _play_intros()
 	_apply_passives("battle_start", _everyone())
 	_check_low_hp_all()
 	if not _team_link_ids.is_empty():
@@ -262,6 +281,7 @@ func _take_turn(unit: CombatUnit) -> void:
 
 	# Sangrado, quemadura, veneno y regeneracion se resuelven al empezar el turno.
 	_tick_periodics(unit)
+	_check_phases()
 	if not unit.alive:
 		return
 
@@ -314,6 +334,10 @@ func _take_turn(unit: CombatUnit) -> void:
 	elif _last_action_kind == "special":
 		await get_tree().create_timer(ULTIMATE_PAUSE * pause_scale).timeout
 	await get_tree().create_timer(TURN_PAUSE * pause_scale).timeout
+	if _phase_pause > 0.0 and not _finished:
+		var wait := _phase_pause
+		_phase_pause = 0.0
+		await get_tree().create_timer(wait * pause_scale).timeout
 
 
 func _perform(actor: CombatUnit, kind: String, target_key: String = "") -> void:
@@ -475,6 +499,7 @@ func _after_deaths(_cause) -> void:
 
 
 func _check_low_hp_all() -> void:
+	_check_phases()
 	for unit in _everyone():
 		if unit.alive:
 			_fire_rules("low_hp", unit)
@@ -818,6 +843,15 @@ func _apply_taunt(pool: Array, actor: CombatUnit) -> Array:
 
 
 func _pick_enemy_kind(unit: CombatUnit) -> String:
+	# Patron de la fase actual (v14): cicla por las acciones que declara; si la
+	# que toca es el especial y no hay SP, ataca normal. Sin patron, como siempre.
+	if not unit.pattern.is_empty():
+		var wanted := String(unit.pattern[unit.pattern_step % unit.pattern.size()])
+		unit.pattern_step += 1
+		var chosen := unit.skill_by_kind(wanted)
+		if not chosen.is_empty() and unit.sp >= _skill_cost(unit, chosen):
+			return wanted
+		return "basic"
 	var special := unit.skill_by_kind("special")
 	if not special.is_empty() and unit.sp >= _skill_cost(unit, special):
 		return "special"
@@ -898,6 +932,10 @@ func _emit_order() -> void:
 
 
 func _tick_round_end() -> void:
+	if survive_rounds > 0 and round_number >= survive_rounds and not _alive_only(allies).is_empty() and not _finished:
+		_log("Has resistido %d rondas." % survive_rounds, "result")
+		_finish(true)
+		return
 	for unit in _everyone():
 		unit.stats.tick()
 		unit.tick_round()
@@ -1084,3 +1122,87 @@ func _log_action(actor_name: String, skill_name: String, hits: Array) -> void:
 				_log("%s: ULTIMO ALIENTO listo" % target_name, "buff")
 			"recoil":
 				_log("%s sufre el retroceso  -%d HP" % [target_name, int(round(float(hit.get("value", 0.0))))], "damage")
+
+
+## --- Jefes: presentacion y fases (v14) -----------------------------------------
+
+## Presentaciones de jefe al empezar. Solo espera si hay una UI escuchando y el
+## jugador no tiene activado reducir movimiento; tiene limite de tiempo.
+func _play_intros() -> void:
+	if GameSettings != null and GameSettings.reduce_motion():
+		return
+	for boss in enemies:
+		if boss.intro.is_empty() or boss_intro.get_connections().is_empty():
+			continue
+		_intro_open = true
+		boss_intro.emit(boss, boss.intro)
+		var timer := get_tree().create_timer(INTRO_MAX_SECONDS)
+		timer.timeout.connect(close_intro)
+		if _intro_open:
+			await intro_closed
+
+
+## La UI (o el jugador, saltandola) cierra la presentacion en curso.
+func close_intro() -> void:
+	if not _intro_open:
+		return
+	_intro_open = false
+	intro_closed.emit()
+
+
+## Activa las fases de jefe cuyas condiciones ya se cumplen. Una por una y en orden:
+## si un golpe cruza dos umbrales, entran las dos fases seguidas.
+func _check_phases() -> void:
+	if _finished:
+		return
+	for boss in enemies:
+		if not boss.alive:
+			continue
+		var guard := 0
+		while boss.phase_index < boss.phases.size() and guard < 8:
+			guard += 1
+			var phase: Dictionary = boss.phases[boss.phase_index]
+			var ctx := {
+				"actor": boss, "target": null, "team": enemies, "foes": allies,
+				"rng": _rng, "round": round_number,
+				"source": "phase:%s" % String(phase.get("id", boss.phase_index)),
+			}
+			var when: Dictionary = phase.get("when", {})
+			if when.is_empty() or not EffectEngine.check_condition(when, ctx):
+				break
+			_enter_phase(boss, phase, ctx)
+
+
+func _enter_phase(boss: CombatUnit, phase: Dictionary, ctx: Dictionary) -> void:
+	boss.phase_index += 1
+	var results: Array = []
+	var effects: Array = phase.get("effects", [])
+	if not effects.is_empty():
+		results = EffectEngine.apply_effects(effects, ctx)
+	var heal_ratio := float(phase.get("heal_ratio", 0.0))
+	if heal_ratio > 0.0:
+		boss.heal(roundf(boss.max_hp() * heal_ratio))
+	var sp_bonus := int(phase.get("sp", 0))
+	if sp_bonus > 0:
+		boss.gain_sp(sp_bonus)
+	var unlocked = phase.get("unlock_skills", [])
+	if unlocked is Array:
+		for skill in unlocked:
+			if skill is Dictionary:
+				boss.unlock_skill(skill)
+	if phase.has("pattern"):
+		var new_pattern = phase["pattern"]
+		boss.pattern = (new_pattern as Array).duplicate() if new_pattern is Array else []
+		boss.pattern_step = 0
+	var phase_name := String(phase.get("name", "Fase %d" % boss.phase_index))
+	phase_log.append({ "unit": boss.source_key, "index": boss.phase_index, "name": phase_name, "round": round_number })
+	_log("%s entra en una nueva fase: %s" % [boss.display_name, phase_name], "buff")
+	if not results.is_empty():
+		_record_passive_stats(boss, results)
+		action_resolved.emit({
+			"actor_key": boss.source_key, "actor_name": boss.display_name,
+			"skill_name": phase_name, "kind": "phase", "hits": results,
+		})
+	phase_changed.emit(boss, boss.phase_index, phase)
+	if not phase_changed.get_connections().is_empty():
+		_phase_pause = maxf(_phase_pause, PHASE_PAUSE)

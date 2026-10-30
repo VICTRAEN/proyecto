@@ -1,0 +1,13 @@
+{
+	"id": "ach_relampago",
+	"name": "RELAMPAGO",
+	"description": "Gana 5 combates en 3 rondas o menos.",
+	"category": "RETOS",
+	"condition": {
+		"type": "challenge",
+		"stat": "fast_wins",
+		"target": 5
+	},
+	"reward_coins": 700,
+	"reward_gems": 15
+}

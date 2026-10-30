@@ -70,6 +70,16 @@ var death_handled := false
 ## Lo que absorbio el escudo y si el ultimo golpe se sobrevivio por "ultimo aliento".
 var last_absorbed := 0.0
 var last_survived := false
+## --- Jefes con fases (v14) -------------------------------------------------
+## Datos del JSON del enemigo. Un enemigo sin "phases" ni "intro" se comporta
+## exactamente como antes. phase_index = fases ya activadas; pattern = ciclo de
+## acciones del jefe (lo cambia cada fase); pattern_step = por donde va.
+var is_boss := false
+var intro: Dictionary = {}
+var phases: Array = []
+var phase_index := 0
+var pattern: Array = []
+var pattern_step := 0
 
 
 func setup(data: Dictionary, ally_flag: bool, slot_index: int) -> void:
@@ -102,6 +112,19 @@ func setup(data: Dictionary, ally_flag: bool, slot_index: int) -> void:
 	var loaded_ultimate = data.get("ultimate", {})
 	ultimate = (loaded_ultimate as Dictionary).duplicate(true) if loaded_ultimate is Dictionary else {}
 	ultimate_used = false
+	is_boss = bool(data.get("boss", false)) or data.get("phases", []) is Array and not (data.get("phases", []) as Array).is_empty()
+	var raw_intro = data.get("intro", {})
+	intro = (raw_intro as Dictionary).duplicate(true) if raw_intro is Dictionary else {}
+	phases = []
+	var raw_phases = data.get("phases", [])
+	if raw_phases is Array:
+		for entry in raw_phases:
+			if entry is Dictionary:
+				phases.append((entry as Dictionary).duplicate(true))
+	phase_index = 0
+	var raw_pattern = data.get("pattern", [])
+	pattern = (raw_pattern as Array).duplicate() if raw_pattern is Array else []
+	pattern_step = 0
 	slot = slot_index
 	source_key = "%s#%d" % [id, slot_index]
 	# El nivel que trae el diccionario viene del estado del jugador (GameState),
@@ -395,6 +418,20 @@ func skill_by_kind(kind: String) -> Dictionary:
 		if String(skill.get("kind", "")) == kind:
 			return skill
 	return {}
+
+
+## Sustituye (por "kind") o anade una habilidad. Lo usan las fases de jefe para
+## desbloquear un especial nuevo sin tocar el personaje base.
+func unlock_skill(skill: Dictionary) -> void:
+	var kind := String(skill.get("kind", "special"))
+	var fresh := skill.duplicate(true)
+	for i in skills.size():
+		if String(skills[i].get("kind", "")) == kind:
+			skills = skills.duplicate()
+			skills[i] = fresh
+			return
+	skills = skills.duplicate()
+	skills.append(fresh)
 
 
 func has_passive() -> bool:

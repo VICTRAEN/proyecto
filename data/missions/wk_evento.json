@@ -1,0 +1,13 @@
+{
+	"id": "wk_evento",
+	"name": "EVENTO ACTIVO",
+	"description": "Supera 3 stages de evento.",
+	"period": "weekly",
+	"objective": {
+		"type": "event_stage"
+	},
+	"target": 3,
+	"reward_coins": 700,
+	"reward_gems": 10,
+	"category": "SEMANALES"
+}

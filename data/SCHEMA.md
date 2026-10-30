@@ -812,3 +812,45 @@ vacios, que significan "no tiene objetos", "ningun personaje tiene mutacion",
 - Tipo o rol nuevo: se anade al esquema de datos y a la tabla de ventajas de
   `core/battle_math.gd` si debe afectar al dano.
 - Efecto nuevo: un caso mas en el match de `core/effect_engine.gd`. Una sola vez.
+
+## v14: jefes con fases, misiones periodicas, logros, titulos y eventos
+
+### Enemigo con fases (`data/enemies/<id>.json`, todo opcional)
+- `"boss": true` marca al enemigo como jefe (cuenta para misiones/logros de jefes).
+  Tener `phases` tambien lo marca.
+- `"intro": { title, subtitle, tagline, color }`: presentacion al empezar el combate
+  (saltable tocando; no sale con "animaciones reducidas").
+- `"pattern": [..]`: ciclo de acciones del jefe (`basic`/`special`); si toca el
+  especial y no hay SP ataca normal.
+- `"phases": [ ... ]` en orden. Cada fase:
+  `id`, `name`, `banner` (texto grande de la transicion), `color`,
+  `when` (condicion del motor de efectos: `hp_below`, `round_at_least`,
+  `allies_fallen_at_least`...), `effects` (efectos normales; `turns: 0` = permanente),
+  `heal_ratio`, `sp`, `unlock_skills` (habilidades que sustituyen a la de su mismo
+  `kind` o se anaden) y `pattern` (sustituye al patron). Una fase entra una sola vez;
+  si un golpe cruza dos umbrales entran las dos en orden.
+- Jefes con fases hoy: `void_warden` (1), `sdp_akaza` (1), `boss_sakuta` (2).
+
+### Misiones periodicas (`data/missions/<id>.json`)
+Igual que las permanentes pero con `"period": "daily"|"weekly"` y
+`"objective": { "type": ... }` en lugar de `stat`. Tipos: `battle_played`,
+`battle_won`, `boss_defeated`, `evolve` (`to` opcional), `summon`, `tower_floor`,
+`event_stage`, `use_character` (`character` o `category`, `min`, `win`),
+`category_win` (`category`, `min`). Recompensa: `reward_coins`, `reward_gems`,
+`reward_items` {id: n}. El periodo se reinicia por fecha local (diarias a las 00:00,
+semanales el lunes); no necesita conexion.
+
+### Logros (`data/achievements/<id>.json`)
+`{ id, name, description, category, condition, reward_coins, reward_gems,
+reward_items, title: { id, name } }`. `condition.type`: `roster_count`, `counter`
+(`stat`), `rarity_count`, `evolved_rarity` (solo cuenta a quien EVOLUCIONA),
+`tower_floor`, `tower_complete`, `boss_kills` (`boss` opcional), `collection`
+(`category`), `collection_all`, `challenge` (`stat`: solo_wins, flawless_wins,
+fast_wins), `event_completed` (`event`). Se evaluan contra el estado real, asi que un
+guardado antiguo desbloquea lo que ya cumplia. `title` da un titulo equipable.
+
+### Evento (`data/events/<id>.json`), campos nuevos opcionales
+- `story`: lista de lineas de historia que pinta la tarjeta del evento.
+- `completion_reward`: `{ coins, gems, items }`, se paga la PRIMERA vez que se completa.
+- Stage: `survive_rounds` (gana quien aguante N rondas), `first_clear_items`
+  {id: n} (solo la primera victoria), y el jefe se detecta solo por sus enemigos.

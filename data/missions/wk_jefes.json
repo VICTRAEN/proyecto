@@ -1,0 +1,13 @@
+{
+	"id": "wk_jefes",
+	"name": "CAZADOR DE JEFES",
+	"description": "Derrota 3 jefes.",
+	"period": "weekly",
+	"objective": {
+		"type": "boss_defeated"
+	},
+	"target": 3,
+	"reward_coins": 1000,
+	"reward_gems": 20,
+	"category": "SEMANALES"
+}

@@ -1,0 +1,12 @@
+{
+	"id": "ach_primer_personaje",
+	"name": "PRIMERA COLECCION",
+	"description": "Ten 5 personajes.",
+	"category": "COLECCION",
+	"condition": {
+		"type": "roster_count",
+		"target": 5
+	},
+	"reward_coins": 200,
+	"reward_gems": 0
+}

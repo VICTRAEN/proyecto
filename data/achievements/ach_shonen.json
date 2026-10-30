@@ -1,0 +1,16 @@
+{
+	"id": "ach_shonen",
+	"name": "FAN DEL SHONEN",
+	"description": "Consigue todos los personajes de la categoria Shonen.",
+	"category": "COLECCION",
+	"condition": {
+		"type": "collection",
+		"category": "shonen"
+	},
+	"reward_coins": 600,
+	"reward_gems": 15,
+	"title": {
+		"id": "title_shonen",
+		"name": "Alma shonen"
+	}
+}

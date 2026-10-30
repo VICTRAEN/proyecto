@@ -1,0 +1,12 @@
+{
+	"id": "ach_jefe_1",
+	"name": "PRIMER JEFE",
+	"description": "Derrota a un jefe.",
+	"category": "JEFES",
+	"condition": {
+		"type": "boss_kills",
+		"target": 1
+	},
+	"reward_coins": 300,
+	"reward_gems": 5
+}

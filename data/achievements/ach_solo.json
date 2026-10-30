@@ -1,0 +1,17 @@
+{
+	"id": "ach_solo",
+	"name": "LOBO SOLITARIO",
+	"description": "Gana 3 combates con un unico personaje.",
+	"category": "RETOS",
+	"condition": {
+		"type": "challenge",
+		"stat": "solo_wins",
+		"target": 3
+	},
+	"reward_coins": 700,
+	"reward_gems": 15,
+	"title": {
+		"id": "title_lobo",
+		"name": "Lobo solitario"
+	}
+}

@@ -145,6 +145,33 @@ func _make_event_card(status: Dictionary) -> Control:
 	description.add_theme_color_override("font_color", VI.INK_SOFT)
 	description.autowrap_mode = TextServer.AUTOWRAP_WORD
 	left.add_child(description)
+	# v14: historia corta y premio exclusivo del evento (ambos opcionales, del JSON).
+	var story = status.get("story", [])
+	if story is Array:
+		for line in story:
+			var story_line := Label.new()
+			story_line.text = String(line)
+			story_line.add_theme_font_size_override("font_size", VI.FONT_TINY)
+			story_line.add_theme_color_override("font_color", VI.INK_DIM)
+			story_line.autowrap_mode = TextServer.AUTOWRAP_WORD
+			left.add_child(story_line)
+	var completion = status.get("completion_reward", {})
+	if completion is Dictionary and not (completion as Dictionary).is_empty():
+		var parts := PackedStringArray()
+		if int(completion.get("coins", 0)) > 0:
+			parts.append("%d monedas" % int(completion["coins"]))
+		if int(completion.get("gems", 0)) > 0:
+			parts.append("%d gemas" % int(completion["gems"]))
+		var comp_items = completion.get("items", {})
+		if comp_items is Dictionary:
+			for item_id in comp_items:
+				parts.append("%s x%d" % [GameState.item_display_name(String(item_id)), int(comp_items[item_id])])
+		var prize := Label.new()
+		prize.text = "Premio por completar: %s" % ", ".join(parts)
+		prize.add_theme_font_size_override("font_size", VI.FONT_TINY)
+		prize.add_theme_color_override("font_color", VI.GOLD)
+		prize.autowrap_mode = TextServer.AUTOWRAP_WORD
+		left.add_child(prize)
 	var chips := HFlowContainer.new()
 	chips.add_theme_constant_override("h_separation", 6)
 	chips.add_theme_constant_override("v_separation", 6)
@@ -327,6 +354,16 @@ func _make_stage_card(event_id: String, stage: Dictionary) -> Control:
 	_add_line(box, "Recompensa: %d XP   %d monedas" % [
 		int(stage.get("xp_reward", 0)), int(stage.get("coin_reward", 0))], VI.INK, VI.FONT_SMALL)
 
+	if int(stage.get("survive_rounds", 0)) > 0:
+		_add_line(box, "SUPERVIVENCIA: aguanta %d rondas." % int(stage["survive_rounds"]), VI.RED, VI.FONT_SMALL)
+	if bool(stage.get("boss", false)):
+		_add_line(box, "JEFE con fases", VI.VIOLET, VI.FONT_SMALL)
+	var excl = stage.get("first_clear_items", {})
+	if excl is Dictionary and not (excl as Dictionary).is_empty():
+		var excl_parts := PackedStringArray()
+		for item_id in excl:
+			excl_parts.append("%s x%d" % [GameState.item_display_name(String(item_id)), int(excl[item_id])])
+		_add_line(box, "Primera victoria: %s" % ", ".join(excl_parts), VI.GOLD, VI.FONT_SMALL)
 	var drops_text := _drops_text(stage.get("drops", []))
 	if not drops_text.is_empty():
 		_add_line(box, "Suelta al ganar: %s" % drops_text, VI.GOLD, VI.FONT_SMALL)

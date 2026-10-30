@@ -693,6 +693,8 @@ func _event_battle_info() -> Dictionary:
 		"enemies": stage.get("enemies", []),
 		"xp_reward": int(stage.get("xp_reward", 0)),
 		"coin_reward": int(stage.get("coin_reward", 0)),
+		# v14: reto de supervivencia (ganas si tu equipo aguanta N rondas en pie).
+		"survive_rounds": int(stage.get("survive_rounds", 0)),
 	}
 
 
@@ -822,9 +824,32 @@ func grant_battle_rewards(token: int, ally_ids: Array, victory: bool) -> Diction
 	add_counter("combates_jugados")
 	add_counter("victorias" if victory else "derrotas")
 	var report := _pay_battle_by_source(ally_ids, victory)
+	_record_battle_meta(ally_ids, victory)
 	# El guardado cubre tambien la derrota: el contador sube aunque no haya premio.
 	save_game()
 	return report
+
+
+## v14: UNICO punto donde una batalla cobrada alimenta misiones y logros (el token
+## de batalla ya garantiza que se llama una sola vez por combate). Los jefes salen
+## de los datos del enemigo ("boss": true o con fases); los caidos y las rondas los
+## deja el combate en last_battle_info.
+var last_battle_info: Dictionary = {}
+
+
+func _record_battle_meta(ally_ids: Array, victory: bool) -> void:
+	var bosses: Array = []
+	for enemy_id in current_stage_enemies:
+		var data: Dictionary = DB.get_enemy(String(enemy_id))
+		if bool(data.get("boss", false)) or not (data.get("phases", []) as Array).is_empty():
+			bosses.append(String(enemy_id))
+	meta.record("battle", 1, {
+		"victory": victory, "ally_ids": ally_ids, "bosses": bosses,
+		"rounds": int(last_battle_info.get("rounds", 99)),
+		"fallen": int(last_battle_info.get("fallen", 0)),
+		"solo": ally_ids.size() == 1,
+	})
+	last_battle_info = {}
 
 
 ## Paga la batalla segun su ORIGEN. Cada origen sabe calcular su premio en un
@@ -896,6 +921,8 @@ func _pay_event_battle(ally_ids: Array) -> Dictionary:
 	var event_id := String(battle_source_ref.get("event", ""))
 	var stage_key := String(battle_source_ref.get("stage", ""))
 	var info: Dictionary = complete_event_stage(event_id, stage_key, ally_ids)
+	if bool(info.get("ok", false)):
+		meta.record("event_stage", 1, { "event": event_id, "stage": stage_key })
 	var report := _empty_report()
 	report["xp"] = int(info.get("xp", 0))
 	report["coins"] = int(info.get("coins", 0))
@@ -1058,6 +1085,9 @@ func mission_state(id: String) -> Dictionary:
 func all_missions_state() -> Array:
 	var out: Array = []
 	for mission in DB.all_missions():
+		# Las periodicas (diarias/semanales) tienen su propia lista: meta.periodic_list.
+		if not String(mission.get("period", "")).is_empty():
+			continue
 		out.append(mission_state(String(mission.get("id", ""))))
 	return out
 
@@ -1065,6 +1095,8 @@ func all_missions_state() -> Array:
 ## Cobra una mision completada. Devuelve lo entregado, o vacio si no habia nada
 ## que cobrar: una mision completada solo paga UNA vez.
 func claim_mission(id: String) -> Dictionary:
+	if not String(DB.get_mission(String(id)).get("period", "")).is_empty():
+		return meta.claim_periodic(String(id))
 	var state := mission_state(String(id))
 	if state.is_empty() or not bool(state["completed"]) or bool(state["claimed"]):
 		return {}
@@ -1542,6 +1574,9 @@ func can_reach_rarity(id: String, rarity: String) -> bool:
 ## esa rareza NO tiene pity (se dice asi en su informacion) en vez de prometer algo
 ## que no puede cumplir.
 var pity_counters: Dictionary = {}
+## v14: misiones diarias/semanales, logros y titulos (core/meta_progress.gd).
+const MetaProgress := preload("res://core/meta_progress.gd")
+var meta = MetaProgress.new(self)
 
 
 ## Personajes del pool del banner que cuentan para su pity.
@@ -1803,6 +1838,8 @@ func summon(banner_id: String, count: int = 1, stage_reveal: bool = false) -> Di
 	report["pity_before"] = pity_before
 	report["pity_after"] = counter
 	report["pity_guaranteed"] = guaranteed_count
+	# v14: misiones y logros de invocacion, una vez por tirada completa.
+	meta.record("summon", tries, {})
 	# Historial persistente y totales: en el mismo guardado que el cobro.
 	summon_total += tries
 	summon_banner_totals[key] = int(summon_banner_totals.get(key, 0)) + tries
@@ -3049,6 +3086,8 @@ func complete_event_stage(event_id: String, stage_id: String, ally_ids: Array = 
 	if not already:
 		character_report = _grant_story_xp(ally_ids, xp)
 	_mark_event_stage(event_key, stage_key)
+	if not already and not (stage.get("first_clear_items", {}) as Dictionary).is_empty():
+		report["exclusive"] = _pay_listed_reward({ "items": stage["first_clear_items"] })
 	report["ok"] = true
 	report["reason"] = "Stage superado." if already else "Stage superado por primera vez."
 	report["xp"] = xp if not already else 0
@@ -3063,6 +3102,10 @@ func complete_event_stage(event_id: String, stage_id: String, ally_ids: Array = 
 		if not counter.is_empty():
 			add_counter(counter)
 		report["event_completed"] = true
+		# Premio exclusivo de completar el evento: solo la PRIMERA vez que se completa.
+		var completion = DB.get_event(event_key).get("completion_reward", {})
+		if int(state["times_completed"]) == 1 and completion is Dictionary and not (completion as Dictionary).is_empty():
+			report["completion_reward"] = _pay_listed_reward(completion)
 		report["counter"] = counter
 		report["counter_value"] = counter_value(counter)
 	report["times_completed"] = event_times_completed(event_key)
@@ -3079,6 +3122,34 @@ func complete_event_stage(event_id: String, stage_id: String, ally_ids: Array = 
 					report["unlocked"].append(next_id)
 	save_game()
 	return report
+
+
+func _stage_has_boss(enemy_ids: Variant) -> bool:
+	if not (enemy_ids is Array):
+		return false
+	for enemy_id in enemy_ids:
+		var data: Dictionary = DB.get_enemy(String(enemy_id))
+		if bool(data.get("boss", false)) or not (data.get("phases", []) as Array).is_empty():
+			return true
+	return false
+
+
+## Premio de una sola vez declarado en el JSON (monedas, gemas, objetos). Lo usan
+## "first_clear_items" de un stage y "completion_reward" de un evento.
+func _pay_listed_reward(reward: Variant) -> Dictionary:
+	var paid := { "coins": 0, "gems": 0, "items": {} }
+	if not (reward is Dictionary):
+		return paid
+	paid["coins"] = int(reward.get("coins", 0))
+	paid["gems"] = int(reward.get("gems", 0))
+	add_coins(int(paid["coins"]))
+	add_gems(int(paid["gems"]))
+	var items = reward.get("items", reward if not reward.has("coins") and not reward.has("gems") else {})
+	if items is Dictionary:
+		for item_id in items:
+			add_item(String(item_id), int(items[item_id]))
+			paid["items"][String(item_id)] = int(items[item_id])
+	return paid
 
 
 func _mark_event_stage(event_id: String, stage_id: String) -> void:
@@ -3232,6 +3303,9 @@ func event_status(event_id: String) -> Dictionary:
 			"coin_reward": int((stage as Dictionary).get("coin_reward", 0)),
 			"drops": (stage as Dictionary).get("drops", []),
 			"requires_party_character": String((stage as Dictionary).get("requires_party_character", "")),
+			"survive_rounds": int((stage as Dictionary).get("survive_rounds", 0)),
+			"first_clear_items": (stage as Dictionary).get("first_clear_items", {}),
+			"boss": _stage_has_boss((stage as Dictionary).get("enemies", [])),
 			"completed": event_stage_completed(event_key, stage_id),
 			"clears": event_stage_clears(event_key, stage_id),
 			"unlocked": event_stage_unlocked(event_key, stage_id),
@@ -3240,6 +3314,8 @@ func event_status(event_id: String) -> Dictionary:
 		"id": event_key,
 		"name": String(event.get("name", event_key)),
 		"description": String(event.get("description", "")),
+		"story": event.get("story", []),
+		"completion_reward": event.get("completion_reward", {}),
 		"background": String(event.get("background", "")),
 		"stages": stages,
 		"stage_count": stages.size(),
@@ -3833,6 +3909,7 @@ func complete_tower_floor(tower_id: String, floor_number: int, ally_ids: Array =
 			var amount := int(floor_data.get("first_clear_amount", 1))
 			report["drops"] = _roll_drops([{ "item": item_id, "min": amount, "max": amount }])
 		add_counter("pisos_torre")
+		meta.record("tower_floor", 1, {})
 	save_game()
 	return report
 
@@ -4048,6 +4125,7 @@ func evolve(id: String) -> Dictionary:
 	# bonus y su origen se releen del balance por si su rango ha cambiado.
 	_refresh_mutation(key)
 	add_counter("evoluciones")
+	meta.record("evolve", 1, { "to": to_rarity, "id": key })
 	save_game()
 	# El informe se lee DESPUES de aplicar el cambio, para que la pasiva, los
 	# links y las categorias que anuncia sean los que de verdad valen ya.
@@ -4274,6 +4352,7 @@ func evolve_special(id: String) -> Dictionary:
 		mutations.erase(key)
 		rarities.erase(key)
 	add_counter("evoluciones")
+	meta.record("evolve", 1, { "to": String(DB.get_character(to_id).get("rarity", "")), "id": to_id })
 	save_game()
 	_refresh_mutation(to_id)
 	var data := character_data(to_id)
@@ -4714,6 +4793,7 @@ func save_game() -> void:
 		"summon_history": summon_history,
 		"summon_total": summon_total,
 		"summon_banner_totals": summon_banner_totals,
+		"meta_progress": meta.to_dict(),
 	}
 	_write_save_safely(JSON.stringify(payload, "\t"))
 
@@ -4900,6 +4980,9 @@ func load_game() -> bool:
 	var loaded_pending = data.get("pending_reveal", {})
 	pending_reveal = _clean_pending_reveal(loaded_pending)
 	_load_summon_records(data)
+	# v14: un guardado anterior no trae "meta_progress" y empieza vacio; los logros
+	# se reevaluan contra el estado real, asi que desbloquea lo que ya cumplia.
+	meta.from_dict(data.get("meta_progress", {}))
 
 	# Por si el archivo es de antes de anadir un personaje al roster.
 	ensure_defaults()

@@ -117,6 +117,13 @@ func _ready() -> void:
 		sim_node.name = "SimBalance"
 		add_child(sim_node)
 		sim_node.call_deferred("run", self)
+	elif dbg_args.has("--dbg26"):
+		var hito_l: GDScript = load("res://scenes/debug/hito_l_checks.gd")
+		var hito_l_node := Node.new()
+		hito_l_node.set_script(hito_l)
+		hito_l_node.name = "HitoLChecks"
+		add_child(hito_l_node)
+		hito_l_node.call_deferred("run", self)
 	elif dbg_args.has("--dbg25"):
 		var hito_k: GDScript = load("res://scenes/debug/hito_k_checks.gd")
 		var hito_k_node := Node.new()

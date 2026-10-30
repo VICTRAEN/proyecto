@@ -1,0 +1,15 @@
+{
+	"id": "ach_gran_coleccion",
+	"name": "LA COLECCION COMPLETA",
+	"description": "Consigue todos los personajes.",
+	"category": "COLECCION",
+	"condition": {
+		"type": "collection_all"
+	},
+	"reward_coins": 3000,
+	"reward_gems": 100,
+	"title": {
+		"id": "title_completista",
+		"name": "Completista"
+	}
+}
