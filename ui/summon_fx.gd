@@ -79,6 +79,12 @@ func _start(best: String, reveal: Callable) -> void:
 	_tween.tween_callback(queue_free)
 
 
+## Texto de la capa (por ejemplo "PITY GARANTIZADO" cuando la tirada lo es).
+func set_caption(text: String) -> void:
+	if _label != null:
+		_label.text = text
+
+
 func _process(_delta: float) -> void:
 	queue_redraw()
 

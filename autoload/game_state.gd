@@ -1481,6 +1481,197 @@ func _pick_candidate(banner_id: String, rarity: String, candidates: Array) -> St
 	return String(others[randi() % others.size()])
 
 
+## --- Rareza maxima alcanzable (v13) -------------------------------------------------
+## Hasta que rareza PUEDE llegar un personaje, calculado SOLO desde los datos: la
+## cadena de evolucion normal (data/evolution/rules.json; el ultimo paso a LR exige
+## que el personaje declare evolution.lr en su JSON) y las rutas de evolucion
+## especial (data/evolutions/special.json). No hay ninguna lista de ids aqui.
+const RARITY_LADDER := ["R", "SR", "SSR", "UR", "LR"]
+
+
+func rarity_rank_of(rarity: String) -> int:
+	return RARITY_LADDER.find(String(rarity))
+
+
+func max_reachable_rarity(id: String) -> String:
+	return _max_reachable(String(id), [])
+
+
+func _max_reachable(id: String, visited: Array) -> String:
+	var data := DB.get_character(id)
+	if data.is_empty() or visited.has(id):
+		return ""
+	visited.append(id)
+	var best := String(data.get("rarity", "R"))
+	var evolution = data.get("evolution", {})
+	if evolution is Dictionary and not (evolution as Dictionary).is_empty():
+		var current := best
+		for _step in 6:
+			var routes := DB.evolution_routes_from(current)
+			if routes.is_empty():
+				break
+			var to_rarity := String((routes[0] as Dictionary).get("to", ""))
+			if to_rarity.is_empty():
+				break
+			if to_rarity == "LR":
+				var lr_block = (evolution as Dictionary).get("lr", {})
+				if not (lr_block is Dictionary) or (lr_block as Dictionary).is_empty():
+					break
+			current = to_rarity
+		if rarity_rank_of(current) > rarity_rank_of(best):
+			best = current
+	for raw_route in DB.special_evolution_routes_from(id):
+		var other := _max_reachable(String((raw_route as Dictionary).get("to", "")), visited)
+		if not other.is_empty() and rarity_rank_of(other) > rarity_rank_of(best):
+			best = other
+	return best
+
+
+func can_reach_rarity(id: String, rarity: String) -> bool:
+	var reach := max_reachable_rarity(id)
+	return not reach.is_empty() and rarity_rank_of(reach) >= rarity_rank_of(rarity) and rarity_rank_of(rarity) >= 0
+
+
+## --- PITY (v13) ------------------------------------------------------------------
+## Un banner declara `"pity": { "pulls": N, "rarity": "LR" }`: si las N-1 primeras
+## tiradas seguidas no dan ningun personaje que PUEDA ALCANZAR esa rareza (rareza
+## maxima alcanzable, no la rareza con la que sale), la tirada N garantiza uno. Si
+## sale uno antes, el contador vuelve a 0. El contador es POR BANNER (cada banner
+## tiene un pool distinto) y se guarda con el resto: cerrar el juego no lo reinicia
+## ni permite repetir una tirada. Un banner cuyo pool no tiene a nadie que llegue a
+## esa rareza NO tiene pity (se dice asi en su informacion) en vez de prometer algo
+## que no puede cumplir.
+var pity_counters: Dictionary = {}
+
+
+## Personajes del pool del banner que cuentan para su pity.
+func pity_eligible_ids(banner_id: String) -> Array:
+	var cfg = DB.get_banner(String(banner_id)).get("pity", {})
+	if not (cfg is Dictionary):
+		return []
+	var target := String((cfg as Dictionary).get("rarity", ""))
+	var out: Array = []
+	if target.is_empty():
+		return out
+	for id in banner_pool(banner_id):
+		if can_reach_rarity(String(id), target):
+			out.append(String(id))
+	return out
+
+
+## Configuracion EFECTIVA del pity de un banner:
+## { enabled, pulls, rarity, eligible[], counter, until, reason }
+## counter = tiradas seguidas sin premio; until = cuantas tiradas faltan para el
+## garantizado (1 = la proxima es la garantizada).
+func pity_status(banner_id: String) -> Dictionary:
+	var key := String(banner_id)
+	var cfg = DB.get_banner(key).get("pity", {})
+	var pulls := int((cfg as Dictionary).get("pulls", 0)) if cfg is Dictionary else 0
+	var target := String((cfg as Dictionary).get("rarity", "")) if cfg is Dictionary else ""
+	var eligible := pity_eligible_ids(key)
+	var out := {
+		"enabled": false, "pulls": pulls, "rarity": target, "eligible": eligible,
+		"counter": 0, "until": 0, "reason": "",
+	}
+	if pulls <= 0 or target.is_empty():
+		out["reason"] = "Este banner no tiene pity."
+		return out
+	if eligible.is_empty():
+		out["reason"] = "Sin pity: ningun personaje de este banner puede llegar a %s." % target
+		return out
+	var counter := clampi(int(pity_counters.get(key, 0)), 0, pulls - 1)
+	out["enabled"] = true
+	out["counter"] = counter
+	out["until"] = pulls - counter
+	return out
+
+
+func pity_counter(banner_id: String) -> int:
+	return int(pity_status(banner_id)["counter"])
+
+
+## Texto de las reglas del pity de un banner (lo que lee el jugador). Sale de la
+## MISMA configuracion que aplica summon(), asi que no puede contradecirla.
+func pity_rules_text(banner_id: String) -> String:
+	var st := pity_status(banner_id)
+	if not bool(st["enabled"]):
+		return String(st["reason"])
+	var names := PackedStringArray()
+	for id in st["eligible"]:
+		names.append(display_name(String(id)))
+	return "PITY: si pasan %d tiradas seguidas sin que salga un personaje que pueda llegar a %s (%s), la tirada %d lo garantiza. Si sale uno antes, el contador vuelve a 0. Cuenta cada tirada una sola vez, tanto en x1 como en x%d, y se guarda aunque cierres el juego." % [
+		int(st["pulls"]) - 1, String(st["rarity"]), ", ".join(names), int(st["pulls"]),
+		maxi(2, int(DB.get_banner(String(banner_id)).get("multi_pulls", 10)))]
+
+
+## Probabilidad REAL por tirada de un personaje en un banner (sin contar el pity),
+## con la misma aritmetica que _pick_candidate. 0 si no puede salir.
+func banner_character_rate(banner_id: String, id: String) -> float:
+	var key := String(id)
+	var pool := banner_pool(banner_id)
+	if not pool.has(key):
+		return 0.0
+	var rarity := String(DB.get_character(key).get("rarity", ""))
+	var rarity_rate := float(banner_rates(banner_id).get(rarity, 0.0))
+	if rarity_rate <= 0.0:
+		return 0.0
+	var featured := banner_featured_rates(banner_id)
+	if featured.has(key):
+		return float(featured[key])
+	var others := 0
+	var featured_sum := 0.0
+	for other in pool:
+		if String(DB.get_character(String(other)).get("rarity", "")) != rarity:
+			continue
+		if featured.has(String(other)):
+			featured_sum += float(featured[String(other)])
+		else:
+			others += 1
+	if others <= 0:
+		return 0.0
+	return maxf(0.0, rarity_rate - featured_sum) / float(others)
+
+
+## --- Historial de invocaciones (v13) ---------------------------------------------
+## Una entrada por invocacion (x1 o x10), guardada en el MISMO guardado que el cobro
+## y la entrega. Se conservan las ultimas SUMMON_HISTORY_MAX; los totales no caducan.
+const SUMMON_HISTORY_MAX := 300
+var summon_history: Array = []
+var summon_total := 0
+var summon_banner_totals: Dictionary = {}
+
+
+func summon_history_list() -> Array:
+	return summon_history.duplicate(true)
+
+
+## "2026-10-30  03:12" en la hora local del dispositivo.
+static func format_timestamp(unix_time: int) -> String:
+	if unix_time <= 0:
+		return "-"
+	var bias := int(Time.get_time_zone_from_system().get("bias", 0)) * 60
+	var d := Time.get_datetime_dict_from_unix_time(unix_time + bias)
+	return "%04d-%02d-%02d  %02d:%02d" % [d["year"], d["month"], d["day"], d["hour"], d["minute"]]
+
+
+## Evita guardados a mitad de una invocacion: dentro de summon() add_character
+## guardaria en cada tirada con el pity y el historial a medias.
+var _save_deferred := false
+var _save_pending := false
+
+
+func _begin_atomic() -> void:
+	_save_deferred = true
+	_save_pending = false
+
+
+func _end_atomic() -> void:
+	_save_deferred = false
+	if _save_pending:
+		_save_pending = false
+		save_game()
+
+
 ## Coste de una invocacion de `count` tiradas, leido del banner. El precio de la
 ## multi vive en los datos, asi que cambiar de banner no toca ningun script.
 func banner_cost(banner_id: String, count: int) -> int:
@@ -1565,13 +1756,29 @@ func summon(banner_id: String, count: int = 1, stage_reveal: bool = false) -> Di
 		report["reason"] = "Faltan gemas: cuesta %d y tienes %d." % [cost, gems]
 		return report
 	var results: Array = []
+	var pity := pity_status(key)
+	var pity_before := int(pity["counter"])
+	var counter := pity_before
+	var guaranteed_count := 0
+	_begin_atomic()
 	for i in tries:
-		var rarity := roll_rarity(rates)
-		var candidates: Array = []
-		for id in pool:
-			if String(DB.get_character(String(id)).get("rarity", "")) == rarity:
-				candidates.append(String(id))
-		var picked: String = _pick_candidate(key, rarity, candidates)
+		var picked := ""
+		var guaranteed := false
+		if bool(pity["enabled"]) and counter >= int(pity["pulls"]) - 1:
+			# Tirada garantizada: sale uno de los personajes que cuentan para el pity.
+			var eligible: Array = pity["eligible"]
+			picked = String(eligible[randi() % eligible.size()])
+			guaranteed = true
+			guaranteed_count += 1
+		else:
+			var rarity := roll_rarity(rates)
+			var candidates: Array = []
+			for id in pool:
+				if String(DB.get_character(String(id)).get("rarity", "")) == rarity:
+					candidates.append(String(id))
+			picked = _pick_candidate(key, rarity, candidates)
+		if bool(pity["enabled"]):
+			counter = 0 if (pity["eligible"] as Array).has(picked) else counter + 1
 		var info := add_character(picked)
 		results.append({
 			"id": picked,
@@ -1580,6 +1787,8 @@ func summon(banner_id: String, count: int = 1, stage_reveal: bool = false) -> Di
 			"new": bool(info.get("added", false)),
 			"duplicate": bool(info.get("duplicate", false)),
 			"duplicates": int(info.get("duplicates", 0)),
+			"pity": counter,
+			"guaranteed": guaranteed,
 		})
 		if bool(info.get("added", false)):
 			report["new_count"] = int(report["new_count"]) + 1
@@ -1589,6 +1798,31 @@ func summon(banner_id: String, count: int = 1, stage_reveal: bool = false) -> Di
 	report["ok"] = true
 	report["gems"] = gems
 	report["reason"] = "%d invocacion(es)." % tries
+	if bool(pity["enabled"]):
+		pity_counters[key] = counter
+	report["pity_before"] = pity_before
+	report["pity_after"] = counter
+	report["pity_guaranteed"] = guaranteed_count
+	# Historial persistente y totales: en el mismo guardado que el cobro.
+	summon_total += tries
+	summon_banner_totals[key] = int(summon_banner_totals.get(key, 0)) + tries
+	summon_history.append({
+		"time": int(Time.get_unix_time_from_system()),
+		"banner": key,
+		"banner_name": String(report["banner_name"]),
+		"count": tries,
+		"cost": cost,
+		"pity_enabled": bool(pity["enabled"]),
+		"pity_pulls": int(pity["pulls"]),
+		"pity_before": pity_before,
+		"pity_after": counter,
+		"guaranteed": guaranteed_count,
+		"new_count": int(report["new_count"]),
+		"results": results.duplicate(true),
+		"total_after": summon_total,
+	})
+	while summon_history.size() > SUMMON_HISTORY_MAX:
+		summon_history.remove_at(0)
 	if stage_reveal:
 		# Los resultados quedan FIJADOS junto al cobro y la entrega, en el mismo
 		# guardado: si el juego se cierra a mitad de la revelacion, al volver se
@@ -1603,7 +1837,13 @@ func summon(banner_id: String, count: int = 1, stage_reveal: bool = false) -> Di
 			"new_count": int(report["new_count"]),
 			"duplicate_count": int(report["duplicate_count"]),
 			"cinematic_done": false,
+			"pity_before": pity_before,
+			"pity_after": counter,
+			"pity_guaranteed": guaranteed_count,
+			"pity_enabled": bool(pity["enabled"]),
+			"pity_pulls": int(pity["pulls"]),
 		}
+	_end_atomic()
 	save_game()
 	return report
 
@@ -1697,27 +1937,40 @@ func dupe_can_receive(id: String) -> bool:
 ## las que se han gastado en Dupes y las que siguen libres. Siempre se cumple
 ##   total = disponibles + usadas,   usadas = 1 (la unidad) + gastadas en Dupes
 ## asi que 12 invocaciones dan: total 12, disponibles 11, usadas 1.
+##
+## v13: las copias CONVERTIDAS en monedas (solo sobrantes de un personaje en Dupe
+## maximo) se anotan aparte en `copies_converted`: siguen contando en el total (es lo
+## que te ha salido), no estan disponibles y tampoco estan "usadas" en el personaje.
+##   total = disponibles + usadas + convertidas
+var copies_converted: Dictionary = {}
+
+
 func copy_ledger(id: String) -> Dictionary:
 	var key := String(id)
 	if not is_owned(key):
-		return { "id": key, "total": 0, "available": 0, "used": 0, "in_unit": 0, "spent": 0 }
+		return { "id": key, "total": 0, "available": 0, "used": 0, "in_unit": 0, "spent": 0, "converted": 0 }
 	var available := dupe_copies_available(key)
 	var spent := _dupe_copies_spent(key)
+	var converted := maxi(0, int(copies_converted.get(key, 0)))
 	var in_unit := 1
 	return {
 		"id": key,
-		"total": in_unit + available + spent,
+		"total": in_unit + available + spent + converted,
 		"available": available,
 		"used": in_unit + spent,
 		"in_unit": in_unit,
 		"spent": spent,
+		"converted": converted,
 	}
 
 
 ## Texto corto del libro: "12 en total: 11 disponibles, 1 usada".
 func copy_ledger_text(id: String) -> String:
 	var l := copy_ledger(id)
-	return "%d en total: %d disponibles, %d usadas" % [int(l["total"]), int(l["available"]), int(l["used"])]
+	var text := "%d en total: %d disponibles, %d usadas" % [int(l["total"]), int(l["available"]), int(l["used"])]
+	if int(l.get("converted", 0)) > 0:
+		text += ", %d convertidas" % int(l["converted"])
+	return text
 
 
 func copy_stacks() -> Array:
@@ -1921,7 +2174,13 @@ func dupe_convert_overflow(id: String) -> Dictionary:
 	if copies <= 0:
 		report["reason"] = "No hay copias sobrantes."
 		return report
+	# Un FAVORITO no pierde copias por accidente: hay que quitarle la marca antes.
+	if is_favorite(key):
+		report["protected"] = true
+		report["reason"] = "%s es FAVORITO: quita la marca para poder convertir sus copias." % display_name(key)
+		return report
 	duplicates[key] = duplicates_of(key) - copies
+	copies_converted[key] = int(copies_converted.get(key, 0)) + copies
 	add_coins(copies * rate)
 	save_game()
 	report["done"] = true
@@ -3994,6 +4253,9 @@ func evolve_special(id: String) -> Dictionary:
 		# a sumar niveles (con tope); con costes distintos nunca se pierde ninguna copia.
 		var spent_budget := _dupe_copies_spent(to_id) + _dupe_copies_spent(key)
 		duplicates[to_id] = duplicates_of(to_id) + duplicates_of(key)
+		if copies_converted.has(key):
+			copies_converted[to_id] = int(copies_converted.get(to_id, 0)) + int(copies_converted[key])
+			copies_converted.erase(key)
 		var merged_level := _dupe_level_for_budget(spent_budget)
 		if merged_level > 0:
 			dupe_levels[to_id] = merged_level
@@ -4414,6 +4676,9 @@ func _load_saved_teams(data: Dictionary) -> void:
 ## --- Guardado --------------------------------------------------------------
 
 func save_game() -> void:
+	if _save_deferred:
+		_save_pending = true
+		return
 	var payload := {
 		"version": SAVE_VERSION,
 		"roster": roster,
@@ -4444,6 +4709,11 @@ func save_game() -> void:
 		"saved_teams": saved_teams,
 		"next_team_id": _next_team_id,
 		"favorites": favorites,
+		"pity_counters": pity_counters,
+		"copies_converted": copies_converted,
+		"summon_history": summon_history,
+		"summon_total": summon_total,
+		"summon_banner_totals": summon_banner_totals,
 	}
 	_write_save_safely(JSON.stringify(payload, "\t"))
 
@@ -4629,10 +4899,47 @@ func load_game() -> bool:
 
 	var loaded_pending = data.get("pending_reveal", {})
 	pending_reveal = _clean_pending_reveal(loaded_pending)
+	_load_summon_records(data)
 
 	# Por si el archivo es de antes de anadir un personaje al roster.
 	ensure_defaults()
 	return true
+
+
+## Contadores de pity, historial y totales del archivo. Un guardado anterior a la
+## v13 no los trae y empieza con todo a cero (el historial arranca en la v13).
+func _load_summon_records(data: Dictionary) -> void:
+	pity_counters = {}
+	var raw_counters = data.get("pity_counters", {})
+	if raw_counters is Dictionary:
+		for banner_key in (raw_counters as Dictionary).keys():
+			pity_counters[String(banner_key)] = maxi(0, int((raw_counters as Dictionary)[banner_key]))
+	summon_history = []
+	var raw_history = data.get("summon_history", [])
+	if raw_history is Array:
+		for entry in raw_history:
+			if not (entry is Dictionary) or not ((entry as Dictionary).get("results") is Array):
+				continue
+			var clean_results: Array = []
+			for result in (entry as Dictionary)["results"]:
+				if result is Dictionary and not String((result as Dictionary).get("id", "")).is_empty():
+					clean_results.append((result as Dictionary).duplicate(true))
+			var fixed := (entry as Dictionary).duplicate(true)
+			fixed["results"] = clean_results
+			summon_history.append(fixed)
+	while summon_history.size() > SUMMON_HISTORY_MAX:
+		summon_history.remove_at(0)
+	copies_converted = {}
+	var raw_converted = data.get("copies_converted", {})
+	if raw_converted is Dictionary:
+		for converted_key in (raw_converted as Dictionary).keys():
+			copies_converted[String(converted_key)] = maxi(0, int((raw_converted as Dictionary)[converted_key]))
+	summon_total = maxi(0, int(data.get("summon_total", 0)))
+	summon_banner_totals = {}
+	var raw_totals = data.get("summon_banner_totals", {})
+	if raw_totals is Dictionary:
+		for banner_key in (raw_totals as Dictionary).keys():
+			summon_banner_totals[String(banner_key)] = maxi(0, int((raw_totals as Dictionary)[banner_key]))
 
 
 ## Una secuencia de revelado guardada solo se acepta si es coherente: resultados

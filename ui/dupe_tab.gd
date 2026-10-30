@@ -27,6 +27,23 @@ static func build(id: String, editable: bool, confirming: bool, on_ask: Callable
 	var copies := int(status.get("copies", 0))
 
 	box.add_child(FichaTabs.block_title("DUPES"))
+	# v13: FAVORITO. Un favorito no se consume en evoluciones especiales ni convierte
+	# sus copias en monedas hasta que se le quita la marca.
+	if editable and GameState.is_owned(id):
+		var fav := Button.new()
+		fav.name = "FavoriteButton"
+		fav.toggle_mode = true
+		fav.button_pressed = GameState.is_favorite(id)
+		fav.custom_minimum_size = Vector2(0, VI.TOUCH * 0.7)
+		fav.add_theme_font_size_override("font_size", VI.FONT_SMALL)
+		var paint := func(on: bool):
+			fav.text = "FAVORITO: PROTEGIDO (toca para quitar)" if on else "MARCAR COMO FAVORITO (proteger)"
+			VI.tint_button(fav, VI.MAGENTA if on else VI.INK_DIM)
+		paint.call(fav.button_pressed)
+		fav.toggled.connect(func(on: bool):
+			GameState.set_favorite(id, on)
+			paint.call(GameState.is_favorite(id)))
+		box.add_child(fav)
 	if max_level <= 0:
 		box.add_child(FichaTabs.note("El sistema de Dupes no esta disponible."))
 		return box
@@ -109,7 +126,9 @@ static func build(id: String, editable: bool, confirming: bool, on_ask: Callable
 		# Copias SOBRANTES (ya no mejoran a este personaje): se pueden cambiar por monedas.
 		var spare := GameState.dupe_overflow_copies(id)
 		var rate := GameState.dupe_overflow_rate()
-		if editable and spare > 0 and rate > 0:
+		if editable and spare > 0 and rate > 0 and GameState.is_favorite(id):
+			box.add_child(FichaTabs.note("Te sobran %d copia(s), pero es FAVORITO: quita la marca para convertirlas en monedas." % spare))
+		elif editable and spare > 0 and rate > 0:
 			var gain := spare * rate
 			if confirming:
 				_confirm_row(box, "Convertir %d copia(s) sobrante(s) en %d monedas?\nNo se puede deshacer." % [spare, gain], on_confirm, on_cancel)

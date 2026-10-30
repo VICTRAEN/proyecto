@@ -24,8 +24,8 @@
 		"hero": "david_lucy_duo"
 	},
 	"pity": {
-		"pulls": 0,
-		"rarity": ""
+		"pulls": 10,
+		"rarity": "LR"
 	},
-	"notes": "Probabilidades POR TIRADA, explicitas y sumando 1 (sin renormalizar): SR 85%, SSR 15%. Dentro del SSR, el duo tiene tasa propia del 7% por tirada (featured_rates) y el 8% restante se reparte a partes iguales entre los demas SSR del pool. El duo SOLO existe como SSR: UR y LR se consiguen evolucionando. 'enabled': false apaga el banner. El duo no entra en ningun otro banner (banner_only + exclusive_ids)."
+	"notes": "PITY (v13): pity.rarity = rareza MAXIMA ALCANZABLE que debe poder tener el personaje (no la rareza con la que sale). Aqui solo el duo puede llegar a LR, asi que la 10a tirada sin duo lo garantiza. Probabilidades POR TIRADA, explicitas y sumando 1 (sin renormalizar): SR 85%, SSR 15%. Dentro del SSR, el duo tiene tasa propia del 7% por tirada (featured_rates) y el 8% restante se reparte a partes iguales entre los demas SSR del pool. El duo SOLO existe como SSR: UR y LR se consiguen evolucionando. 'enabled': false apaga el banner. El duo no entra en ningun otro banner (banner_only + exclusive_ids)."
 }

@@ -384,7 +384,20 @@ sola leyendo estos archivos: no hay ninguna lista de banners en el codigo.
 | pool_categories | array | Si esta vacio, entra todo el roster. Si tiene ids, solo entran personajes de esas categorias. |
 | featured | array | Personajes destacados. |
 | featured_bonus | number | Cuanto sube la probabilidad de los destacados. |
-| pity | objeto | `{ pulls, rarity }`: a las N tiradas sin exito se garantiza esa rareza. |
+| pity | objeto | (v13) `{ pulls, rarity }`. Si las `pulls - 1` tiradas anteriores seguidas no dan ningun personaje del pool que PUEDA ALCANZAR `rarity` (rareza maxima alcanzable por evolucion, no la rareza con la que sale), la tirada `pulls` garantiza uno. Si sale uno antes, el contador vuelve a 0. `pulls: 0` = sin pity. Si ningun personaje del pool puede llegar a esa rareza, el banner NO tiene pity (se informa asi). |
+| exclusive_ids, featured_rates | | Unidades exclusivas del banner y su tasa propia por tirada. |
+
+### Pity, historial y copias (v13)
+
+- Rareza maxima alcanzable de un personaje (`GameState.max_reachable_rarity`): se calcula
+  con `data/evolution/rules.json` (el paso a LR exige `evolution.lr` en el personaje) y
+  `data/evolutions/special.json`. Hoy solo el duo David + Lucy (de los invocables) llega a LR,
+  asi que solo `banner_david_lucy` tiene pity (10).
+- El contador de pity es POR BANNER (`pity_counters`) y se guarda en `user://save.json` junto al
+  cobro y la entrega (guardado atomico por invocacion).
+- `summon_history` (maximo 300 entradas), `summon_total`, `summon_banner_totals`, `copies_converted`:
+  claves opcionales del guardado; un guardado anterior carga con todo a cero.
+- Libro de copias: `total = disponibles + usadas + convertidas`.
 
 ## Tienda (`data/shop/<id>.json`)
 

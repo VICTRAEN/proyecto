@@ -11,6 +11,7 @@ const TypeColors := preload("res://ui/type_colors.gd")
 const TitleBanner := preload("res://ui/title_banner.gd")
 const WalletChip := preload("res://ui/wallet_chip.gd")
 const Frame := preload("res://ui/vi_frame.gd")
+const BannerInfoPanel := preload("res://ui/banner_info_panel.gd")
 
 ## INVOCAR: el GACHA de verdad.
 ##
@@ -154,6 +155,8 @@ var _stage_row: HBoxContainer = null
 var _tabs: HBoxContainer = null
 var _show_stage_button: Button = null
 var _has_results := false
+var _stage_pity: Label = null
+var _tools_row: HBoxContainer = null
 
 
 func _build_stage() -> void:
@@ -188,11 +191,34 @@ func _build_stage() -> void:
 	_stage_rates.add_theme_color_override("font_outline_color", Color(0.04, 0.0, 0.10, 0.8))
 	_stage_rates.add_theme_constant_override("outline_size", 4)
 	v.add_child(_stage_rates)
+	# v13: progreso del pity del banner (solo si el banner tiene pity de verdad).
+	_stage_pity = Label.new()
+	_stage_pity.name = "PityProgress"
+	_stage_pity.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_stage_pity.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_stage_pity.add_theme_font_size_override("font_size", VI.FONT_SMALL)
+	_stage_pity.add_theme_color_override("font_color", VI.GOLD_LIGHT)
+	v.add_child(_stage_pity)
 	_stage_row = HBoxContainer.new()
 	_stage_row.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	_stage_row.add_theme_constant_override("separation", 16)
 	_stage_row.alignment = BoxContainer.ALIGNMENT_CENTER
 	v.add_child(_stage_row)
+	_tools_row = HBoxContainer.new()
+	_tools_row.name = "ToolsRow"
+	_tools_row.add_theme_constant_override("separation", 8)
+	main.add_child(_tools_row)
+	main.move_child(_tools_row, _tabs.get_index() + 1)
+	for spec in [["INFO DEL BANNER", "InfoButton", "_on_info_pressed"], ["HISTORIAL", "HistoryButton", "_on_history_pressed"]]:
+		var tool_button := Button.new()
+		tool_button.name = String(spec[1])
+		tool_button.text = String(spec[0])
+		tool_button.custom_minimum_size = Vector2(0, 64)
+		tool_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		tool_button.add_theme_font_size_override("font_size", VI.FONT_TINY)
+		VI.tint_button(tool_button, VI.CYAN)
+		tool_button.pressed.connect(Callable(self, String(spec[2])))
+		_tools_row.add_child(tool_button)
 	_show_stage_button = Button.new()
 	_show_stage_button.name = "ShowStageButton"
 	_show_stage_button.text = "VER BANNER"
@@ -202,6 +228,33 @@ func _build_stage() -> void:
 	_show_stage_button.visible = false
 	main.add_child(_show_stage_button)
 	main.move_child(_show_stage_button, _stage.get_index() + 1)
+
+
+func _on_info_pressed() -> void:
+	if _banner_id.is_empty() or get_node_or_null("BannerInfoPanel") != null:
+		return
+	BannerInfoPanel.open_on(self, _banner_id)
+
+
+func _on_history_pressed() -> void:
+	# Con una secuencia en marcha no se cambia de pantalla: primero se revela lo pagado.
+	if _sequence_active():
+		return
+	var app := NAV.app_of(self)
+	if app != null and app.has_method("open_screen"):
+		app.call("open_screen", "summon_history")
+
+
+func _pity_line(banner_id: String) -> String:
+	var st := GameState.pity_status(banner_id)
+	if not bool(st["enabled"]):
+		return ""
+	var line := "PITY  %d/%d" % [int(st["counter"]), int(st["pulls"])]
+	if int(st["until"]) <= 1:
+		line += "   -   la PROXIMA tirada esta garantizada"
+	else:
+		line += "   -   garantizado en %d tiradas" % int(st["until"])
+	return line + "   (personaje que puede llegar a %s)" % String(st["rarity"])
 
 
 func _on_show_stage() -> void:
@@ -230,6 +283,8 @@ func _refresh_stage(banner: Dictionary) -> void:
 					text += " (%s %s%%)" % [GameState.display_name(String(fid)), _pct(float(featured_rates[fid]))]
 			parts.append(text)
 	_stage_rates.text = "Probabilidad por tirada:   " + "    ".join(parts)
+	_stage_pity.text = _pity_line(_banner_id)
+	_stage_pity.visible = not _stage_pity.text.is_empty()
 	# Presentacion propia del banner: "theme" en su JSON (color y lema). Un banner
 	# sin tema usa el marco dorado de siempre.
 	var theme = banner.get("theme", {})
@@ -408,9 +463,11 @@ func _on_roll(count: int) -> void:
 	_set_buttons_locked(true)
 	var best := _best_rarity(report)
 	_animating = true
-	SummonFx.play(self, best, func():
+	var fx: Control = SummonFx.play(self, best, func():
 		_animating = false
 		_begin_reveal())
+	if int(report.get("pity_guaranteed", 0)) > 0 and fx != null:
+		fx.call("set_caption", "PITY GARANTIZADO")
 
 
 ## Hay una animacion de invocacion o un revelado en marcha?
@@ -435,6 +492,8 @@ func _on_reveal_finished(summary: Dictionary) -> void:
 		_summary_text = "%d tiradas  -  %d gemas  -  %d nuevos, %d repetidos" % [
 			count, int(summary.get("cost", 0)),
 			int(summary.get("new_count", 0)), int(summary.get("duplicate_count", 0))]
+		if bool(summary.get("pity_enabled", false)):
+			_summary_text += "   -   pity %d/%d" % [int(summary.get("pity_after", 0)), int(summary.get("pity_pulls", 0))]
 	_set_buttons_locked(false)
 
 

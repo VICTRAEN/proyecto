@@ -108,6 +108,21 @@ func bind(new_data: Dictionary, selected: bool = false, extra: String = "") -> v
 		circle.offset_left = -6.0 - 56.0
 		circle.offset_top = 6.0
 
+	# v13: marca de FAVORITO (protegido frente al consumo accidental).
+	if owned and bool(data.get("favorite", false)):
+		var star := Label.new()
+		star.name = "FavoriteMark"
+		star.text = "★"
+		star.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		star.add_theme_font_size_override("font_size", VI.FONT_BODY)
+		star.add_theme_color_override("font_color", VI.GOLD)
+		star.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.95))
+		star.add_theme_constant_override("outline_size", 6)
+		art_holder.add_child(star)
+		star.set_anchors_and_offsets_preset(Control.PRESET_TOP_LEFT, Control.PRESET_MODE_MINSIZE)
+		star.offset_left = 8.0
+		star.offset_top = 4.0
+
 	var name_label := Label.new()
 	name_label.text = String(data.get("name", id)) if owned else "???"
 	name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER

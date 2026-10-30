@@ -63,6 +63,11 @@ var _category_filter := ALL
 var _category_names: Dictionary = {}
 var _sort_mode := SORT_RARITY
 var _progress: ProgressBar = null
+## v13: filtros rapidos para localizar duplicados (con copias) y favoritos.
+var _only_dupes := false
+var _only_favorites := false
+var _dupe_toggle: Button = null
+var _fav_toggle: Button = null
 
 
 func _ready() -> void:
@@ -133,6 +138,29 @@ func _compact_filters() -> void:
 	var sort_row: Node = sort_label.get_parent()
 	_advanced.append_array([type_title, category_title, sort_row])
 	filter_label.text = "RAREZA"
+	var quick := HBoxContainer.new()
+	quick.name = "QuickFilters"
+	quick.add_theme_constant_override("separation", 8)
+	_dupe_toggle = Button.new()
+	_dupe_toggle.name = "DupesToggle"
+	_dupe_toggle.text = "CON COPIAS"
+	_fav_toggle = Button.new()
+	_fav_toggle.name = "FavoritesToggle"
+	_fav_toggle.text = "FAVORITOS"
+	for toggle in [_dupe_toggle, _fav_toggle]:
+		toggle.toggle_mode = true
+		toggle.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		toggle.custom_minimum_size = Vector2(0, 60)
+		toggle.add_theme_font_size_override("font_size", VI.FONT_SMALL)
+		VI.tint_button(toggle, VI.CYAN)
+		quick.add_child(toggle)
+	_dupe_toggle.toggled.connect(func(on: bool):
+		_only_dupes = on
+		_build())
+	_fav_toggle.toggled.connect(func(on: bool):
+		_only_favorites = on
+		_build())
+	box.add_child(quick)
 	_filters_toggle = Button.new()
 	_filters_toggle.name = "FiltersToggle"
 	_filters_toggle.text = "MAS FILTROS"
@@ -245,6 +273,7 @@ func _build() -> void:
 			separate.append(stack)
 	var shown: Array = []
 	for data in all:
+		data["favorite"] = GameState.is_favorite(String(data.get("id", "")))
 		data["copy_count"] = int(merged_counts.get(String(data.get("id", "")), 0))
 		data["copy_ledger"] = GameState.copy_ledger_text(String(data.get("id", ""))) if int(data["copy_count"]) > 0 else ""
 		data["copy_total"] = int(GameState.copy_ledger(String(data.get("id", "")))["total"]) if int(data["copy_count"]) > 0 else 0
@@ -259,6 +288,7 @@ func _build() -> void:
 		pile["form_override"] = String(stack["quality"]).to_lower()
 		pile["copy_only"] = true
 		pile["copy_count"] = int(stack["count"])
+		pile["favorite"] = GameState.is_favorite(String(stack["id"]))
 		pile["copy_ledger"] = GameState.copy_ledger_text(String(stack["id"]))
 		pile["copy_total"] = int(stack["total"])
 		if _matches(pile):
@@ -286,6 +316,11 @@ func _build() -> void:
 
 
 func _matches(data: Dictionary) -> bool:
+	# Filtros rapidos (v13): "con copias" = tiene copias disponibles (suyas o aparte).
+	if _only_dupes and GameState.dupe_copies_available(String(data.get("id", ""))) <= 0:
+		return false
+	if _only_favorites and not GameState.is_favorite(String(data.get("id", ""))):
+		return false
 	if _rarity_filter != ALL and String(data.get("rarity", "R")) != _rarity_filter:
 		return false
 	if _type_filter != ALL and String(data.get("type", "?")) != _type_filter:

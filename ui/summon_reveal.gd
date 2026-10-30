@@ -53,6 +53,7 @@ var _flash: ColorRect = null
 var _cin_layer: Control = null
 var _video: VideoStreamPlayer = null
 var _skip_button: Button = null
+var _skip_all_button: Button = null
 var _cin_done := true
 var _cin_token := 0
 var _cin_cfg: Dictionary = {}
@@ -108,6 +109,24 @@ func _ready() -> void:
 	add_child(_flash)
 	_flash.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_flash.z_index = 5
+	# v13: en una multi se puede saltar al resumen sin pasar carta por carta. Los
+	# resultados ya estan cobrados y guardados, asi que omitir solo cambia lo que se ve.
+	_skip_all_button = Button.new()
+	_skip_all_button.name = "SkipAllButton"
+	_skip_all_button.text = "OMITIR TODO  >>"
+	_skip_all_button.focus_mode = Control.FOCUS_NONE
+	_skip_all_button.custom_minimum_size = Vector2(300, 76)
+	_skip_all_button.add_theme_font_size_override("font_size", VI.FONT_SMALL)
+	VI.tint_button(_skip_all_button, VI.BLUE)
+	_skip_all_button.visible = false
+	_skip_all_button.pressed.connect(skip_all)
+	_skip_all_button.z_index = 6
+	add_child(_skip_all_button)
+	_skip_all_button.set_anchors_preset(Control.PRESET_TOP_RIGHT)
+	_skip_all_button.offset_left = -330.0
+	_skip_all_button.offset_right = -24.0
+	_skip_all_button.offset_top = 120.0
+	_skip_all_button.offset_bottom = 196.0
 
 
 func _exit_tree() -> void:
@@ -175,6 +194,20 @@ func tap() -> void:
 	_advance()
 
 
+## Salta todas las cartas que quedan y abre el resumen. Idempotente y solo en la fase
+## de carta (la cinematica del duo tiene su propio SALTAR).
+func skip_all() -> void:
+	if _closed or _busy or _phase != "card" or _total <= 1:
+		return
+	_busy = true
+	if _skip_all_button != null:
+		_skip_all_button.visible = false
+	while GameState.reveal_advance():
+		pass
+	fx_log.append("skip_all")
+	_show_end()
+
+
 func _advance() -> void:
 	_busy = true
 	var tween := create_tween()
@@ -205,6 +238,8 @@ func _show_current() -> void:
 		_show_end() if _total > 1 else _close()
 		return
 	_busy = true
+	if _skip_all_button != null:
+		_skip_all_button.visible = false
 	var cin = DB.get_character(current_id()).get("summon_cinematic", {})
 	_cin_cfg = cin if cin is Dictionary else {}
 	_short_special = false
@@ -248,6 +283,8 @@ func _present_card() -> void:
 	var last := index >= _total - 1
 	_hint.text = ("TOCA PARA FINALIZAR" if _total <= 1 or not last else "TOCA PARA TERMINAR") if last else "TOCA PARA CONTINUAR"
 	_hint.visible = true
+	if _skip_all_button != null:
+		_skip_all_button.visible = _total > 1 and not last
 
 	var box := MarginContainer.new()
 	box.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -332,6 +369,8 @@ func _present_card() -> void:
 	chip.name = "NewChip"
 	var is_new := bool(_entry.get("new", false))
 	chip.text = "NUEVO" if is_new else "REPETIDO  +%d" % int(_entry.get("duplicates", 1))
+	if bool(_entry.get("guaranteed", false)):
+		chip.text += "   -   PITY GARANTIZADO"
 	chip.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	chip.add_theme_font_size_override("font_size", VI.FONT_BODY)
 	chip.add_theme_color_override("font_color", VI.GREEN if is_new else VI.INK_SOFT)
@@ -573,6 +612,18 @@ func _show_summary() -> void:
 	info.add_theme_font_size_override("font_size", VI.FONT_BODY)
 	info.add_theme_color_override("font_color", VI.INK_SOFT)
 	col.add_child(info)
+	if bool(GameState.pending_reveal.get("pity_enabled", false)):
+		var pity_line := Label.new()
+		pity_line.name = "PityInfo"
+		pity_line.text = "PITY: %d -> %d de %d" % [
+			int(GameState.pending_reveal.get("pity_before", 0)), int(GameState.pending_reveal.get("pity_after", 0)),
+			int(GameState.pending_reveal.get("pity_pulls", 0))]
+		if int(GameState.pending_reveal.get("pity_guaranteed", 0)) > 0:
+			pity_line.text += "   (garantizado x%d)" % int(GameState.pending_reveal.get("pity_guaranteed", 0))
+		pity_line.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		pity_line.add_theme_font_size_override("font_size", VI.FONT_SMALL)
+		pity_line.add_theme_color_override("font_color", VI.GOLD)
+		col.add_child(pity_line)
 	var scroll := ScrollContainer.new()
 	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED

@@ -19,5 +19,5 @@
 		"pulls": 0,
 		"rarity": ""
 	},
-	"notes": "Probabilidades POR TIRADA, explicitas y sumando 1 (sin renormalizar). Una x10 son 10 tiradas independientes. No hay pity ni bonus de destacados: los destacados solo se muestran en el banner. Las formas UR/LR de evolucion y las unidades F2P no entran en el gacha."
+	"notes": "Probabilidades POR TIRADA, explicitas y sumando 1 (sin renormalizar). Una x10 son 10 tiradas independientes. Sin pity (ningun personaje de este pool puede llegar a LR) ni bonus de destacados: los destacados solo se muestran en el banner. Las formas UR/LR de evolucion y las unidades F2P no entran en el gacha."
 }

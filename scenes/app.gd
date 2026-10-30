@@ -28,6 +28,7 @@ const SCREENS := {
 	"team": preload("res://scenes/screens/team.tscn"),
 	"stage_select": preload("res://scenes/screens/stage_select.tscn"),
 	"summon": preload("res://scenes/screens/summon.tscn"),
+	"summon_history": preload("res://scenes/screens/summon_history.tscn"),
 	"missions": preload("res://scenes/screens/missions.tscn"),
 	# HITO 2 de la historia: HISTORIA lista los mundos y MAPA DE MUNDO pinta los
 	# niveles del mundo elegido. El combate que abre el mapa se abre POR ENCIMA y
@@ -116,6 +117,13 @@ func _ready() -> void:
 		sim_node.name = "SimBalance"
 		add_child(sim_node)
 		sim_node.call_deferred("run", self)
+	elif dbg_args.has("--dbg25"):
+		var hito_k: GDScript = load("res://scenes/debug/hito_k_checks.gd")
+		var hito_k_node := Node.new()
+		hito_k_node.set_script(hito_k)
+		hito_k_node.name = "HitoKChecks"
+		add_child(hito_k_node)
+		hito_k_node.call_deferred("run", self)
 	elif dbg_args.has("--dbg24"):
 		var hito_j: GDScript = load("res://scenes/debug/hito_j_checks.gd")
 		var hito_j_node := Node.new()
