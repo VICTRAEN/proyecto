@@ -1,0 +1,16 @@
+{
+	"id": "pm_goku_batallas",
+	"name": "Entrenamiento diario",
+	"description": "Combate 20 veces con Goku en el equipo.",
+	"scope": "personal",
+	"character": "goku",
+	"category": "SON GOKU",
+	"target": 20,
+	"objective": {
+		"type": "battle_played"
+	},
+	"reward": {
+		"coins": 600,
+		"materials": 3
+	}
+}

@@ -1,5 +1,6 @@
 extends Control
 
+const StageInfo := preload("res://core/stage_info.gd")
 const NAV := preload("res://scenes/nav.gd")
 const VI := preload("res://ui/visual_identity.gd")
 const ROSTER_CARD := preload("res://ui/roster_card.tscn")
@@ -88,14 +89,14 @@ func _build_stages() -> void:
 		var completed: bool = GameState.stage_completed(id)
 		var selected := id == _selected_stage and unlocked
 		var button := Button.new()
-		button.custom_minimum_size = Vector2(0, 190)
-		button.text = "%s\n%s   -   %s\n%s\nRecompensas: %d XP   %d monedas" % [
+		button.custom_minimum_size = Vector2(0, 250)
+		var info_lines: Array = StageInfo.lines("stage", stage.get("enemies", []), int(stage.get("xp_reward", 0)), int(stage.get("coin_reward", 0)), stage)
+		button.text = "%s\n%s   -   %s\n%s\n%s" % [
 			String(stage.get("name", id)),
 			String(stage.get("difficulty", "NORMAL")),
 			_enemies_text(stage),
 			_status_text(unlocked, completed),
-			int(stage.get("xp_reward", 0)),
-			int(stage.get("coin_reward", 0)),
+			"\n".join(PackedStringArray(info_lines)),
 		]
 		button.add_theme_font_size_override("font_size", VI.FONT_BODY)
 		button.toggle_mode = true

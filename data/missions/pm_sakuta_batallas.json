@@ -1,0 +1,16 @@
+{
+	"id": "pm_sakuta_batallas",
+	"name": "Compania de batalla",
+	"description": "Combate 15 veces con Sakuta en el equipo (en cualquiera de sus formas).",
+	"scope": "personal",
+	"character": "sakuta_mai",
+	"category": "SAKUTA AZUSAGAWA",
+	"target": 15,
+	"objective": {
+		"type": "battle_played"
+	},
+	"reward": {
+		"coins": 600,
+		"materials": 3
+	}
+}

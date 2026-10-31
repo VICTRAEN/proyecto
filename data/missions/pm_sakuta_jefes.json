@@ -1,0 +1,16 @@
+{
+	"id": "pm_sakuta_jefes",
+	"name": "Rompe-sindromes",
+	"description": "Derrota a 3 jefes con Sakuta en el equipo.",
+	"scope": "personal",
+	"character": "sakuta_mai",
+	"category": "SAKUTA AZUSAGAWA",
+	"target": 3,
+	"objective": {
+		"type": "boss_defeated"
+	},
+	"reward": {
+		"coins": 900,
+		"gems": 20
+	}
+}

@@ -103,6 +103,21 @@ func _apply_identity() -> void:
 	_progress.custom_minimum_size = Vector2(0, 14)
 	_progress.add_theme_stylebox_override("fill", ThemeFactory.bar_fill(VI.GOLD))
 	header.add_child(_progress)
+	# v15: acceso a las recompensas por colecciones.
+	var rewards_button := Button.new()
+	rewards_button.name = "RewardsButton"
+	rewards_button.text = "RECOMPENSAS DE COLECCION"
+	rewards_button.custom_minimum_size = Vector2(0, 60)
+	VI.tint_button(rewards_button, VI.GOLD)
+	rewards_button.pressed.connect(_open_rewards)
+	header.add_child(rewards_button)
+	var compare_button := Button.new()
+	compare_button.name = "CompareButton"
+	compare_button.text = "COMPARAR PERSONAJES"
+	compare_button.custom_minimum_size = Vector2(0, 60)
+	VI.tint_button(compare_button, VI.CYAN)
+	compare_button.pressed.connect(_open_compare)
+	header.add_child(compare_button)
 	filters_panel.add_theme_stylebox_override("panel", VI.panel(0.80, true))
 	for label in [filter_label, type_title, category_title, sort_label]:
 		VI.style_title(label, VI.FONT_SMALL)
@@ -420,6 +435,18 @@ func _on_card_pressed(data: Dictionary) -> void:
 	if bool(data.get("copy_only", false)):
 		data = GameState.character_data(String(data.get("id", "")))
 	info_panel.open_for_data(data, false)
+
+
+func _open_rewards() -> void:
+	var app := NAV.app_of(self)
+	if app != null and app.has_method("open_screen"):
+		app.call("open_screen", "collection_rewards")
+
+
+func _open_compare() -> void:
+	var app := NAV.app_of(self)
+	if app != null and app.has_method("open_screen"):
+		app.call("open_screen", "compare")
 
 
 func _back() -> void:

@@ -1,0 +1,29 @@
+{
+	"id": "col_evento_sindromes",
+	"name": "Evento: Sindromes de la Pubertad",
+	"kind": "event",
+	"description": "Completa el evento y reune a los protagonistas de la historia.",
+	"members": [
+		"sakuta_mai",
+		"mai"
+	],
+	"event": "event_sindromes_de_la_pubertad",
+	"tiers": [
+		{
+			"id": "full",
+			"percent": 100,
+			"requires_event": true,
+			"reward": {
+				"coins": 1200,
+				"gems": 25,
+				"title": {
+					"id": "title_col_evento_sindromes",
+					"name": "Testigo del sindrome"
+				},
+				"cosmetics": [
+					"bg_eventos"
+				]
+			}
+		}
+	]
+}

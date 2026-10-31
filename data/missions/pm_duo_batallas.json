@@ -1,0 +1,16 @@
+{
+	"id": "pm_duo_batallas",
+	"name": "Hasta la luna",
+	"description": "Combate 10 veces con David y Lucy (el duo) en el equipo.",
+	"scope": "personal",
+	"character": "david_lucy_duo",
+	"category": "DAVID MARTINEZ & LUCY",
+	"target": 10,
+	"objective": {
+		"type": "battle_played"
+	},
+	"reward": {
+		"coins": 600,
+		"materials": 3
+	}
+}

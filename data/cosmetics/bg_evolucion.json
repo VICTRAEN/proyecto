@@ -1,0 +1,7 @@
+{
+	"id": "bg_evolucion",
+	"type": "background",
+	"name": "Fondo: Evolucion",
+	"description": "El fondo de la evolucion como fondo del menu principal.",
+	"slot": "evolution"
+}

@@ -1,0 +1,32 @@
+{
+	"id": "col_cat_rivals",
+	"name": "Categoria: Rivales",
+	"kind": "category",
+	"description": "Alguien a quien superar, o alguien que te obliga a crecer. Reune a todos los personajes de la categoria.",
+	"category": "rivals",
+	"tiers": [
+		{
+			"id": "half",
+			"percent": 50,
+			"reward": {
+				"coins": 330,
+				"materials": 3
+			}
+		},
+		{
+			"id": "full",
+			"percent": 100,
+			"reward": {
+				"coins": 860,
+				"gems": 22,
+				"title": {
+					"id": "title_col_cat_rivals",
+					"name": "Rival eterno"
+				},
+				"cosmetics": [
+					"bg_ruinas"
+				]
+			}
+		}
+	]
+}

@@ -1,0 +1,38 @@
+{
+	"id": "col_serie_chainsaw_man",
+	"name": "Chainsaw Man",
+	"kind": "series",
+	"description": "Cazadores de demonios, demonios cazadores y quien mueve los hilos.",
+	"members": [
+		"denji",
+		"power",
+		"makima",
+		"reze",
+		"aki"
+	],
+	"tiers": [
+		{
+			"id": "half",
+			"percent": 50,
+			"reward": {
+				"coins": 350,
+				"materials": 2
+			}
+		},
+		{
+			"id": "full",
+			"percent": 100,
+			"reward": {
+				"coins": 800,
+				"gems": 18,
+				"title": {
+					"id": "title_col_serie_chainsaw_man",
+					"name": "Contrato de Motosierra"
+				},
+				"cosmetics": [
+					"ill_makima"
+				]
+			}
+		}
+	]
+}

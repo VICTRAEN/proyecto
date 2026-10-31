@@ -1,0 +1,32 @@
+{
+	"id": "col_cat_veterans",
+	"name": "Categoria: Veteranos",
+	"kind": "category",
+	"description": "Ya han sobrevivido a lo peor. Reune a todos los personajes de la categoria.",
+	"category": "veterans",
+	"tiers": [
+		{
+			"id": "half",
+			"percent": 50,
+			"reward": {
+				"coins": 300,
+				"materials": 3
+			}
+		},
+		{
+			"id": "full",
+			"percent": 100,
+			"reward": {
+				"coins": 800,
+				"gems": 20,
+				"title": {
+					"id": "title_col_cat_veterans",
+					"name": "Curtido en mil batallas"
+				},
+				"cosmetics": [
+					"bg_bosque"
+				]
+			}
+		}
+	]
+}

@@ -23,6 +23,10 @@ const WORLDS_DIR := "res://data/worlds"
 const DIALOGUES_DIR := "res://data/dialogues"
 const EVENTS_DIR := "res://data/events"
 const TOWERS_DIR := "res://data/towers"
+## v15: colecciones con recompensas, cosmeticos y nivel de cuenta.
+const COLLECTIONS_DIR := "res://data/collections"
+const COSMETICS_DIR := "res://data/cosmetics"
+const ACCOUNT_FILE := "res://data/account/levels.json"
 ## Las Leader Skills son UN archivo de balance (tabla de lideres + quien lleva
 ## cual), igual que las mutaciones: por eso se lee aparte y no con _load_dir.
 const LEADERS_FILE := "res://data/leaders/leaders.json"
@@ -70,6 +74,11 @@ var mutations_config: Dictionary = {}
 var special_evolution_rules: Dictionary = {}
 ## Reglas de Dupes (res://data/dupes/rules.json): niveles, coste y bonus. Un solo sitio.
 var dupe_rules: Dictionary = {}
+## v15: colecciones (series, categorias, rarezas y eventos) con sus recompensas por
+## tramos, catalogo de cosmeticos (fondos e ilustraciones) y tabla del nivel de cuenta.
+var collections: Dictionary = {}
+var cosmetics: Dictionary = {}
+var account_levels: Dictionary = {}
 var load_errors: Array = []
 
 
@@ -93,6 +102,9 @@ func load_all() -> void:
 	dialogues = _load_dir(DIALOGUES_DIR)
 	events = _load_dir(EVENTS_DIR)
 	towers = _load_dir(TOWERS_DIR)
+	collections = _load_dir(COLLECTIONS_DIR)
+	cosmetics = _load_dir(COSMETICS_DIR)
+	account_levels = _load_account_levels()
 	mutations_config = _load_mutations()
 	evolution_rules = _read_routes_file(EVOLUTION_FILE)
 	special_evolution_rules = _read_routes_file(SPECIAL_EVOLUTION_FILE)
@@ -281,6 +293,49 @@ func _read_routes_file(path: String) -> Dictionary:
 		load_errors.append("%s no tiene una lista 'routes'." % path)
 		return { "routes": [] }
 	return data
+
+
+## Tabla del nivel de cuenta (res://data/account/levels.json). Si falta, el nivel de
+## cuenta queda desactivado (nivel 1 fijo) en lugar de inventarse una tabla.
+func _load_account_levels() -> Dictionary:
+	var data = _read_json(ACCOUNT_FILE)
+	if not (data is Dictionary):
+		load_errors.append("No se pudo leer la tabla de cuenta %s" % ACCOUNT_FILE)
+		return {}
+	return data
+
+
+## --- v15: colecciones, cosmeticos y cuenta ----------------------------------------
+
+func get_collection(id: String) -> Dictionary:
+	return collections.get(String(id), {})
+
+
+## Colecciones ordenadas por id (la pantalla las agrupa por "kind").
+func all_collections() -> Array:
+	return _all_sorted(collections)
+
+
+func get_cosmetic(id: String) -> Dictionary:
+	return cosmetics.get(String(id), {})
+
+
+func all_cosmetics() -> Array:
+	return _all_sorted(cosmetics)
+
+
+func account_config() -> Dictionary:
+	return account_levels
+
+
+## Misiones PERSONALES (campo "scope": "personal"), ordenadas por id. Viven en
+## res://data/missions junto a las demas pero tienen su propia lista.
+func personal_missions() -> Array:
+	var out: Array = []
+	for mission in all_missions():
+		if String(mission.get("scope", "")) == "personal":
+			out.append(mission)
+	return out
 
 
 ## El balance de mutaciones se lee como un archivo de configuracion: coste,

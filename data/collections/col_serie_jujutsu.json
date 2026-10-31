@@ -1,0 +1,40 @@
+{
+	"id": "col_serie_jujutsu",
+	"name": "Jujutsu Kaisen",
+	"kind": "series",
+	"description": "Hechiceros y maldiciones de la escuela de Tokio y los que la desafian.",
+	"members": [
+		"itadori",
+		"megumi",
+		"gojo",
+		"sukuna",
+		"geto",
+		"mahito",
+		"todo"
+	],
+	"tiers": [
+		{
+			"id": "half",
+			"percent": 50,
+			"reward": {
+				"coins": 430,
+				"materials": 2
+			}
+		},
+		{
+			"id": "full",
+			"percent": 100,
+			"reward": {
+				"coins": 960,
+				"gems": 22,
+				"title": {
+					"id": "title_col_serie_jujutsu",
+					"name": "Hechicero de Jujutsu"
+				},
+				"cosmetics": [
+					"ill_gojo"
+				]
+			}
+		}
+	]
+}

@@ -1,6 +1,7 @@
 extends Control
 
 const NAV := preload("res://scenes/nav.gd")
+const StageInfo := preload("res://core/stage_info.gd")
 const VI := preload("res://ui/visual_identity.gd")
 
 ## MAPA DE MUNDO. Un mundo de la historia pintado como un mapa: cada nivel en la
@@ -302,14 +303,14 @@ func _build_difficulties(status: Dictionary) -> void:
 		previous_cleared = state == "completed"
 		var accent := _difficulty_accent(state)
 		var button := Button.new()
-		button.text = "%s\n%s\n+%d XP   +%d monedas\n%s" % [
+		var info_lines: Array = StageInfo.lines("story", (difficulty as Dictionary).get("enemies", []), int((difficulty as Dictionary).get("xp_reward", 0)), int((difficulty as Dictionary).get("coin_reward", 0)))
+		button.text = "%s\n%s\n%s\n%s" % [
 			String((difficulty as Dictionary).get("name", difficulty_id.to_upper())),
 			_enemies_text((difficulty as Dictionary).get("enemies", [])),
-			int((difficulty as Dictionary).get("xp_reward", 0)),
-			int((difficulty as Dictionary).get("coin_reward", 0)),
+			"\n".join(PackedStringArray(info_lines)),
 			_difficulty_state_text(state),
 		]
-		button.custom_minimum_size = Vector2(0.0, VI.TOUCH * 1.4)
+		button.custom_minimum_size = Vector2(0.0, VI.TOUCH * 2.2)
 		button.focus_mode = Control.FOCUS_NONE
 		button.disabled = state == "locked"
 		button.add_theme_font_size_override("font_size", VI.FONT_SMALL)

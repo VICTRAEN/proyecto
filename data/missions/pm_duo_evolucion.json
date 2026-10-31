@@ -1,0 +1,20 @@
+{
+	"id": "pm_duo_evolucion",
+	"name": "Mas alla del limite",
+	"description": "Evoluciona al duo (SSR a UR).",
+	"scope": "personal",
+	"character": "david_lucy_duo",
+	"category": "DAVID MARTINEZ & LUCY",
+	"target": 1,
+	"objective": {
+		"type": "evolve"
+	},
+	"reward": {
+		"coins": 1000,
+		"gems": 30,
+		"title": {
+			"id": "title_pm_duo",
+			"name": "Leyenda de Night City"
+		}
+	}
+}

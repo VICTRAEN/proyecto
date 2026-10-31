@@ -1,0 +1,27 @@
+{
+	"id": "col_serie_seishun_buta",
+	"name": "Seishun Buta Yarou",
+	"kind": "series",
+	"description": "Sakuta y Mai y el sindrome de la adolescencia que los une.",
+	"members": [
+		"mai",
+		"sakuta_mai"
+	],
+	"tiers": [
+		{
+			"id": "full",
+			"percent": 100,
+			"reward": {
+				"coins": 560,
+				"gems": 12,
+				"title": {
+					"id": "title_col_serie_seishun_buta",
+					"name": "Sindrome adolescente"
+				},
+				"cosmetics": [
+					"ill_mai"
+				]
+			}
+		}
+	]
+}

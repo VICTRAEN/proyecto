@@ -1,0 +1,7 @@
+{
+	"id": "bg_historia",
+	"type": "background",
+	"name": "Fondo: Historia",
+	"description": "El fondo de la historia como fondo del menu principal.",
+	"slot": "history"
+}

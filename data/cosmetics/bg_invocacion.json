@@ -1,0 +1,7 @@
+{
+	"id": "bg_invocacion",
+	"type": "background",
+	"name": "Fondo: Invocacion",
+	"description": "El fondo de la invocacion como fondo del menu principal.",
+	"slot": "summon"
+}

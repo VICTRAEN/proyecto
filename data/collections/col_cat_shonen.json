@@ -1,0 +1,32 @@
+{
+	"id": "col_cat_shonen",
+	"name": "Categoria: Shonen",
+	"kind": "category",
+	"description": "Punos, energia y torneos. Reune a todos los personajes de la categoria.",
+	"category": "shonen",
+	"tiers": [
+		{
+			"id": "half",
+			"percent": 50,
+			"reward": {
+				"coins": 780,
+				"materials": 3
+			}
+		},
+		{
+			"id": "full",
+			"percent": 100,
+			"reward": {
+				"coins": 1760,
+				"gems": 52,
+				"title": {
+					"id": "title_col_cat_shonen",
+					"name": "Alma shonen total"
+				},
+				"cosmetics": [
+					"ill_deku"
+				]
+			}
+		}
+	]
+}

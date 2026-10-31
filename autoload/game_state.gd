@@ -1,6 +1,7 @@
 extends Node
 
 const TeamPlanner := preload("res://core/team_planner.gd")
+const Families := preload("res://core/families.gd")
 
 ## Autoload GameState: estado del jugador.
 ##
@@ -837,12 +838,18 @@ func grant_battle_rewards(token: int, ally_ids: Array, victory: bool) -> Diction
 var last_battle_info: Dictionary = {}
 
 
-func _record_battle_meta(ally_ids: Array, victory: bool) -> void:
+## Jefes de la batalla en curso (ids de enemigo con "boss": true o con fases).
+func current_battle_bosses() -> Array:
 	var bosses: Array = []
 	for enemy_id in current_stage_enemies:
 		var data: Dictionary = DB.get_enemy(String(enemy_id))
 		if bool(data.get("boss", false)) or not (data.get("phases", []) as Array).is_empty():
 			bosses.append(String(enemy_id))
+	return bosses
+
+
+func _record_battle_meta(ally_ids: Array, victory: bool) -> void:
+	var bosses: Array = current_battle_bosses()
 	meta.record("battle", 1, {
 		"victory": victory, "ally_ids": ally_ids, "bosses": bosses,
 		"rounds": int(last_battle_info.get("rounds", 99)),
@@ -1088,6 +1095,9 @@ func all_missions_state() -> Array:
 		# Las periodicas (diarias/semanales) tienen su propia lista: meta.periodic_list.
 		if not String(mission.get("period", "")).is_empty():
 			continue
+		# v15: las misiones PERSONALES (scope "personal") tienen su propia lista.
+		if String(mission.get("scope", "")) == "personal":
+			continue
 		out.append(mission_state(String(mission.get("id", ""))))
 	return out
 
@@ -1095,6 +1105,8 @@ func all_missions_state() -> Array:
 ## Cobra una mision completada. Devuelve lo entregado, o vacio si no habia nada
 ## que cobrar: una mision completada solo paga UNA vez.
 func claim_mission(id: String) -> Dictionary:
+	if String(DB.get_mission(String(id)).get("scope", "")) == "personal":
+		return meta.claim_personal(String(id))
 	if not String(DB.get_mission(String(id)).get("period", "")).is_empty():
 		return meta.claim_periodic(String(id))
 	var state := mission_state(String(id))
@@ -1577,6 +1589,12 @@ var pity_counters: Dictionary = {}
 ## v14: misiones diarias/semanales, logros y titulos (core/meta_progress.gd).
 const MetaProgress := preload("res://core/meta_progress.gd")
 var meta = MetaProgress.new(self)
+## v15: nivel de cuenta + cosmeticos (core/account.gd) y colecciones con recompensas
+## (core/collections.gd). Comparten el pagador de recompensas core/rewards.gd.
+const Account := preload("res://core/account.gd")
+const CollectionsSystem := preload("res://core/collections.gd")
+var account = Account.new(self)
+var collections = CollectionsSystem.new(self)
 
 
 ## Personajes del pool del banner que cuentan para su pity.
@@ -4719,11 +4737,66 @@ func consume_guard(id: String) -> Dictionary:
 		message = "%s es FAVORITO: quita la marca para poder consumirlo." % display_name(key)
 	elif not teams.is_empty():
 		message = "%s esta en %d equipo(s) guardado(s): %s." % [display_name(key), teams.size(), ", ".join(PackedStringArray(teams))]
-	return { "protected": protected, "teams": teams, "message": message }
+	# v15: ademas de los favoritos (que BLOQUEAN), las unidades IMPORTANTES (en un equipo,
+	# con mutacion, Dupes, mucho nivel...) piden confirmacion antes de consumirse.
+	var reasons := important_reasons(key)
+	return {
+		"protected": protected, "teams": teams, "message": message,
+		"important": not reasons.is_empty(), "reasons": reasons,
+		"needs_confirmation": not protected and not reasons.is_empty(),
+	}
 
 
-## Equipos guardados y favoritos del archivo. Un guardado antiguo no los trae y se
-## queda con listas vacias; un equipo mal formado se descarta sin romper la carga.
+## Nivel a partir del cual una unidad cuenta como importante por si sola.
+const IMPORTANT_LEVEL := 50
+
+
+## Por que una unidad es IMPORTANTE (lista de frases; vacia = nada que proteger). Un
+## favorito no aparece aqui: ese ya esta bloqueado del todo.
+func important_reasons(id: String) -> Array:
+	var key := String(id)
+	var out: Array = []
+	if not is_owned(key):
+		return out
+	if party.has(key):
+		out.append("esta en tu equipo activo")
+	if tower_team.has(key):
+		out.append("esta en el equipo de la torre")
+	var teams := saved_teams_with(key)
+	if not teams.is_empty():
+		out.append("esta en %d equipo(s) guardado(s)" % teams.size())
+	if has_mutation(key):
+		out.append("tiene una mutacion")
+	if dupe_level_of(key) > 0:
+		out.append("tiene Dupe %d" % dupe_level_of(key))
+	if level_of(key) >= IMPORTANT_LEVEL:
+		out.append("es nivel %d" % level_of(key))
+	if is_evolved(key):
+		out.append("ya esta evolucionado (%s)" % rarity_of(key))
+	var root := Families.root_of(key)
+	for st in meta.personal_for_character(root):
+		if int(st["progress"]) > 0 and not bool(st["claimed"]):
+			out.append("tiene misiones personales en curso")
+			break
+	return out
+
+
+## La evolucion (especial) de `id` CONSUME al personaje actual? Si si, y es importante,
+## la interfaz tiene que pedir confirmacion. Devuelve { consumes, needs_confirmation, text }.
+func evolution_consume_check(id: String) -> Dictionary:
+	var key := String(id)
+	var special := can_special_evolve(key)
+	var consumes := false
+	if not special.is_empty() and not String(special.get("to", "")).is_empty():
+		consumes = bool((special.get("route", {}) as Dictionary).get("consume_from", true))
+	var guard := consume_guard(key)
+	var needs := consumes and bool(guard["needs_confirmation"])
+	var text := ""
+	if needs:
+		text = "%s se CONSUME en esta evolucion y %s. Pulsa otra vez para confirmar." % [display_name(key), ", ".join(PackedStringArray(guard["reasons"]))]
+	return { "consumes": consumes, "needs_confirmation": needs, "text": text }
+
+
 func _load_saved_teams(data: Dictionary) -> void:
 	saved_teams = []
 	var raw_teams = data.get("saved_teams", [])
@@ -4758,6 +4831,12 @@ func save_game() -> void:
 	if _save_deferred:
 		_save_pending = true
 		return
+	_write_save_safely(JSON.stringify(build_save_payload(), "\t"))
+
+
+## Todo lo que se guarda, como diccionario (v15: separado de la escritura para poder
+## comprobar el guardado sin tocar el archivo; save_game escribe exactamente esto).
+func build_save_payload() -> Dictionary:
 	var payload := {
 		"version": SAVE_VERSION,
 		"roster": roster,
@@ -4794,8 +4873,10 @@ func save_game() -> void:
 		"summon_total": summon_total,
 		"summon_banner_totals": summon_banner_totals,
 		"meta_progress": meta.to_dict(),
+		"account": account.to_dict(),
+		"collections": collections.to_dict(),
 	}
-	_write_save_safely(JSON.stringify(payload, "\t"))
+	return payload
 
 
 ## Escritura SEGURA del guardado (v10). Escribir directamente sobre save.json lo
@@ -4983,6 +5064,12 @@ func load_game() -> bool:
 	# v14: un guardado anterior no trae "meta_progress" y empieza vacio; los logros
 	# se reevaluan contra el estado real, asi que desbloquea lo que ya cumplia.
 	meta.from_dict(data.get("meta_progress", {}))
+	# v15: cuenta y colecciones. Un guardado de la v14 no los trae: la XP de cuenta se
+	# estima UNA vez desde los contadores y las colecciones empiezan sin tramos cobrados
+	# (el progreso se lee del roster, asi que lo que ya cumplia sale listo para cobrar).
+	account.from_dict(data.get("account", {}))
+	collections.from_dict(data.get("collections", {}))
+	account.bootstrap_if_needed()
 
 	# Por si el archivo es de antes de anadir un personaje al roster.
 	ensure_defaults()

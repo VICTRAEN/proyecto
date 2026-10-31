@@ -1,0 +1,32 @@
+{
+	"id": "col_cat_villains",
+	"name": "Categoria: Villanos",
+	"kind": "category",
+	"description": "El otro lado de la historia. Reune a todos los personajes de la categoria.",
+	"category": "villains",
+	"tiers": [
+		{
+			"id": "half",
+			"percent": 50,
+			"reward": {
+				"coins": 330,
+				"materials": 3
+			}
+		},
+		{
+			"id": "full",
+			"percent": 100,
+			"reward": {
+				"coins": 860,
+				"gems": 22,
+				"title": {
+					"id": "title_col_cat_villains",
+					"name": "Lado oscuro"
+				},
+				"cosmetics": [
+					"ill_reze"
+				]
+			}
+		}
+	]
+}

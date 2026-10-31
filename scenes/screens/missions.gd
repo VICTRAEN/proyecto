@@ -35,7 +35,7 @@ const RING := preload("res://ui/progress_ring.gd")
 
 ## v14: pestanas. DIARIAS y SEMANALES salen de core/meta_progress.gd (se reinician
 ## solas por fecha), PERMANENTES son las de siempre y LOGROS lleva ademas los titulos.
-const TABS := [["daily", "DIARIAS"], ["weekly", "SEMANALES"], ["permanent", "PERMANENTES"], ["achievements", "LOGROS"]]
+const TABS := [["daily", "DIARIAS"], ["weekly", "SEMANALES"], ["permanent", "PERMANENTES"], ["personal", "PERSONAJES"], ["achievements", "LOGROS"]]
 var _tab := "daily"
 var _tab_buttons: Dictionary = {}
 
@@ -99,6 +99,9 @@ func _entries_for(tab: String) -> Array:
 			return GameState.meta.periodic_list("daily")
 		"weekly":
 			return GameState.meta.periodic_list("weekly")
+		"personal":
+			# v15: misiones PERSONALES de personajes concretos.
+			return GameState.meta.personal_list()
 		"achievements":
 			var out: Array = []
 			for id in GameState.meta.achievement_ids():
@@ -178,7 +181,7 @@ func _build_list() -> void:
 	var missions: Array = _entries_for(_tab)
 	if _tab == "achievements":
 		list.add_child(_make_titles_row())
-	elif _tab != "permanent":
+	elif _tab != "permanent" and _tab != "personal":
 		var period := "daily" if _tab == "daily" else "weekly"
 		list.add_child(_make_reset_label(period))
 	if missions.is_empty():
@@ -296,7 +299,10 @@ func _make_card(mission: Dictionary) -> Control:
 	reward.text = "+%d monedas" % reward_coins
 	if reward_gems > 0:
 		reward.text += "\n+%d gemas" % reward_gems
-	if not String(mission.get("title_name", "")).is_empty():
+	if String(mission.get("kind", "")) == "personal":
+		# Las personales pueden dar materiales, objetos y titulo: se muestra el texto completo.
+		reward.text = String(mission.get("reward_text", "")).replace(", ", "\n")
+	if not String(mission.get("title_name", "")).is_empty() and String(mission.get("kind", "")) != "personal":
 		reward.text += "\nTitulo: %s" % String(mission["title_name"])
 	reward.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	reward.add_theme_font_size_override("font_size", VI.FONT_TINY)

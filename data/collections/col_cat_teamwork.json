@@ -1,0 +1,32 @@
+{
+	"id": "col_cat_teamwork",
+	"name": "Categoria: Trabajo en equipo",
+	"kind": "category",
+	"description": "Gana el conjunto, no la estrella. Reune a todos los personajes de la categoria.",
+	"category": "teamwork",
+	"tiers": [
+		{
+			"id": "half",
+			"percent": 50,
+			"reward": {
+				"coins": 420,
+				"materials": 3
+			}
+		},
+		{
+			"id": "full",
+			"percent": 100,
+			"reward": {
+				"coins": 1040,
+				"gems": 28,
+				"title": {
+					"id": "title_col_cat_teamwork",
+					"name": "Espiritu de equipo"
+				},
+				"cosmetics": [
+					"bg_misiones"
+				]
+			}
+		}
+	]
+}

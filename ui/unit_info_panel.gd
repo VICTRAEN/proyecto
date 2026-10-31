@@ -4,6 +4,7 @@ const CombatUnit := preload("res://core/combat_unit.gd")
 const StatBlock := preload("res://core/stat_block.gd")
 const Portrait := preload("res://ui/portrait.gd")
 const TypeColors := preload("res://ui/type_colors.gd")
+const EvolutionPreview := preload("res://ui/evolution_preview.gd")
 const VI := preload("res://ui/visual_identity.gd")
 const FichaTabs := preload("res://ui/ficha_tabs.gd")
 const DupeTab := preload("res://ui/dupe_tab.gd")
@@ -501,7 +502,11 @@ func _fill_evolution() -> void:
 		ready_label.add_theme_color_override("font_color", VI.GREEN)
 		tab_datos.add_child(ready_label)
 
+	# v15: estadisticas previstas de la evolucion (las mismas que en la pantalla EVOLUCION).
+	tab_datos.add_child(EvolutionPreview.make(GameState, id))
+
 	var button := Button.new()
+	button.name = "EvolveButton"
 	button.text = "EVOLUCIONAR"
 	button.custom_minimum_size = Vector2(0.0, VI.TOUCH)
 	button.add_theme_font_size_override("font_size", VI.FONT_BODY)
@@ -514,10 +519,24 @@ func _fill_evolution() -> void:
 
 ## Evoluciona de verdad. La transicion la pinta EvolutionFx con los datos del
 ## informe; quien cambia el personaje es GameState, en un solo sitio.
+var _evolve_armed_for := ""
+
+
 func _on_evolve_pressed(is_special: bool) -> void:
 	if unit == null or unit.id.is_empty():
 		return
 	var id := unit.id
+	# v15: si la evolucion CONSUME a una unidad importante, hace falta confirmar.
+	if is_special:
+		var guard: Dictionary = GameState.evolution_consume_check(id)
+		if bool(guard["needs_confirmation"]) and _evolve_armed_for != id:
+			_evolve_armed_for = id
+			var b := tab_datos.find_child("EvolveButton", true, false)
+			if b is Button:
+				(b as Button).text = "CONFIRMAR: %s" % String(guard["text"]).split(". ")[0]
+				(b as Button).autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+			return
+	_evolve_armed_for = ""
 	var before_form := String(unit.rarity)
 	var report: Dictionary = GameState.evolve_special(id) if is_special else GameState.evolve(id)
 	if report.is_empty():

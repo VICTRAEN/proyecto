@@ -1,0 +1,28 @@
+{
+	"id": "col_serie_frieren",
+	"name": "Frieren",
+	"kind": "series",
+	"description": "El viaje de la maga que sobrevivio al heroe y de quienes la siguen.",
+	"members": [
+		"frieren",
+		"fern",
+		"stark"
+	],
+	"tiers": [
+		{
+			"id": "full",
+			"percent": 100,
+			"reward": {
+				"coins": 640,
+				"gems": 14,
+				"title": {
+					"id": "title_col_serie_frieren",
+					"name": "Compania del viaje"
+				},
+				"cosmetics": [
+					"ill_frieren"
+				]
+			}
+		}
+	]
+}

@@ -1,0 +1,7 @@
+{
+	"id": "bg_misiones",
+	"type": "background",
+	"name": "Fondo: Misiones",
+	"description": "El fondo de las misiones como fondo del menu principal.",
+	"slot": "missions"
+}

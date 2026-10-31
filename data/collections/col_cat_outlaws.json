@@ -1,0 +1,32 @@
+{
+	"id": "col_cat_outlaws",
+	"name": "Categoria: Proscritos",
+	"kind": "category",
+	"description": "Viven al margen de las reglas. Reune a todos los personajes de la categoria.",
+	"category": "outlaws",
+	"tiers": [
+		{
+			"id": "half",
+			"percent": 50,
+			"reward": {
+				"coins": 360,
+				"materials": 3
+			}
+		},
+		{
+			"id": "full",
+			"percent": 100,
+			"reward": {
+				"coins": 920,
+				"gems": 24,
+				"title": {
+					"id": "title_col_cat_outlaws",
+					"name": "Fuera de la ley"
+				},
+				"cosmetics": [
+					"ill_denji"
+				]
+			}
+		}
+	]
+}

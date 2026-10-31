@@ -1,0 +1,7 @@
+{
+	"id": "bg_mutacion",
+	"type": "background",
+	"name": "Fondo: Mutaciones",
+	"description": "El fondo de las mutaciones como fondo del menu principal.",
+	"slot": "mutation"
+}

@@ -1,0 +1,7 @@
+{
+	"id": "bg_resultados",
+	"type": "background",
+	"name": "Fondo: Resultados",
+	"description": "El fondo dorado de los resultados como fondo del menu principal.",
+	"slot": "results"
+}

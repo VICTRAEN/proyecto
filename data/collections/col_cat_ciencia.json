@@ -1,0 +1,24 @@
+{
+	"id": "col_cat_ciencia",
+	"name": "Categoria: Ciencia",
+	"kind": "category",
+	"description": "Lo resuelve con el metodo, no con los punos. Reune a todos los personajes de la categoria.",
+	"category": "ciencia",
+	"tiers": [
+		{
+			"id": "full",
+			"percent": 100,
+			"reward": {
+				"coins": 680,
+				"gems": 16,
+				"title": {
+					"id": "title_col_cat_ciencia",
+					"name": "Cientifico loco"
+				},
+				"cosmetics": [
+					"bg_inventario"
+				]
+			}
+		}
+	]
+}

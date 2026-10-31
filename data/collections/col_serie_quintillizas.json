@@ -1,0 +1,28 @@
+{
+	"id": "col_serie_quintillizas",
+	"name": "Las quintillizas",
+	"kind": "series",
+	"description": "Las hermanas Nakano que sobran para llenar una clase.",
+	"members": [
+		"itsuki",
+		"nino",
+		"miku"
+	],
+	"tiers": [
+		{
+			"id": "full",
+			"percent": 100,
+			"reward": {
+				"coins": 640,
+				"gems": 14,
+				"title": {
+					"id": "title_col_serie_quintillizas",
+					"name": "Hermana Nakano"
+				},
+				"cosmetics": [
+					"ill_itsuki"
+				]
+			}
+		}
+	]
+}

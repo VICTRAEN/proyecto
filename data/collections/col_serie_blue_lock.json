@@ -1,0 +1,28 @@
+{
+	"id": "col_serie_blue_lock",
+	"name": "Blue Lock",
+	"kind": "series",
+	"description": "Delanteros que quieren ser el mejor del mundo.",
+	"members": [
+		"isagi",
+		"bachira",
+		"nagi"
+	],
+	"tiers": [
+		{
+			"id": "full",
+			"percent": 100,
+			"reward": {
+				"coins": 640,
+				"gems": 14,
+				"title": {
+					"id": "title_col_serie_blue_lock",
+					"name": "Delantero egoista"
+				},
+				"cosmetics": [
+					"ill_isagi"
+				]
+			}
+		}
+	]
+}

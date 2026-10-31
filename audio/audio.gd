@@ -11,6 +11,7 @@ extends Node
 ##   res://audio/music/history.ogg       -> musica de la historia
 ##   res://audio/music/events.ogg        -> musica de eventos
 ##   res://audio/music/results.ogg       -> musica de resultados
+##   res://audio/music/boss.ogg          -> musica de jefe (opcional; si falta suena la de combate)
 ##   res://audio/music/david_lucy_theme.ogg -> tema del duo David & Lucy (lo aportas tu)
 ##   res://audio/ui/click.ogg            -> sonidos de interfaz
 ##   res://audio/combat/attack.ogg       -> sonidos de combate
@@ -32,7 +33,7 @@ extends Node
 ## Anadir un sonido nuevo es anadir su nombre a esta tabla y dejar el archivo en
 ## su carpeta. No hay que tocar ninguna pantalla.
 const CATALOG := {
-	"music": ["menu", "battle", "history", "events", "results", "david_lucy_theme"],
+	"music": ["menu", "battle", "history", "events", "results", "david_lucy_theme", "boss"],
 	"ui": ["click", "select", "back", "open", "close", "equip", "remove", "claim", "tab", "buy"],
 	"combat": ["attack", "special", "critical", "heal", "victory", "defeat"],
 	"progression": ["summon", "evolution", "level_up", "mutation"],
@@ -59,6 +60,30 @@ var _music_slot := ""
 ## permite comprobar desde fuera que pista esta puesta sin tocar el reproductor.
 var _music_path := ""
 
+## --- Transiciones (v15) ---------------------------------------------------------
+## Un SOLO reproductor de musica: las pistas nunca se solapan. Al cambiar de pista la
+## actual baja (MUSIC_FADE_OUT), se cambia el archivo y la nueva sube (MUSIC_FADE_IN). Si
+## llega otra peticion durante el fundido gana la ultima (no hay reinicios de pistas que
+## ya no tocan) y pedir la misma pista que ya suena o que esta entrando no hace nada.
+## En headless (pruebas, sin salida de audio) los fundidos se desactivan y el cambio es
+## instantaneo; las pruebas de v15 los activan a proposito.
+const MUSIC_FADE_OUT := 0.30
+const MUSIC_FADE_IN := 0.50
+var fades_enabled := DisplayServer.get_name() != "headless"
+var _fade_tween: Tween = null
+## Pista que espera a que termine el fundido de salida ("" = ninguna).
+var _pending_slot := ""
+## Cuantas veces se ha puesto un archivo de musica en el reproductor (para comprobar
+## que pedir la misma pista no la reinicia).
+var music_starts := 0
+## Bajada temporal de la musica (dB, <= 0) para que se oigan las intros y los jingles.
+var _duck_db := 0.0
+var _duck_tween: Tween = null
+## Efectos: hueco minimo entre el mismo sonido y tope de reproductores simultaneos.
+const SFX_MIN_GAP_MS := 45
+const SFX_MAX_PLAYERS := 14
+var _sfx_last_ms: Dictionary = {}
+
 
 func _ready() -> void:
 	# Indice inverso nombre -> categoria, montado una vez desde el catalogo.
@@ -84,8 +109,8 @@ static func _db_for(setting: String, base_db: float) -> float:
 
 
 func _on_setting_changed(key: String) -> void:
-	if key == "music_volume" and _music != null:
-		_music.volume_db = _music_db(_music_slot)
+	if key == "music_volume" and _music != null and _fade_tween == null:
+		_music.volume_db = _music_db(_music_slot) + _duck_db
 
 
 ## Volumen de una pista de musica: el del ajuste del jugador + su ganancia propia.
@@ -139,7 +164,8 @@ func missing_events() -> Array:
 
 ## Entradas del catalogo cuyo archivo APORTA EL DESARROLLADOR (no se genera ni se
 ## incluye): faltar no es un fallo, el juego sigue sin ellas.
-const USER_SUPPLIED := ["david_lucy_theme"]
+## "boss" (v15): musica de jefe OPCIONAL. Sin archivo, los jefes siguen con la de combate.
+const USER_SUPPLIED := ["david_lucy_theme", "boss"]
 
 
 ## Entradas aportadas por el usuario que aun no tienen archivo.
@@ -170,6 +196,15 @@ func play(slot: String, volume_db: float = SFX_VOLUME) -> void:
 	var stream := load_stream(slot)
 	if stream == null:
 		return
+	# Anti-solape (v15): el mismo sonido no se repite en menos de SFX_MIN_GAP_MS y no
+	# hay mas de SFX_MAX_PLAYERS efectos a la vez (un combate con muchos golpes no
+	# satura el audio ni se come la musica).
+	var now_ms := Time.get_ticks_msec()
+	if now_ms - int(_sfx_last_ms.get(slot, -100000)) < SFX_MIN_GAP_MS:
+		return
+	if _count_sfx_players() >= SFX_MAX_PLAYERS:
+		return
+	_sfx_last_ms[slot] = now_ms
 	var player := AudioStreamPlayer.new()
 	player.stream = stream
 	# El volumen por defecto sigue el ajuste del jugador: sonidos de interfaz con su
@@ -186,19 +221,85 @@ func play(slot: String, volume_db: float = SFX_VOLUME) -> void:
 ## Musica en bucle. Llamar dos veces con el mismo slot no la reinicia, asi que
 ## una pantalla puede pedirla en cada refresh() sin cortar la cancion.
 func play_music(slot: String) -> void:
-	if slot == _music_slot and _music != null and _music.playing:
+	# Misma pista: ni se reinicia ni se toca el fundido en curso.
+	if slot == _music_slot and not slot.is_empty() and ((_music != null and _music.playing) or _pending_slot == slot):
 		return
 	var stream := load_stream(slot)
 	_music_slot = slot
 	_music_path = path_for(slot) if stream != null else ""
 	if stream == null:
+		_kill_fade()
+		_pending_slot = ""
 		stop_music()
 		return
 	if _music == null:
 		_music = AudioStreamPlayer.new()
 		add_child(_music)
+	var switching := fades_enabled and _music.playing and _music.stream != null
+	if not switching:
+		_kill_fade()
+		_pending_slot = ""
+		_start_stream(stream, slot)
+		if fades_enabled:
+			_fade_in()
+		return
+	# Cambio de pista: bajar la actual y, al terminar, entrar la ultima pedida.
+	_pending_slot = slot
+	if _fade_tween != null and _fade_tween.is_valid() and _fading_out:
+		return   # ya esta bajando: cuando llegue abajo cogera _pending_slot (la ultima)
+	_kill_fade()
+	_fading_out = true
+	_fade_tween = create_tween()
+	_fade_tween.tween_property(_music, "volume_db", -60.0, MUSIC_FADE_OUT)
+	_fade_tween.tween_callback(_finish_switch)
+
+
+var _fading_out := false
+
+
+func _finish_switch() -> void:
+	_fading_out = false
+	_fade_tween = null
+	var wanted := _pending_slot
+	_pending_slot = ""
+	if wanted.is_empty() or wanted != _music_slot:
+		# Nadie pidio otra pista durante el fundido (fade_out_music): se corta del todo.
+		if _music != null and _music_slot.is_empty():
+			_music.stop()
+			_music.stream = null
+		return
+	var stream := load_stream(wanted)
+	if stream == null or _music == null:
+		return
+	_start_stream(stream, wanted)
+	_fade_in()
+
+
+func _fade_in() -> void:
+	if _music == null:
+		return
+	var target := _music_db(_music_slot) + _duck_db
+	_music.volume_db = -60.0 if target > -60.0 else target
+	_kill_fade()
+	_fade_tween = create_tween()
+	_fade_tween.tween_property(_music, "volume_db", target, MUSIC_FADE_IN)
+	_fade_tween.tween_callback(func():
+		_fade_tween = null
+		_apply_duck(0.2))
+
+
+func _kill_fade() -> void:
+	if _fade_tween != null and _fade_tween.is_valid():
+		_fade_tween.kill()
+	_fade_tween = null
+	_fading_out = false
+
+
+## Pone el archivo en el reproductor unico, con bucle, al volumen de su pista.
+func _start_stream(stream: AudioStream, slot: String) -> void:
+	music_starts += 1
 	_music.stream = stream
-	_music.volume_db = _music_db(slot)
+	_music.volume_db = _music_db(slot) + _duck_db
 	# Bucle: si el archivo es un ogg sin metadatos de loop, se le pone aqui.
 	if stream is AudioStreamOggVorbis:
 		stream.loop = true
@@ -211,6 +312,66 @@ func play_music(slot: String) -> void:
 	elif stream is AudioStreamMP3:
 		stream.loop = true
 	_music.play()
+
+
+func _count_sfx_players() -> int:
+	var n := 0
+	for child in get_children():
+		if child is AudioStreamPlayer and child != _music and (child as AudioStreamPlayer).playing:
+			n += 1
+	return n
+
+
+## Musica de un combate: la de jefe si hay archivo y el combate tiene jefe; si no, la de
+## combate de siempre.
+func battle_slot(has_boss: bool) -> String:
+	if has_boss and has_stream("boss"):
+		return "boss"
+	return "battle"
+
+
+## Baja la musica `db` dB (negativo) durante una intro o un jingle. No cambia de pista.
+func duck(db: float = -9.0, seconds: float = 0.25) -> void:
+	_duck_db = minf(0.0, db)
+	_apply_duck(seconds)
+
+
+func unduck(seconds: float = 0.45) -> void:
+	_duck_db = 0.0
+	_apply_duck(seconds)
+
+
+func is_ducked() -> bool:
+	return _duck_db < -0.01
+
+
+func _apply_duck(seconds: float) -> void:
+	if _music == null or not _music.playing or _fade_tween != null:
+		return
+	var target := _music_db(_music_slot) + _duck_db
+	if not fades_enabled:
+		_music.volume_db = target
+		return
+	if _duck_tween != null and _duck_tween.is_valid():
+		_duck_tween.kill()
+	_duck_tween = create_tween()
+	_duck_tween.tween_property(_music, "volume_db", target, maxf(0.01, seconds))
+
+
+## Corta la musica con un fundido corto (la pista deja de contar como puesta YA, asi
+## nada vuelve a arrancarla). Sin fundidos equivale a stop_music().
+func fade_out_music(seconds: float = 0.35) -> void:
+	if not fades_enabled or _music == null or not _music.playing:
+		stop_music()
+		return
+	_music_slot = ""
+	_music_path = ""
+	_pending_slot = ""
+	_kill_fade()
+	_fading_out = true
+	_fade_tween = create_tween()
+	_fade_tween.tween_property(_music, "volume_db", -60.0, maxf(0.01, seconds))
+	_fade_tween.tween_callback(_finish_switch)
 
 
 ## --- Musica ESPECIAL (override) ---------------------------------------------------
@@ -252,6 +413,9 @@ func override_clear(owner_name: String = "") -> void:
 
 
 func stop_music() -> void:
+	_kill_fade()
+	_pending_slot = ""
+	_duck_db = 0.0
 	_music_slot = ""
 	_music_path = ""
 	if _music != null:

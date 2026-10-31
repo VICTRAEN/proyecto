@@ -50,6 +50,10 @@ const SCREENS := {
 	# TIENDA gasta monedas y gemas en articulos (res://data/shop). Es una pantalla
 	# propia, con su fondo y su distribucion, no una lista generica.
 	"shop": preload("res://scenes/screens/shop.tscn"),
+	# v15: recompensas por colecciones y perfil (nivel de cuenta + cosmeticos).
+	"collection_rewards": preload("res://scenes/screens/collection_rewards.tscn"),
+	"profile": preload("res://scenes/screens/profile.tscn"),
+	"compare": preload("res://scenes/screens/compare.tscn"),
 }
 
 var nav: NAV = null
@@ -117,6 +121,16 @@ func _ready() -> void:
 		sim_node.name = "SimBalance"
 		add_child(sim_node)
 		sim_node.call_deferred("run", self)
+	elif dbg_args.has("--diag"):
+		# v15: diagnostico de datos y guardado (solo desarrollo; dev/diagnostics.gd).
+		_run_diagnostics()
+	elif dbg_args.has("--dbg27"):
+		var hito_m: GDScript = load("res://scenes/debug/hito_m_checks.gd")
+		var hito_m_node := Node.new()
+		hito_m_node.set_script(hito_m)
+		hito_m_node.name = "HitoMChecks"
+		add_child(hito_m_node)
+		hito_m_node.call_deferred("run", self)
 	elif dbg_args.has("--dbg26"):
 		var hito_l: GDScript = load("res://scenes/debug/hito_l_checks.gd")
 		var hito_l_node := Node.new()
@@ -558,7 +572,9 @@ func _update_music() -> void:
 		if alive and not GameAudio.current_music_path().is_empty():
 			return
 		GameAudio.override_clear()
-	GameAudio.play_music("battle" if _battle != null else _music_for(_current))
+	if _battle == null and GameAudio.is_ducked():
+		GameAudio.unduck(0.01)   # un combate abandonado en plena intro no deja el menu bajo
+	GameAudio.play_music(GameAudio.battle_slot(not GameState.current_battle_bosses().is_empty()) if _battle != null else _music_for(_current))
 
 
 func _show_screen(screen: String) -> void:
@@ -2689,6 +2705,17 @@ func _start_hito_c(run_full: bool = true, write_mode: bool = true) -> void:
 
 ## Arnes del Hito D (torre y reglas de Mai): godot --headless --path . -- --dbg18
 var _hito_d: Node = null
+
+
+func _run_diagnostics() -> void:
+	if not ResourceLoader.exists("res://dev/diagnostics.gd"):
+		print("DIAGNOSTICO: no disponible (res://dev/ no esta en esta compilacion).")
+		get_tree().quit(2)
+		return
+	var diag = load("res://dev/diagnostics.gd").new()
+	var report: Dictionary = diag.run_all()
+	print(diag.to_text(2000))
+	get_tree().quit(0 if bool(report["ok"]) else 1)
 
 
 func _start_hito_d() -> void:

@@ -1,0 +1,7 @@
+{
+	"id": "bg_eventos",
+	"type": "background",
+	"name": "Fondo: Eventos",
+	"description": "El atardecer de los eventos como fondo del menu principal.",
+	"slot": "events"
+}

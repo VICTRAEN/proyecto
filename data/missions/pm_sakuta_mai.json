@@ -1,0 +1,19 @@
+{
+	"id": "pm_sakuta_mai",
+	"name": "Dos personas, una promesa",
+	"description": "Gana 5 combates con Sakuta y Mai (la Mai individual) en el mismo equipo.",
+	"scope": "personal",
+	"character": "sakuta_mai",
+	"category": "SAKUTA AZUSAGAWA",
+	"target": 5,
+	"objective": {
+		"type": "battle_won",
+		"with_all": [
+			"mai"
+		]
+	},
+	"reward": {
+		"coins": 800,
+		"gems": 15
+	}
+}

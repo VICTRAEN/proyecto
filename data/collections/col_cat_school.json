@@ -1,0 +1,32 @@
+{
+	"id": "col_cat_school",
+	"name": "Categoria: Escolar",
+	"kind": "category",
+	"description": "Instituto, clubes y vida normal. Reune a todos los personajes de la categoria.",
+	"category": "school",
+	"tiers": [
+		{
+			"id": "half",
+			"percent": 50,
+			"reward": {
+				"coins": 630,
+				"materials": 3
+			}
+		},
+		{
+			"id": "full",
+			"percent": 100,
+			"reward": {
+				"coins": 1460,
+				"gems": 42,
+				"title": {
+					"id": "title_col_cat_school",
+					"name": "Delegado de curso"
+				},
+				"cosmetics": [
+					"ill_nino"
+				]
+			}
+		}
+	]
+}

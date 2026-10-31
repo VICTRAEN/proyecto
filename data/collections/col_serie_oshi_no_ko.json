@@ -1,0 +1,27 @@
+{
+	"id": "col_serie_oshi_no_ko",
+	"name": "Oshi no Ko",
+	"kind": "series",
+	"description": "La familia Hoshino, entre el escenario y los focos.",
+	"members": [
+		"ai_hoshino",
+		"ruby"
+	],
+	"tiers": [
+		{
+			"id": "full",
+			"percent": 100,
+			"reward": {
+				"coins": 560,
+				"gems": 12,
+				"title": {
+					"id": "title_col_serie_oshi_no_ko",
+					"name": "Estrella del escenario"
+				},
+				"cosmetics": [
+					"bg_mutacion"
+				]
+			}
+		}
+	]
+}

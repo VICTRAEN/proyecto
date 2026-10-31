@@ -1,0 +1,16 @@
+{
+	"id": "pm_goku_jefes",
+	"name": "Rival a su altura",
+	"description": "Derrota a 2 jefes con Goku en el equipo.",
+	"scope": "personal",
+	"character": "goku",
+	"category": "SON GOKU",
+	"target": 2,
+	"objective": {
+		"type": "boss_defeated"
+	},
+	"reward": {
+		"coins": 900,
+		"gems": 20
+	}
+}

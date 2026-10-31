@@ -1,0 +1,37 @@
+{
+	"id": "col_serie_black_clover",
+	"name": "Black Clover",
+	"kind": "series",
+	"description": "Los caballeros magicos del reino del trebol.",
+	"members": [
+		"asta",
+		"yuno",
+		"noelle",
+		"yami"
+	],
+	"tiers": [
+		{
+			"id": "half",
+			"percent": 50,
+			"reward": {
+				"coins": 310,
+				"materials": 2
+			}
+		},
+		{
+			"id": "full",
+			"percent": 100,
+			"reward": {
+				"coins": 720,
+				"gems": 16,
+				"title": {
+					"id": "title_col_serie_black_clover",
+					"name": "Caballero del Trebol"
+				},
+				"cosmetics": [
+					"ill_asta"
+				]
+			}
+		}
+	]
+}

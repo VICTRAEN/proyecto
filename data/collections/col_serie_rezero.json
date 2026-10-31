@@ -1,0 +1,38 @@
+{
+	"id": "col_serie_rezero",
+	"name": "Re:Zero",
+	"kind": "series",
+	"description": "La gente que rodea a Subaru en su mundo de reinicios.",
+	"members": [
+		"subaru",
+		"emilia",
+		"rem",
+		"ram",
+		"reinhard"
+	],
+	"tiers": [
+		{
+			"id": "half",
+			"percent": 50,
+			"reward": {
+				"coins": 350,
+				"materials": 2
+			}
+		},
+		{
+			"id": "full",
+			"percent": 100,
+			"reward": {
+				"coins": 800,
+				"gems": 18,
+				"title": {
+					"id": "title_col_serie_rezero",
+					"name": "Testigo del reinicio"
+				},
+				"cosmetics": [
+					"bg_tienda"
+				]
+			}
+		}
+	]
+}

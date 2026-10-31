@@ -635,7 +635,7 @@ func _check_screens() -> void:
 	if screen == null:
 		return
 	var list: Node = screen.get_node("Margin/Main/Scroll/List")
-	_check("existen las 4 pestanas", screen.get_node_or_null("Margin/Main/Tabs") != null and screen.get_node("Margin/Main/Tabs").get_child_count() == 4)
+	_check("existen las 5 pestanas (la de PERSONAJES llego en la v15)", screen.get_node_or_null("Margin/Main/Tabs") != null and screen.get_node("Margin/Main/Tabs").get_child_count() == 5)
 	var cards_daily := _cards(list)
 	_check("DIARIAS: 5 tarjetas", cards_daily == 5)
 	screen.call("_select_tab", "weekly")

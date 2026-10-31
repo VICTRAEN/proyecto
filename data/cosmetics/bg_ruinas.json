@@ -1,0 +1,7 @@
+{
+	"id": "bg_ruinas",
+	"type": "background",
+	"name": "Fondo: Ruinas",
+	"description": "Las ruinas de combate como fondo del menu principal.",
+	"slot": "battle_ruins"
+}

@@ -1,0 +1,28 @@
+{
+	"id": "col_serie_edgerunners",
+	"name": "Cyberpunk: Edgerunners",
+	"kind": "series",
+	"description": "Night City, una netrunner y un chico que queria llegar a la luna.",
+	"members": [
+		"david",
+		"lucy",
+		"david_lucy_duo"
+	],
+	"tiers": [
+		{
+			"id": "full",
+			"percent": 100,
+			"reward": {
+				"coins": 640,
+				"gems": 14,
+				"title": {
+					"id": "title_col_serie_edgerunners",
+					"name": "Edgerunner"
+				},
+				"cosmetics": [
+					"ill_david"
+				]
+			}
+		}
+	]
+}

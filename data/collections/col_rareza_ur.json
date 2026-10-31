@@ -1,0 +1,32 @@
+{
+	"id": "col_rareza_ur",
+	"name": "Coleccion UR",
+	"kind": "rarity",
+	"description": "Todos los personajes que nacen UR.",
+	"rarity": "UR",
+	"tiers": [
+		{
+			"id": "half",
+			"percent": 50,
+			"reward": {
+				"coins": 0,
+				"materials": 0
+			}
+		},
+		{
+			"id": "full",
+			"percent": 100,
+			"reward": {
+				"coins": 1500,
+				"gems": 60,
+				"title": {
+					"id": "title_col_rareza_ur",
+					"name": "Coleccionista de leyendas"
+				},
+				"cosmetics": [
+					"bg_torre"
+				]
+			}
+		}
+	]
+}

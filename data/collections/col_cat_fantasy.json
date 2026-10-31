@@ -1,0 +1,32 @@
+{
+	"id": "col_cat_fantasy",
+	"name": "Categoria: Fantasia",
+	"kind": "category",
+	"description": "Magia, reinos y gremios. Reune a todos los personajes de la categoria.",
+	"category": "fantasy",
+	"tiers": [
+		{
+			"id": "half",
+			"percent": 50,
+			"reward": {
+				"coins": 570,
+				"materials": 3
+			}
+		},
+		{
+			"id": "full",
+			"percent": 100,
+			"reward": {
+				"coins": 1340,
+				"gems": 38,
+				"title": {
+					"id": "title_col_cat_fantasy",
+					"name": "Viajero de reinos"
+				},
+				"cosmetics": [
+					"bg_evolucion"
+				]
+			}
+		}
+	]
+}

@@ -43,3 +43,18 @@ Solo si se cumplen las dos condiciones:
 Ver los checks `DBG19` de `scenes/debug/hito_e_checks.gd`. Una exportacion release real
 no se ha podido probar en este entorno (no hay plantillas de exportacion): se simula con
 `DevTools.simulate_release(true)`.
+
+## Diagnostico (v15)
+
+`dev/diagnostics.gd` revisa los datos y el guardado y avisa de lo que esta roto. Solo existe
+en desarrollo: sigue a `DevTools.enabled()` (depuracion y sin `simulate_release`), asi que en
+la version publica no hace nada y su boton no se monta. Excluye `dev/*` de la exportacion.
+
+- Desde el panel de desarrollo (Ajustes): boton **DIAGNOSTICO** con el informe en pantalla.
+- Desde consola: `godot --headless --path . -- --diag` (codigo de salida 0 = sin errores,
+  1 = hay errores).
+- Areas: identificadores repetidos, recursos que faltan, errores de guardado, recompensas
+  duplicadas, personajes imposibles de conseguir y fases mal configuradas.
+- Gravedad: **error** (el juego esta roto o es injusto), **aviso** (se degrada con gracia,
+  p. ej. arte que falta: se dibuja una silueta) y **nota** (informativo).
+- Solo lee: no escribe el guardado ni cambia el estado del jugador.

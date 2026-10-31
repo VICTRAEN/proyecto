@@ -1,6 +1,7 @@
 extends Control
 
 const NAV := preload("res://scenes/nav.gd")
+const EvolutionPreview := preload("res://ui/evolution_preview.gd")
 const VI := preload("res://ui/visual_identity.gd")
 const ROSTER_CARD := preload("res://ui/roster_card.tscn")
 const FichaTabs := preload("res://ui/ficha_tabs.gd")
@@ -265,6 +266,8 @@ func _on_card_pressed(data: Dictionary) -> void:
 ## --- Detalle -----------------------------------------------------------------
 
 func _build_detail() -> void:
+	if _confirm_armed_for != _selected_id:
+		_confirm_armed_for = ""
 	_clear(detail_box)
 	if _selected_id.is_empty():
 		subtitle_label.text = "Aqui veras los requisitos de la evolucion, uno por uno."
@@ -290,8 +293,10 @@ func _build_detail() -> void:
 	detail_box.add_child(row)
 	row.add_child(_form_panel("ANTES", _selected_id, from_form, GameState.display_name(_selected_id), "Nv. %d" % GameState.level_of(_selected_id)))
 	row.add_child(_materials_panel(check))
-	var after_level := "Nv. %d" % GameState.level_of(_selected_id)
+	# La evolucion NORMAL vuelve a nivel 1 (GameState.evolve); la especial hereda el nivel.
+	var after_level := "Nv. %d" % (GameState.level_of(_selected_id) if String(route["kind"]) == "special" else 1)
 	row.add_child(_form_panel("DESPUES", target_id, to_form, String(route["to_name"]), after_level))
+	detail_box.add_child(EvolutionPreview.make(GameState, _selected_id))
 
 	if String(route["kind"]) == "special":
 		detail_box.add_child(FichaTabs.note("Cambia de personaje: es una forma nueva, no solo una rareza mas alta."))
@@ -466,6 +471,10 @@ func _add_requirement(label_text: String, have: int, need: int, as_percent: bool
 ## Evoluciona de verdad. Quien cambia el personaje es GameState (evolve /
 ## evolve_special), que vuelve a comprobar los requisitos por su cuenta: la
 ## pantalla no puede saltarselos aunque el boton estuviera mal pintado.
+## Confirmacion de dos pasos (v15) para la evolucion que CONSUME a una unidad importante.
+var _confirm_armed_for := ""
+
+
 func _on_evolve_pressed() -> void:
 	if _selected_id.is_empty():
 		return
@@ -475,6 +484,16 @@ func _on_evolve_pressed() -> void:
 	var check: Dictionary = route["check"]
 	if not bool(check.get("ok", false)):
 		return
+	if String(route["kind"]) == "special":
+		var guard: Dictionary = GameState.evolution_consume_check(_selected_id)
+		if bool(guard["needs_confirmation"]) and _confirm_armed_for != _selected_id:
+			_confirm_armed_for = _selected_id
+			subtitle_label.text = String(guard["text"])
+			var b := detail_box.get_node_or_null("EvolveButton")
+			if b != null:
+				(b as Button).text = "CONFIRMAR EVOLUCION"
+			return
+	_confirm_armed_for = ""
 	var id := _selected_id
 	_last_from_id = id
 	var before_form := GameState.rarity_of(id)

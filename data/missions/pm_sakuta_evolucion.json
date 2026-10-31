@@ -1,0 +1,20 @@
+{
+	"id": "pm_sakuta_evolucion",
+	"name": "Despertar compartido",
+	"description": "Haz que Sakuta y Mai despierten juntos (evolucion especial).",
+	"scope": "personal",
+	"character": "sakuta_mai",
+	"category": "SAKUTA AZUSAGAWA",
+	"target": 1,
+	"objective": {
+		"type": "evolve"
+	},
+	"reward": {
+		"coins": 1000,
+		"gems": 30,
+		"title": {
+			"id": "title_pm_sakuta",
+			"name": "Promesa cumplida"
+		}
+	}
+}

@@ -1,0 +1,7 @@
+{
+	"id": "bg_torre",
+	"type": "background",
+	"name": "Fondo: Torre",
+	"description": "El fondo de la torre como fondo del menu principal.",
+	"slot": "tower"
+}

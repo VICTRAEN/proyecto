@@ -1,0 +1,7 @@
+{
+	"id": "bg_tienda",
+	"type": "background",
+	"name": "Fondo: Tienda",
+	"description": "El fondo de la tienda como fondo del menu principal.",
+	"slot": "shop"
+}

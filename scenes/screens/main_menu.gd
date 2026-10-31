@@ -46,6 +46,8 @@ var _hero_tag: Label = null
 var _coins_chip: Control = null
 var _gems_chip: Control = null
 var tower_button: Button = null
+## v15: acceso al PERFIL (nivel de cuenta) y fondo/ilustracion equipados.
+var profile_button: Button = null
 
 
 func _ready() -> void:
@@ -156,6 +158,13 @@ func _rebuild_layout() -> void:
 	status_label.add_theme_color_override("font_color", VI.INK_SOFT)
 	status_label.add_theme_font_size_override("font_size", VI.FONT_SMALL)
 	main.add_child(status_label)
+	profile_button = Button.new()
+	profile_button.name = "ProfileButton"
+	profile_button.custom_minimum_size = Vector2(0, 64)
+	profile_button.add_theme_font_size_override("font_size", VI.FONT_SMALL)
+	VI.tint_button(profile_button, VI.GOLD)
+	profile_button.pressed.connect(_goto.bind("profile"))
+	main.add_child(profile_button)
 
 	# --- Escaparate del lider ---
 	_hero = Control.new()
@@ -263,6 +272,11 @@ func _refresh_hero() -> void:
 		return
 	var id := GameState.party_leader_id()
 	var is_leader := not id.is_empty()
+	# v15: una ILUSTRACION de perfil equipada sustituye al lider en el escaparate.
+	var showcase := String(GameState.account.illustration_character())
+	if not showcase.is_empty() and DB.characters.has(showcase):
+		id = showcase
+		is_leader = false
 	if id.is_empty() and not GameState.roster.is_empty():
 		id = String(GameState.roster[0])
 	var data := GameState.character_data(id)
@@ -278,6 +292,14 @@ func _refresh_hero() -> void:
 
 func refresh() -> void:
 	_refresh_hero()
+	# v15: fondo del menu elegido en el perfil (el de siempre si no hay ninguno).
+	var bg := get_node_or_null("Background")
+	if bg != null and bg.has_method("show_slot"):
+		bg.call("show_slot", GameState.account.menu_background_slot())
+	if profile_button != null:
+		var pr: Dictionary = GameState.account.progress()
+		var pending: int = GameState.account.pending_levels().size() + GameState.collections.unclaimed_count()
+		profile_button.text = "PERFIL  -  NIVEL %d%s" % [int(pr["level"]), ("   (%d para reclamar)" % pending) if pending > 0 else ""]
 	if _coins_chip != null:
 		_coins_chip.call("set_value", GameState.coins)
 		_gems_chip.call("set_value", GameState.gems)

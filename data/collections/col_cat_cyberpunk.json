@@ -1,0 +1,24 @@
+{
+	"id": "col_cat_cyberpunk",
+	"name": "Categoria: Cyberpunk",
+	"kind": "category",
+	"description": "Cromo, implantes y ciudades que no duermen. Reune a todos los personajes de la categoria.",
+	"category": "cyberpunk",
+	"tiers": [
+		{
+			"id": "full",
+			"percent": 100,
+			"reward": {
+				"coins": 680,
+				"gems": 16,
+				"title": {
+					"id": "title_col_cat_cyberpunk",
+					"name": "Netrunner"
+				},
+				"cosmetics": [
+					"ill_lucy"
+				]
+			}
+		}
+	]
+}

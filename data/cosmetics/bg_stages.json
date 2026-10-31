@@ -1,0 +1,7 @@
+{
+	"id": "bg_stages",
+	"type": "background",
+	"name": "Fondo: Batallas",
+	"description": "El fondo de seleccion de batalla como fondo del menu principal.",
+	"slot": "stages"
+}

@@ -1,0 +1,7 @@
+{
+	"id": "bg_equipo",
+	"type": "background",
+	"name": "Fondo: Equipo",
+	"description": "El fondo azul verdoso del equipo como fondo del menu principal.",
+	"slot": "team"
+}

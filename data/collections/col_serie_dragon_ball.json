@@ -1,0 +1,28 @@
+{
+	"id": "col_serie_dragon_ball",
+	"name": "Dragon Ball",
+	"kind": "series",
+	"description": "Los guerreros que persiguen el limite del poder.",
+	"members": [
+		"goku",
+		"vegeta",
+		"gohan"
+	],
+	"tiers": [
+		{
+			"id": "full",
+			"percent": 100,
+			"reward": {
+				"coins": 640,
+				"gems": 14,
+				"title": {
+					"id": "title_col_serie_dragon_ball",
+					"name": "Guerrero Z"
+				},
+				"cosmetics": [
+					"ill_goku"
+				]
+			}
+		}
+	]
+}

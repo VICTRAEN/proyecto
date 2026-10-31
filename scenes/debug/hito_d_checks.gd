@@ -502,6 +502,11 @@ func _check_evolution() -> void:
 	if ready:
 		screen.call("_on_evolve_pressed")
 		await _frames(2)
+		# v15: Sakuta y Mai a nivel 100 es una unidad importante que la evolucion CONSUME, asi que el
+		# primer toque pide confirmacion y el segundo evoluciona.
+		if GameState.is_owned("sakuta_mai"):
+			screen.call("_on_evolve_pressed")
+			await _frames(2)
 		var fx = screen.get_node_or_null("EvolutionFx")
 		_check("evolucionar lanza la animacion de evolucion", fx != null)
 		_check("se consumen los 25 uniformes y no monedas", GameState.item_count("rabbit_costume") == 0)

@@ -354,12 +354,19 @@ func _show_link_notice() -> void:
 ## Presentacion de jefe (v14): se salta tocando. Mientras dura, el combate espera.
 func _on_boss_intro(unit: CombatUnit, info: Dictionary) -> void:
 	GameAudio.play("special")
+	# v15: la musica baja mientras dura la presentacion del jefe y vuelve al cerrarla.
+	GameAudio.duck(-10.0)
 	var art := unit.art_for("front")
-	var layer: Control = BossFx.intro(self, unit.id, art, info, manager.close_intro)
+	var layer: Control = BossFx.intro(self, unit.id, art, info, _close_boss_intro)
 	if layer == null:
-		manager.close_intro()
+		_close_boss_intro()
 	boss_intro_count += 1
 	BossFx.ambient(self, BossFx.color_of(info, GOLD))
+
+
+func _close_boss_intro() -> void:
+	GameAudio.unduck()
+	manager.close_intro()
 
 
 ## Cambio de fase de un jefe: aviso grande y onda desde su tarjeta.
@@ -513,7 +520,8 @@ func _on_battle_finished(victory: bool, rounds: int) -> void:
 	# La musica de RESULTADOS recupera la prioridad: el tema especial del combate se
 	# suelta antes de cortar la musica.
 	GameAudio.override_clear("battle")
-	GameAudio.stop_music()
+	GameAudio.unduck(0.01)
+	GameAudio.fade_out_music(0.30)
 	GameAudio.play("victory" if victory else "defeat")
 	if victory:
 		_celebrate_victory()
@@ -1159,6 +1167,10 @@ func _play_feedback(payload: Dictionary) -> void:
 					BossFx.impact(self, card.global_position + card.size * 0.5, TypeColors.color_for(actor_type) if actor_type != "" else DAMAGE_COLOR, strong)
 					if not card.unit.is_ally:
 						CombatFx.hit_shake(card, 22.0 if strong else 12.0)
+					# v15: un critico sobre un rival sacude tambien la escena entera, suave
+					# (se desactiva con animaciones reducidas dentro de CombatFx).
+					if bool(hit.get("crit", false)) and not card.unit.is_ally:
+						CombatFx.screen_shake(self, 8.0)
 			"heal":
 				var healed := int(round(float(hit.get("value", 0.0))))
 				if healed > 0:

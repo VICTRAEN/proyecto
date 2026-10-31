@@ -1,0 +1,21 @@
+{
+	"id": "pm_goku_solo",
+	"name": "El mas fuerte del universo",
+	"description": "Gana 3 combates con Goku solo (equipo de una unidad).",
+	"scope": "personal",
+	"character": "goku",
+	"category": "SON GOKU",
+	"target": 3,
+	"objective": {
+		"type": "battle_won",
+		"solo": true
+	},
+	"reward": {
+		"coins": 1000,
+		"gems": 20,
+		"title": {
+			"id": "title_pm_goku",
+			"name": "Guerrero de la montana"
+		}
+	}
+}

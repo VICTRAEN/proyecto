@@ -1,0 +1,32 @@
+{
+	"id": "col_cat_spokon",
+	"name": "Categoria: Spokon",
+	"kind": "category",
+	"description": "Deporte, equipo y entrenamiento. Reune a todos los personajes de la categoria.",
+	"category": "spokon",
+	"tiers": [
+		{
+			"id": "half",
+			"percent": 50,
+			"reward": {
+				"coins": 300,
+				"materials": 3
+			}
+		},
+		{
+			"id": "full",
+			"percent": 100,
+			"reward": {
+				"coins": 800,
+				"gems": 20,
+				"title": {
+					"id": "title_col_cat_spokon",
+					"name": "Capitan de equipo"
+				},
+				"cosmetics": [
+					"ill_hinata"
+				]
+			}
+		}
+	]
+}

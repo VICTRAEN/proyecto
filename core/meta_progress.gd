@@ -16,6 +16,9 @@ extends RefCounted
 ##
 ## Todo es dato: data/missions/*.json con "period", data/achievements/*.json.
 
+const Families := preload("res://core/families.gd")
+const Rewards := preload("res://core/rewards.gd")
+
 const RARITY_LADDER := ["R", "SR", "SSR", "UR", "LR"]
 const DEFAULT_TITLE := "title_recien_llegado"
 
@@ -27,6 +30,9 @@ var titles_owned: Array = []
 var title_equipped := ""
 var boss_kills: Dictionary = {}   # enemy_id -> veces derrotado
 var challenges: Dictionary = {}   # stat -> n (retos especiales)
+## v15: misiones PERSONALES (de un personaje). mission_id -> { progress, claimed }.
+## No se reinician nunca: son objetivos de largo plazo de un personaje concreto.
+var personal: Dictionary = {}
 
 
 func _init(owner = null) -> void:
@@ -156,6 +162,10 @@ func record(kind: String, amount: int, ctx: Dictionary) -> void:
 			continue
 		var entry := _entry(id, String(data["period"]))
 		entry["progress"] = mini(int(entry["progress"]) + add, maxi(1, int(data.get("target", 1))))
+	_record_personal(kind, amount, ctx)
+	# v15: la XP de cuenta entra por este MISMO punto unico, una vez por accion.
+	if gs != null and gs.get("account") != null:
+		gs.account.on_record(kind, amount, ctx)
 	check_achievements()
 
 
@@ -292,17 +302,23 @@ func _condition_progress(cond: Dictionary) -> Array:
 			var boss := String(cond.get("boss", ""))
 			return [int(boss_kills.get(boss, 0)) if not boss.is_empty() else int(challenges.get("boss_total", 0)), target]
 		"collection":
+			# Por FAMILIA evolutiva: Sakuta y Mai cuenta aunque ya se haya evolucionado.
 			var cat := String(cond.get("category", ""))
-			var total := 0
+			var roots: Array = []
 			var owned := 0
 			for char_id in DB.characters:
 				if (DB.characters[char_id].get("categories", []) as Array).has(cat):
-					total += 1
-					if gs.is_owned(String(char_id)):
-						owned += 1
-			return [owned, maxi(1, total)]
+					var root := Families.root_of(String(char_id))
+					if not roots.has(root):
+						roots.append(root)
+						if Families.owns(gs, root):
+							owned += 1
+			return [owned, maxi(1, roots.size())]
 		"collection_all":
-			return [gs.roster.size(), maxi(1, DB.characters.size())]
+			# v15: ANTES comparaba el roster con TODOS los ids (65), pero las evoluciones
+			# especiales consumen al personaje anterior y el roster no puede llegar a 65:
+			# el logro era imposible. Ahora cuenta familias evolutivas.
+			return [Families.owned_roots(gs), maxi(1, Families.all_roots().size())]
 		"challenge":
 			return [int(challenges.get(String(cond.get("stat", "")), 0)), target]
 		"event_completed":
@@ -354,6 +370,29 @@ func title_catalog() -> Dictionary:
 		var title_data = DB.achievements[id].get("title", {})
 		if title_data is Dictionary and not String(title_data.get("id", "")).is_empty():
 			out[String(title_data["id"])] = String(title_data.get("name", title_data["id"]))
+	# v15: tambien dan titulo las colecciones, los niveles de cuenta y las misiones personales.
+	for entry in title_sources():
+		out[String(entry["id"])] = String(entry["name"])
+	return out
+
+
+## Todos los titulos que dan las fuentes v15 (colecciones, cuenta, misiones personales):
+## [{ id, name, source }]. Lo usa el catalogo y el diagnostico de recompensas duplicadas.
+func title_sources() -> Array:
+	var out: Array = []
+	for cid in DB.collections:
+		for tier in DB.collections[cid].get("tiers", []):
+			var t = (tier as Dictionary).get("reward", {}).get("title", {}) if tier is Dictionary else {}
+			if t is Dictionary and not String((t as Dictionary).get("id", "")).is_empty():
+				out.append({ "id": String(t["id"]), "name": String(t.get("name", t["id"])), "source": "coleccion %s/%s" % [cid, (tier as Dictionary).get("id", "")] })
+	for entry in DB.account_config().get("level_rewards", []):
+		var t2 = (entry as Dictionary).get("reward", {}).get("title", {}) if entry is Dictionary else {}
+		if t2 is Dictionary and not String((t2 as Dictionary).get("id", "")).is_empty():
+			out.append({ "id": String(t2["id"]), "name": String(t2.get("name", t2["id"])), "source": "cuenta nivel %d" % int((entry as Dictionary).get("level", 0)) })
+	for mission in DB.personal_missions():
+		var t3 = (mission as Dictionary).get("reward", {}).get("title", {})
+		if t3 is Dictionary and not String((t3 as Dictionary).get("id", "")).is_empty():
+			out.append({ "id": String(t3["id"]), "name": String(t3.get("name", t3["id"])), "source": "mision personal %s" % (mission as Dictionary).get("id", "") })
 	return out
 
 
@@ -380,6 +419,141 @@ func equip_title(id: String) -> bool:
 	return true
 
 
+## --- Misiones personales (v15) -------------------------------------------------------
+## Objetivos de UN personaje (data/missions/pm_*.json, "scope": "personal"). Reutilizan el
+## mismo punto de entrada record() y los mismos tipos de objetivo que las periodicas
+## (battle_played, battle_won, boss_defeated, evolve) con filtros de equipo:
+##   "with_all": [ids]  todos tienen que estar tambien en el equipo
+##   "with_any": [ids]  al menos uno tiene que estar en el equipo
+##   "solo": true       el equipo es de una sola unidad
+## El personaje se cuenta por FAMILIA (Sakuta y Mai, Sakuta y Sakuta y Mai LR), asi que
+## el progreso no se pierde al evolucionarlo.
+
+func personal_ids() -> Array:
+	var out: Array = []
+	for mission in DB.personal_missions():
+		out.append(String((mission as Dictionary).get("id", "")))
+	return out
+
+
+func _personal_entry(id: String) -> Dictionary:
+	var entry: Dictionary = personal.get(id, {})
+	if entry.is_empty():
+		entry = { "progress": 0, "claimed": false }
+		personal[id] = entry
+	return entry
+
+
+func personal_state(id: String) -> Dictionary:
+	var data: Dictionary = DB.get_mission(id)
+	if data.is_empty() or String(data.get("scope", "")) != "personal":
+		return {}
+	var entry := _personal_entry(id)
+	var target := maxi(1, int(data.get("target", 1)))
+	var progress := mini(int(entry["progress"]), target)
+	var root := String(data.get("character", ""))
+	var reward: Dictionary = data.get("reward", {})
+	return {
+		"id": id, "name": String(data.get("name", id)),
+		"description": String(data.get("description", "")),
+		"category": String(data.get("category", "PERSONAL")),
+		"character": root, "owned": Families.owns(gs, root),
+		"character_name": gs.display_name(Families.owned_form(gs, root) if Families.owns(gs, root) else root),
+		"target": target, "progress": progress, "completed": progress >= target,
+		"claimed": bool(entry["claimed"]), "reward": reward,
+		"reward_coins": int(reward.get("coins", 0)), "reward_gems": int(reward.get("gems", 0)),
+		"title_name": String((reward.get("title", {}) as Dictionary).get("name", "")) if reward.get("title", {}) is Dictionary else "",
+		"reward_text": Rewards.describe(reward), "kind": "personal",
+	}
+
+
+func personal_list() -> Array:
+	var out: Array = []
+	for id in personal_ids():
+		out.append(personal_state(String(id)))
+	return out
+
+
+func personal_for_character(root: String) -> Array:
+	var out: Array = []
+	for st in personal_list():
+		if String(st["character"]) == root:
+			out.append(st)
+	return out
+
+
+func claim_personal(id: String) -> Dictionary:
+	var state := personal_state(id)
+	if state.is_empty() or not bool(state["completed"]) or bool(state["claimed"]):
+		return {}
+	personal[id]["claimed"] = true
+	var report := Rewards.pay(gs, state["reward"])
+	gs.save_game()
+	return { "coins": int(report["coins"]), "gems": int(report["gems"]), "items": report["items"], "name": String(state["name"]), "report": report }
+
+
+func personal_unclaimed() -> int:
+	var n := 0
+	for st in personal_list():
+		if bool(st["completed"]) and not bool(st["claimed"]):
+			n += 1
+	return n
+
+
+func _record_personal(kind: String, amount: int, ctx: Dictionary) -> void:
+	for id in personal_ids():
+		var data: Dictionary = DB.get_mission(String(id))
+		var add := _personal_gain(data, kind, amount, ctx)
+		if add <= 0:
+			continue
+		var entry := _personal_entry(String(id))
+		entry["progress"] = mini(int(entry["progress"]) + add, maxi(1, int(data.get("target", 1))))
+
+
+func _personal_gain(data: Dictionary, kind: String, amount: int, ctx: Dictionary) -> int:
+	var objective = data.get("objective", {})
+	if not (objective is Dictionary):
+		return 0
+	var forms: Array = Families.forms_of(String(data.get("character", "")))
+	var objective_type := String(objective.get("type", ""))
+	if objective_type == "evolve":
+		return amount if kind == "evolve" and forms.has(String(ctx.get("id", ""))) else 0
+	if kind != "battle":
+		return 0
+	var allies: Array = ctx.get("ally_ids", [])
+	if not _team_has_any_of(allies, forms):
+		return 0
+	if bool(objective.get("solo", false)) and allies.size() != 1:
+		return 0
+	for needed in objective.get("with_all", []):
+		if not _team_has_any_of(allies, Families.forms_of(String(needed))):
+			return 0
+	var any_list: Array = objective.get("with_any", [])
+	if not any_list.is_empty():
+		var found := false
+		for option in any_list:
+			if _team_has_any_of(allies, Families.forms_of(String(option))):
+				found = true
+		if not found:
+			return 0
+	var won := bool(ctx.get("victory", false))
+	match objective_type:
+		"battle_played":
+			return 1
+		"battle_won":
+			return 1 if won else 0
+		"boss_defeated":
+			return (ctx.get("bosses", []) as Array).size() if won else 0
+	return 0
+
+
+func _team_has_any_of(allies: Array, forms: Array) -> bool:
+	for raw in allies:
+		if forms.has(String(raw)):
+			return true
+	return false
+
+
 ## --- Guardado -----------------------------------------------------------------------
 
 func to_dict() -> Dictionary:
@@ -387,6 +561,7 @@ func to_dict() -> Dictionary:
 		"periodic": periodic.duplicate(true), "achievements": achievements.duplicate(true),
 		"titles_owned": titles_owned.duplicate(), "title_equipped": title_equipped,
 		"boss_kills": boss_kills.duplicate(), "challenges": challenges.duplicate(),
+		"personal": personal.duplicate(true),
 	}
 
 
@@ -397,6 +572,7 @@ func from_dict(raw: Variant) -> void:
 	title_equipped = ""
 	boss_kills = {}
 	challenges = {}
+	personal = {}
 	if not (raw is Dictionary):
 		return
 	var data: Dictionary = raw
@@ -417,6 +593,12 @@ func from_dict(raw: Variant) -> void:
 		for id in owned:
 			if not titles_owned.has(String(id)):
 				titles_owned.append(String(id))
+	var per_personal = data.get("personal", {})
+	if per_personal is Dictionary:
+		for pid in per_personal:
+			var pe = per_personal[pid]
+			if pe is Dictionary and String((DB.missions.get(String(pid), {}) as Dictionary).get("scope", "")) == "personal":
+				personal[String(pid)] = { "progress": maxi(0, int(pe.get("progress", 0))), "claimed": bool(pe.get("claimed", false)) }
 	title_equipped = String(data.get("title_equipped", ""))
 	for key in ["boss_kills", "challenges"]:
 		var src = data.get(key, {})

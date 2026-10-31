@@ -148,8 +148,9 @@ func refresh() -> void:
 	if _selected_floor <= 0 or _selected_floor > run:
 		_selected_floor = run
 	_title.text = String(status.get("name", "TORRE"))
-	_status.text = "Piso actual %d / %d    Checkpoint %d    Mejor piso %d" % [
-		run, int(status.get("floor_count", 0)), int(status.get("checkpoint", 0)), int(status.get("best_floor", 0))]
+	_status.text = "Piso actual %d / %d    Checkpoint %d    Mejor piso %d\n%s" % [
+		run, int(status.get("floor_count", 0)), int(status.get("checkpoint", 0)), int(status.get("best_floor", 0)),
+		"Cada piso solo paga la primera vez que lo superas." ]
 	_picker.visible = false
 	_build_floors(status)
 	_build_team()
@@ -223,7 +224,8 @@ func _make_floor_row(info: Dictionary, selected: bool, open: bool, current: bool
 	name_label.add_theme_color_override("font_color", VI.RED if boss else VI.INK)
 	mid.add_child(name_label)
 	var foes := Label.new()
-	foes.text = _enemy_names(info.get("enemies", []))
+	# v15: cada fila dice que paga (y que es de un solo cobro) y marca a los jefes con fases.
+	foes.text = "%s   -   +%d XP  +%d monedas" % [_enemy_names(info.get("enemies", [])), int(info.get("xp_reward", 0)), int(info.get("coin_reward", 0))]
 	foes.add_theme_font_size_override("font_size", VI.FONT_TINY)
 	foes.add_theme_color_override("font_color", VI.INK_DIM)
 	foes.clip_text = true

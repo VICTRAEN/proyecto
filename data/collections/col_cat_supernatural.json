@@ -1,0 +1,32 @@
+{
+	"id": "col_cat_supernatural",
+	"name": "Categoria: Sobrenatural",
+	"kind": "category",
+	"description": "Maldiciones, demonios y todo lo que no deberia existir. Reune a todos los personajes de la categoria.",
+	"category": "supernatural",
+	"tiers": [
+		{
+			"id": "half",
+			"percent": 50,
+			"reward": {
+				"coins": 750,
+				"materials": 3
+			}
+		},
+		{
+			"id": "full",
+			"percent": 100,
+			"reward": {
+				"coins": 1700,
+				"gems": 50,
+				"title": {
+					"id": "title_col_cat_supernatural",
+					"name": "Cazador de lo invisible"
+				},
+				"cosmetics": [
+					"ill_itadori"
+				]
+			}
+		}
+	]
+}

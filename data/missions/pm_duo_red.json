@@ -1,0 +1,20 @@
+{
+	"id": "pm_duo_red",
+	"name": "Red de apoyo",
+	"description": "Gana 5 combates con el duo y con David o Lucy (las unidades individuales) en el mismo equipo.",
+	"scope": "personal",
+	"character": "david_lucy_duo",
+	"category": "DAVID MARTINEZ & LUCY",
+	"target": 5,
+	"objective": {
+		"type": "battle_won",
+		"with_any": [
+			"david",
+			"lucy"
+		]
+	},
+	"reward": {
+		"coins": 800,
+		"gems": 15
+	}
+}

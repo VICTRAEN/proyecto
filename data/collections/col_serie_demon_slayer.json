@@ -1,0 +1,37 @@
+{
+	"id": "col_serie_demon_slayer",
+	"name": "Kimetsu no Yaiba",
+	"kind": "series",
+	"description": "Cazadores y demonios que se cruzan en una larga noche.",
+	"members": [
+		"tanjiro",
+		"nezuko",
+		"zenitsu",
+		"akaza"
+	],
+	"tiers": [
+		{
+			"id": "half",
+			"percent": 50,
+			"reward": {
+				"coins": 310,
+				"materials": 2
+			}
+		},
+		{
+			"id": "full",
+			"percent": 100,
+			"reward": {
+				"coins": 720,
+				"gems": 16,
+				"title": {
+					"id": "title_col_serie_demon_slayer",
+					"name": "Filo de la Noche"
+				},
+				"cosmetics": [
+					"ill_akaza"
+				]
+			}
+		}
+	]
+}

@@ -1,0 +1,20 @@
+{
+	"id": "pm_goku_saiyans",
+	"name": "Orgullo saiyan",
+	"description": "Gana 5 combates con Goku y con Vegeta o Gohan en el mismo equipo.",
+	"scope": "personal",
+	"character": "goku",
+	"category": "SON GOKU",
+	"target": 5,
+	"objective": {
+		"type": "battle_won",
+		"with_any": [
+			"vegeta",
+			"gohan"
+		]
+	},
+	"reward": {
+		"coins": 800,
+		"gems": 15
+	}
+}

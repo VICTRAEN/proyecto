@@ -1,0 +1,32 @@
+{
+	"id": "col_rareza_ssr",
+	"name": "Coleccion SSR",
+	"kind": "rarity",
+	"description": "Todos los personajes que nacen SSR.",
+	"rarity": "SSR",
+	"tiers": [
+		{
+			"id": "half",
+			"percent": 50,
+			"reward": {
+				"coins": 800,
+				"materials": 6
+			}
+		},
+		{
+			"id": "full",
+			"percent": 100,
+			"reward": {
+				"coins": 3000,
+				"gems": 80,
+				"title": {
+					"id": "title_col_rareza_ssr",
+					"name": "Gran coleccionista SSR"
+				},
+				"cosmetics": [
+					"bg_coleccion"
+				]
+			}
+		}
+	]
+}

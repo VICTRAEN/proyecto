@@ -96,6 +96,18 @@ func _ready() -> void:
 	_status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_status.add_theme_font_size_override("font_size", VI.FONT_SMALL)
 	add_child(_status)
+	# v15: DIAGNOSTICO (solo desarrollo, ver dev/diagnostics.gd).
+	var diag_button := Button.new()
+	diag_button.name = "DiagnosticsButton"
+	diag_button.text = "EJECUTAR DIAGNOSTICO"
+	diag_button.custom_minimum_size = Vector2(0, 64)
+	diag_button.pressed.connect(_on_run_diagnostics)
+	add_child(diag_button)
+	_diag_label = Label.new()
+	_diag_label.name = "DiagnosticsReport"
+	_diag_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_diag_label.add_theme_font_size_override("font_size", 17)
+	add_child(_diag_label)
 	_refresh_balances()
 
 
@@ -116,6 +128,15 @@ func _add_quick_row(entries: Array) -> void:
 
 
 ## Antirrebote: un doble toque no concede dos veces.
+var _diag_label: Label
+
+
+func _on_run_diagnostics() -> void:
+	var diag = load("res://dev/diagnostics.gd").new()
+	diag.run_all()
+	_diag_label.text = diag.to_text(60)
+
+
 func _debounced() -> bool:
 	var now := Time.get_ticks_msec()
 	if now < _next_ok_ms:

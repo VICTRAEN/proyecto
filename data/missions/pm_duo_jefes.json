@@ -1,0 +1,16 @@
+{
+	"id": "pm_duo_jefes",
+	"name": "Edgerunners contra el jefe",
+	"description": "Derrota a 2 jefes con el duo en el equipo.",
+	"scope": "personal",
+	"character": "david_lucy_duo",
+	"category": "DAVID MARTINEZ & LUCY",
+	"target": 2,
+	"objective": {
+		"type": "boss_defeated"
+	},
+	"reward": {
+		"coins": 900,
+		"gems": 20
+	}
+}
