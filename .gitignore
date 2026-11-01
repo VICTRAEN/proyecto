@@ -4,3 +4,4 @@
 
 # Summer Engine local-only state
 .summer/local/
+build/
