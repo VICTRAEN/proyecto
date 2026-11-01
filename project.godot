@@ -29,7 +29,7 @@ window/size/viewport_width=1080.0
 window/size/viewport_height=1920.0
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
-window/handheld/orientation="portrait"
+window/handheld/orientation=1
 
 [dotnet]
 
@@ -58,6 +58,8 @@ ui_right={
 3d/physics_engine="Jolt Physics"
 
 [rendering]
+
+textures/vram_compression/import_etc2_astc=true
 
 rendering_device/driver.windows="d3d12"
 renderer/rendering_method="mobile"
