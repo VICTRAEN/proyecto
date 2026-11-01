@@ -18,7 +18,7 @@ var _verdict: Label
 
 func _ready() -> void:
 	var margin := MarginContainer.new()
-	margin.set_anchors_preset(Control.PRESET_FULL_RECT)
+	margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	for side in ["left", "right"]:
 		margin.add_theme_constant_override("margin_" + side, 24)
 	for side in ["top", "bottom"]:
@@ -132,7 +132,7 @@ func _rebuild() -> void:
 		n.name = "Stat_" + String(r["stat"])
 		_table.add_child(n)
 	_table.add_child(_row("Pasivas", ", ".join(PackedStringArray(info_a["passives"])), ", ".join(PackedStringArray(info_b["passives"])), VI.INK_SOFT, VI.INK_SOFT, VI.INK_DIM))
-	_table.add_child(_row("Categorias", ", ".join(PackedStringArray(info_a["categories"])), ", ".join(PackedStringArray(info_b["categories"])), VI.INK_SOFT, VI.INK_SOFT, VI.INK_DIM))
+	_table.add_child(_row("Categorias", _cat_names(info_a["categories"]), _cat_names(info_b["categories"]), VI.INK_SOFT, VI.INK_SOFT, VI.INK_DIM))
 
 
 func _row(label_text: String, a_text: String, b_text: String, a_color: Color, b_color: Color, label_color: Color) -> Control:
@@ -159,3 +159,11 @@ func _back() -> void:
 	var app := NAV.app_of(self)
 	if app != null and app.has_method("go_back"):
 		app.call("go_back")
+
+
+## Nombres legibles de categoria (el JSON guarda ids como "shonen").
+func _cat_names(ids: Array) -> String:
+	var out := PackedStringArray()
+	for id in ids:
+		out.append(String((DB.categories.get(String(id), {}) as Dictionary).get("name", String(id).capitalize())))
+	return ", ".join(out)

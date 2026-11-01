@@ -30,7 +30,7 @@ static func play(host: Node, duration: float = FADE_TIME) -> void:
 		fade.color = FADE_COLOR
 		# Nunca se come un toque: es decorativo.
 		fade.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		fade.set_anchors_preset(Control.PRESET_FULL_RECT)
+		fade.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 		host.add_child(fade)
 	fade.visible = true
 	fade.modulate.a = 1.0

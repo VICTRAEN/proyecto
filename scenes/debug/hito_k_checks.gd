@@ -474,6 +474,7 @@ func _check_copies() -> void:
 	GameState.add_character("frieren")
 	for n in 11:
 		GameState.add_character("frieren")
+	GameState.rarities["frieren"] = "UR"   # v16: nadie nace UR; los Dupes son para formas UR/LR
 	var l := GameState.copy_ledger("frieren")
 	_check("12 invocaciones: total 12, disponibles 11, usadas 1", int(l["total"]) == 12 and int(l["available"]) == 11 and int(l["used"]) == 1 and _ledger_ok("frieren"))
 	GameState.party = ["frieren", "", "", ""]

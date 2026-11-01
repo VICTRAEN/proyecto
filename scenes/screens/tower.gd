@@ -43,15 +43,15 @@ func _ready() -> void:
 
 
 func _build() -> void:
-	set_anchors_preset(Control.PRESET_FULL_RECT)
+	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	var bg := ScreenBackground.new()
 	bg.slot = "tower"
-	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
+	bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(bg)
 
 	var margin := MarginContainer.new()
-	margin.set_anchors_preset(Control.PRESET_FULL_RECT)
+	margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	for side in ["left", "right"]:
 		margin.add_theme_constant_override("margin_" + side, 22)
 	margin.add_theme_constant_override("margin_top", 20)
@@ -332,15 +332,15 @@ func _on_slot_input(event: InputEvent, index: int) -> void:
 
 func _build_picker() -> void:
 	_picker = Control.new()
-	_picker.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_picker.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_picker.visible = false
 	add_child(_picker)
 	var dim := ColorRect.new()
 	dim.color = Color(0, 0, 0, 0.78)
-	dim.set_anchors_preset(Control.PRESET_FULL_RECT)
+	dim.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_picker.add_child(dim)
 	var margin := MarginContainer.new()
-	margin.set_anchors_preset(Control.PRESET_FULL_RECT)
+	margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	for side in ["left", "right"]:
 		margin.add_theme_constant_override("margin_" + side, 28)
 	margin.add_theme_constant_override("margin_top", 120)

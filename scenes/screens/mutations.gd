@@ -354,19 +354,19 @@ func _value_text(entry: Dictionary, key: String) -> String:
 func _build_modal() -> void:
 	_modal = Control.new()
 	_modal.name = "RitualModal"
-	_modal.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_modal.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_modal.mouse_filter = Control.MOUSE_FILTER_STOP
 	_modal.visible = false
 	add_child(_modal)
 
 	var dim := ColorRect.new()
 	dim.color = Color(0.02, 0.05, 0.04, 0.78)
-	dim.set_anchors_preset(Control.PRESET_FULL_RECT)
+	dim.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	dim.mouse_filter = Control.MOUSE_FILTER_STOP
 	_modal.add_child(dim)
 
 	var margin := MarginContainer.new()
-	margin.set_anchors_preset(Control.PRESET_FULL_RECT)
+	margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	margin.add_theme_constant_override("margin_left", 24)
 	margin.add_theme_constant_override("margin_right", 24)
 	margin.add_theme_constant_override("margin_top", 40)
@@ -435,7 +435,7 @@ func _build_modal() -> void:
 	# puede sustituir por un efecto de verdad sin tocar la logica.
 	_modal_flash = ColorRect.new()
 	_modal_flash.color = Color(1, 1, 1, 0)
-	_modal_flash.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_modal_flash.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_modal_flash.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_modal.add_child(_modal_flash)
 

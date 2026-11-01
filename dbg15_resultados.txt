@@ -1,0 +1,26 @@
+[DBG15] --- bugs del evento: recompensa bloqueada y stage 3 = 1 VS 1 ---
+[DBG15] stage 1 superado=false, reclamado=false
+[DBG15] el evento empieza sin el stage 1 superado -> OK
+[DBG15] reclamable antes de jugar: ok=false, motivo='Supera antes 'El primer sintoma' para poder reclamar a Sakuta y Mai.'
+[DBG15] la recompensa NO es reclamable antes de superar el stage 1 -> OK
+[DBG15] intento de reclamar sin progreso: ok=false, motivo='Supera antes 'El primer sintoma' para poder reclamar a Sakuta y Mai.'
+[DBG15] reclamar a mano no entrega el personaje sin progreso -> OK
+[DBG15] y el personaje NO ha entrado en el roster -> OK
+[DBG15] tras superar el stage 1: reclamable=true
+[DBG15] superado el stage 1 la recompensa SI se puede reclamar -> OK
+[DBG15] y entonces si se entrega -> OK
+[DBG15] el personaje esta en el roster -> OK
+[DBG15] stage 3 con Sakuta+Mai SSR y companeros: ok=false, motivo='Este combate es 1 contra 1: lleva SOLO a Sakuta Azusagawa, sin companeros (ahora llevas 2).'
+[DBG15] el stage 3 RECHAZA a la forma SSR -> OK
+[DBG15] el stage 3 RECHAZA llevar companeros -> OK
+[DBG15] stage 3 con Sakuta UR y companeros en el equipo: ok=false
+[DBG15] equipo con el que COMBATE el stage 3: ["sakuta", "gojo", "miku"] (3 unidad)
+[DBG15] el combate lleva EXACTAMENTE el equipo del jugador, sin recortarlo -> OK
+[DBG15] esas unidades se cargan de verdad desde los datos -> OK
+[DBG15] stage 3 solo con Sakuta UR: ok=true
+[DBG15] el stage 3 SI acepta a Sakuta UR -> OK
+[DBG15] stage 2 con Sakuta+Mai en el equipo: ok=true
+[DBG15] el stage 2 sigue pidiendo a Sakuta+Mai y no el 1 VS 1 -> OK
+[DBG15] el stage 2 NO reduce el equipo a una unidad -> OK
+[DBG15] una batalla normal sigue llevando el equipo completo -> OK
+[DBG15] --- fin ---

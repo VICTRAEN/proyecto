@@ -56,9 +56,14 @@ func members_of(collection_id: String) -> Array:
 						out.append(root)
 		"rarity":
 			var rarity := String(data.get("rarity", ""))
-			for root in Families.all_roots():
-				if String((DB.characters.get(String(root), {}) as Dictionary).get("rarity", "")) == rarity and not out.has(root):
-					out.append(String(root))
+			# Con "members" la coleccion de rareza es una lista explicita (p. ej. Leyendas).
+			for raw in data.get("members", []):
+				if DB.characters.has(String(raw)) and not out.has(Families.root_of(String(raw))):
+					out.append(Families.root_of(String(raw)))
+			if out.is_empty():
+				for root in Families.all_roots():
+					if String((DB.characters.get(String(root), {}) as Dictionary).get("rarity", "")) == rarity and not out.has(root):
+						out.append(String(root))
 		_:
 			for raw in data.get("members", []):
 				if DB.characters.has(String(raw)):
@@ -218,7 +223,7 @@ func problems(collection_id: String) -> Array:
 		out.append("%s: la categoria '%s' no existe" % [collection_id, data.get("category", "")])
 	if kind == "rarity" and not VALID_RARITIES.has(String(data.get("rarity", ""))):
 		out.append("%s: rareza no valida '%s'" % [collection_id, data.get("rarity", "")])
-	if kind != "category" and kind != "rarity":
+	if kind != "category":
 		for raw in data.get("members", []):
 			if not DB.characters.has(String(raw)):
 				out.append("%s: el personaje '%s' no existe" % [collection_id, raw])

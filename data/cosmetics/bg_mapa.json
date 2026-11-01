@@ -1,7 +1,7 @@
 {
 	"id": "bg_mapa",
 	"type": "background",
-	"name": "Fondo: Mapa",
+	"name": "Mapa",
 	"description": "El mapa de mundos como fondo del menu principal.",
 	"slot": "map"
 }

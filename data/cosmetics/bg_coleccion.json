@@ -1,7 +1,7 @@
 {
 	"id": "bg_coleccion",
 	"type": "background",
-	"name": "Fondo: Coleccion",
+	"name": "Coleccion",
 	"description": "El fondo violeta de la coleccion como fondo del menu principal.",
 	"slot": "collection"
 }

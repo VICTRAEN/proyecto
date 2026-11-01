@@ -1,14 +1,13 @@
 {
 	"id": "banner_destacado",
 	"name": "Destacados",
-	"description": "Banner con un 1% de UR por tirada y los mismos 15% de SSR que el resto.",
+	"description": "Banner con los personajes destacados de la temporada. 15% de SSR en CADA tirada.",
 	"cost_gems": 10,
 	"multi_pulls": 10,
 	"multi_cost_gems": 90,
 	"rates": {
-		"SR": 0.84,
-		"SSR": 0.15,
-		"UR": 0.01
+		"SR": 0.85,
+		"SSR": 0.15
 	},
 	"pool_categories": [],
 	"featured": [
@@ -23,5 +22,5 @@
 		"pulls": 0,
 		"rarity": ""
 	},
-	"notes": "Probabilidades POR TIRADA, explicitas y sumando 1 (sin renormalizar). Una x10 son 10 tiradas independientes. Sin pity (ningun personaje de este pool puede llegar a LR) ni bonus de destacados: los destacados solo se muestran en el banner. Las formas UR/LR de evolucion y las unidades F2P no entran en el gacha."
+	"notes": "Probabilidades POR TIRADA, explicitas y sumando 1 (sin renormalizar). Una x10 son 10 tiradas independientes. Sin pity (ningun personaje de este pool puede llegar a LR) ni bonus de destacados: los destacados solo se muestran en el banner. Ningun personaje nace UR ni LR: esas formas se consiguen SOLO evolucionando. Las formas UR/LR de evolucion y las unidades F2P no entran en el gacha."
 }

@@ -1,14 +1,13 @@
 {
 	"id": "banner_ur",
 	"name": "Invocacion superior",
-	"description": "El banner caro: 25 gemas por tirada, con un 2% de UR por tirada y 15% de SSR.",
+	"description": "El banner caro: 25 gemas por tirada. 15% de SSR y, dentro del SSR, Goku, Frieren, Makima y Sukuna salen con tasa propia del 3% cada uno (12% entre los cuatro).",
 	"cost_gems": 25,
 	"multi_pulls": 10,
 	"multi_cost_gems": 225,
 	"rates": {
-		"SR": 0.83,
-		"SSR": 0.15,
-		"UR": 0.02
+		"SR": 0.85,
+		"SSR": 0.15
 	},
 	"pool_categories": [],
 	"featured": [
@@ -22,5 +21,11 @@
 		"pulls": 0,
 		"rarity": ""
 	},
-	"notes": "Probabilidades POR TIRADA, explicitas y sumando 1 (sin renormalizar). Una x10 son 10 tiradas independientes. Sin pity (ningun personaje de este pool puede llegar a LR) ni bonus de destacados: los destacados solo se muestran en el banner. Las formas UR/LR de evolucion y las unidades F2P no entran en el gacha."
+	"notes": "Probabilidades POR TIRADA, explicitas y sumando 1 (sin renormalizar). Una x10 son 10 tiradas independientes. Sin pity (ningun personaje de este pool puede llegar a LR) ni bonus de destacados: los destacados solo se muestran en el banner. Ningun personaje nace UR ni LR: esas formas se consiguen SOLO evolucionando. Las formas UR/LR de evolucion y las unidades F2P no entran en el gacha. Tasas propias: cuatro SSR con 3% por tirada cada uno; el 3% restante de SSR se reparte entre los demas SSR del pool.",
+	"featured_rates": {
+		"goku": 0.03,
+		"frieren": 0.03,
+		"makima": 0.03,
+		"sukuna": 0.03
+	}
 }

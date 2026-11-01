@@ -61,7 +61,9 @@ func run(app: Node) -> void:
 	await _check_audio()
 	_check_quality_of_life()
 	_check_diagnostics()
+	_check_v16_rarity()
 	await _check_screens()
+	await _check_v16_screens()
 	_app.call("_restore_save")
 	_out("[DBG27] --- fin: %d comprobaciones, %d FALLO(S) ---" % [_checks, _fails])
 	get_tree().quit(1 if _fails > 0 else 0)
@@ -992,3 +994,110 @@ func _check_screens() -> void:
 	_check("en la version publica NO hay panel de desarrollo ni diagnostico", st2.find_child("DiagnosticsButton", true, false) == null and st2.find_child("DevAddDuoButton", true, false) == null)
 	st2.queue_free()
 	DevTools.simulate_release(false)
+
+
+## --- 10. v16: nadie nace UR/LR, banners coherentes y nombres de cosmeticos --------------------
+func _check_v16_rarity() -> void:
+	_out("[DBG27] == v16: RAREZA NATURAL Y BANNERS ==")
+	_fresh()
+	var natural_bad: Array = []
+	for id in DB.characters:
+		var d: Dictionary = DB.characters[id]
+		if (String(d.get("rarity", "")) == "UR" or String(d.get("rarity", "")) == "LR") and String(d.get("evolved_from", "")).is_empty():
+			natural_bad.append(String(id))
+	_check("ningun personaje nace UR ni LR (solo las formas evolucionadas: %s)" % ", ".join(PackedStringArray(natural_bad)), natural_bad.is_empty())
+	for id in ["goku", "frieren", "makima", "sukuna"]:
+		_check("%s nace SSR" % id, String(DB.characters[id]["rarity"]) == "SSR")
+	var banner_ok := true
+	var pool_rarities: Dictionary = {}
+	for b in DB.all_banners():
+		var bid := String((b as Dictionary)["id"])
+		if not GameState.banner_problems(bid).is_empty() or (GameState.banner_rates(bid) as Dictionary).has("UR") or (GameState.banner_rates(bid) as Dictionary).has("LR"):
+			banner_ok = false
+		for id in GameState.banner_pool(bid):
+			pool_rarities[String(DB.characters[id]["rarity"])] = true
+	_check("ningun banner da UR ni LR y todos son validos (suman 1, sin rarezas huerfanas)", banner_ok)
+	_check("los pools solo contienen SR y SSR", pool_rarities.keys().size() == 2 and pool_rarities.has("SR") and pool_rarities.has("SSR"))
+	# Una x10 en cada banner solo puede dar SR o SSR.
+	GameState.gems = 100000
+	var seen_bad := false
+	for b in DB.all_banners():
+		var bid2 := String((b as Dictionary)["id"])
+		for n in 30:
+			var report: Dictionary = GameState.summon(bid2, 10)
+			for r in report.get("results", []):
+				var rar := String((r as Dictionary).get("rarity", ""))
+				if rar != "SR" and rar != "SSR":
+					seen_bad = true
+	_check("300 tiradas por banner: jamas sale algo que no sea SR o SSR", not seen_bad)
+	# Goku, ahora SSR, evoluciona a UR como cualquier otro SSR.
+	GameState.progress["goku"] = { "level": 100, "xp": 0 }
+	GameState.coins = 1000000
+	var can: Dictionary = GameState.can_evolve("goku")
+	_check("Goku (SSR) puede evolucionar a UR al nivel 100", bool(can.get("ok", false)) and String(can.get("to", "")) == "UR")
+	var rep: Dictionary = GameState.evolve("goku")
+	_check("... y tras evolucionar es UR con su pasiva de forma UR", not rep.is_empty() and GameState.rarity_of("goku") == "UR" and String(GameState.character_data("goku")["passive"].get("id", "")) == "pas_goku_lr_saiyan")
+	_check("las colecciones siguen validas (Leyendas = Goku, Frieren, Makima, Sukuna)", GameState.collections.members_of("col_rareza_ur").size() == 4 and GameState.collections.problems("col_rareza_ur").is_empty())
+	_check("los cosmeticos no repiten su prefijo (Ilustracion: Ilustracion:)", not Rewards.describe({ "cosmetics": ["ill_asta"] }).contains("Ilustracion: Ilustracion"))
+	var any_prefixed := false
+	for id in DB.cosmetics:
+		if String(DB.cosmetics[id]["name"]).begins_with("Fondo: ") or String(DB.cosmetics[id]["name"]).begins_with("Ilustracion: "):
+			any_prefixed = true
+	_check("los nombres de cosmetico no llevan el prefijo del tipo", not any_prefixed)
+	# El diagnostico avisa si alguien vuelve a hacer nacer a un personaje como UR.
+	var saved: Dictionary = DB.characters["gojo"].duplicate(true)
+	DB.characters["gojo"]["rarity"] = "UR"
+	var d1 = Diagnostics.new()
+	d1.run_all()
+	_check("el diagnostico detecta un personaje que nace UR", _has(d1, "personajes", "gojo", "nace con rareza UR"))
+	DB.characters["gojo"] = saved
+
+
+func _check_v16_screens() -> void:
+	_out("[DBG27] == v16: PANTALLAS ==")
+	_fresh()
+	_app.call("open_screen", "summon")
+	await _wait(0.4)
+	var summon = _app.get("_screens").get("summon", null)
+	summon.call("_on_info_pressed")
+	await _wait(0.3)
+	var panel = summon.get_node_or_null("BannerInfoPanel")
+	_check("INFO DEL BANNER abre su ventana", panel != null)
+	if panel != null:
+		var view := get_viewport().get_visible_rect().size
+		_check("la ventana ocupa la pantalla entera (%s de %s)" % [str(panel.size), str(view)], panel.size.x >= view.x * 0.95 and panel.size.y >= view.y * 0.95)
+		var body: Node = panel.find_child("Body", true, false)
+		_check("el contenido no esta vacio: %d lineas, alto %d" % [body.get_child_count(), int(body.size.y)], body.get_child_count() > 15 and body.size.y > 300)
+		_check("muestra probabilidades, pity y personajes", _all_text(body).contains("PROBABILIDAD") and _all_text(body).contains("PITY") and _all_text(body).contains("PERSONAJES DISPONIBLES"))
+		_check("no dice que nadie llegue a UR sin evolucion: Goku llega a UR", _all_text(body).contains("Son Goku") )
+		var scroll: ScrollContainer = body.get_parent()
+		_check("el scroll tiene altura propia (no colapsa)", scroll.size.y > 300)
+		panel.queue_free()
+	await _wait(0.1)
+	_app.call("go_back")
+	await _wait(0.1)
+	# Perfil rediseñado.
+	GameState.account.add_xp(1800)
+	GameState.account.grant_cosmetic("ill_goku")
+	_app.call("open_screen", "profile")
+	await _wait(0.4)
+	var profile = _app.get("_screens").get("profile", null)
+	_check("el perfil tiene retrato, nivel con fuente grande y tres estadisticas", profile.find_child("Portrait", true, false).texture != null and profile.find_child("LevelLabel", true, false).get_theme_font_size("font_size") >= 44 and profile.find_child("Stats", true, false).get_child_count() == 3)
+	var lv: Node = profile.find_child("Level_2", true, false)
+	_check("cada nivel pendiente es una tarjeta con su boton", lv is PanelContainer and lv.find_children("*", "Button", true, false).size() == 1)
+	var small: Array = []
+	for l in profile.find_children("*", "Label", true, false):
+		if (l as Label).visible and (l as Label).get_theme_font_size("font_size") < 22 and (l as Label).text.length() > 0:
+			small.append((l as Label).text)
+	_check("ningun texto del perfil usa la fuente diminuta (<22): %s" % str(small), small.is_empty())
+	var cos: Node = profile.find_child("Cos_ill_goku", true, false)
+	_check("las ilustraciones ganadas aparecen en cuadricula", cos != null and cos.get_parent() is GridContainer)
+	_app.call("go_back")
+	await _wait(0.1)
+
+
+func _all_text(node: Node) -> String:
+	var out := ""
+	for l in node.find_children("*", "Label", true, false):
+		out += (l as Label).text + "\n"
+	return out

@@ -1,8 +1,8 @@
 {
 	"id": "col_rareza_ur",
-	"name": "Coleccion UR",
+	"name": "Leyendas",
 	"kind": "rarity",
-	"description": "Todos los personajes que nacen UR.",
+	"description": "Los cuatro SSR mas poderosos de la Invocacion superior: Goku, Frieren, Makima y Sukuna.",
 	"rarity": "UR",
 	"tiers": [
 		{
@@ -28,5 +28,11 @@
 				]
 			}
 		}
+	],
+	"members": [
+		"goku",
+		"frieren",
+		"makima",
+		"sukuna"
 	]
 }

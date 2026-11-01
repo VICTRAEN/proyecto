@@ -1,7 +1,7 @@
 {
 	"id": "bg_bosque",
 	"type": "background",
-	"name": "Fondo: Bosque",
+	"name": "Bosque",
 	"description": "El bosque de combate como fondo del menu principal.",
 	"slot": "battle_forest"
 }

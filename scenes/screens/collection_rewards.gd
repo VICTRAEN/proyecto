@@ -19,7 +19,7 @@ var _expanded: Dictionary = {}
 
 func _ready() -> void:
 	var margin := MarginContainer.new()
-	margin.set_anchors_preset(Control.PRESET_FULL_RECT)
+	margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	for side in ["left", "right"]:
 		margin.add_theme_constant_override("margin_" + side, 24)
 	for side in ["top", "bottom"]:

@@ -160,8 +160,8 @@ func _rebuild_layout() -> void:
 	main.add_child(status_label)
 	profile_button = Button.new()
 	profile_button.name = "ProfileButton"
-	profile_button.custom_minimum_size = Vector2(0, 64)
-	profile_button.add_theme_font_size_override("font_size", VI.FONT_SMALL)
+	profile_button.custom_minimum_size = Vector2(0, 72)
+	profile_button.add_theme_font_size_override("font_size", VI.FONT_BODY)
 	VI.tint_button(profile_button, VI.GOLD)
 	profile_button.pressed.connect(_goto.bind("profile"))
 	main.add_child(profile_button)

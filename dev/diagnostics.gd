@@ -436,6 +436,21 @@ func check_unobtainable_characters() -> void:
 		var key := String(id)
 		if not Families.reachable(key):
 			_add("error", "personajes", "'%s' es IMPOSIBLE de conseguir (ni invocacion, ni tienda, ni evento, ni evolucion alcanzable)" % key)
+	# Nadie nace UR ni LR: esas rarezas se consiguen SOLO evolucionando (v16).
+	for id in DB.characters.keys():
+		var data: Dictionary = DB.get_character(String(id))
+		var born := String(data.get("rarity", ""))
+		if (born == "UR" or born == "LR") and String(data.get("evolved_from", "")).is_empty() and not _is_special_target(String(id)):
+			_add("error", "personajes", "'%s' nace con rareza %s: ningun personaje puede nacer UR/LR (solo SSR como maximo; UR y LR se consiguen evolucionando)" % [id, born])
+	# SSR sin bloque "evolution": se quedan en SSR para siempre (no pueden despertar como UR).
+	var dead_ends: Array = []
+	for id in DB.characters.keys():
+		var d2: Dictionary = DB.get_character(String(id))
+		if String(d2.get("rarity", "")) == "SSR" and (d2.get("evolution", {}) as Dictionary).is_empty() and String(d2.get("evolved_from", "")).is_empty():
+			dead_ends.append(String(id))
+	if not dead_ends.is_empty():
+		dead_ends.sort()
+		_add("warning", "personajes", "%d personajes SSR no tienen bloque 'evolution' y no pueden llegar a UR: %s" % [dead_ends.size(), ", ".join(PackedStringArray(dead_ends))])
 	# Rarezas que ningun banner activo puede dar aunque el personaje este en el pool.
 	for banner in DB.all_banners():
 		var bid := String((banner as Dictionary).get("id", ""))
@@ -625,3 +640,10 @@ func _check_position(label: String, pos: Variant) -> void:
 ## Se puede llegar a que `id` tenga la rareza `rarity` (por nacimiento o evolucion)?
 func _form_reachable(id: String, rarity: String) -> bool:
 	return GameState.can_reach_rarity(id, rarity)
+
+
+func _is_special_target(id: String) -> bool:
+	for raw in DB.special_evolution_routes():
+		if raw is Dictionary and String((raw as Dictionary).get("to", "")) == id:
+			return true
+	return false

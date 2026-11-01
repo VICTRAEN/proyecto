@@ -17,19 +17,21 @@ static func make(gs, id: String) -> Control:
 		return box
 	var head := Label.new()
 	head.text = "ESTADISTICAS PREVISTAS"
-	head.add_theme_font_size_override("font_size", VI.FONT_SMALL)
+	head.add_theme_font_size_override("font_size", VI.FONT_BODY)
 	head.add_theme_color_override("font_color", VI.GOLD)
 	box.add_child(head)
 	var grid := GridContainer.new()
 	grid.name = "PreviewGrid"
 	grid.columns = 4
-	grid.add_theme_constant_override("h_separation", 14)
+	grid.add_theme_constant_override("h_separation", 10)
+	grid.add_theme_constant_override("v_separation", 4)
+	grid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	box.add_child(grid)
-	for title in ["", "AHORA", "TRAS EVOLUCIONAR (Nv. %d)" % int(preview["after_level"]), "AL NIVEL %d" % int(preview["max_level"])]:
+	for title in ["", "AHORA", "DESPUES (Nv.%d)" % int(preview["after_level"]), "NIVEL %d" % int(preview["max_level"])]:
 		var h := Label.new()
 		h.text = title
 		h.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		h.add_theme_font_size_override("font_size", VI.FONT_TINY)
+		h.add_theme_font_size_override("font_size", VI.FONT_SMALL)
 		h.add_theme_color_override("font_color", VI.INK_DIM)
 		h.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		grid.add_child(h)
@@ -38,8 +40,9 @@ static func make(gs, id: String) -> Control:
 		for i in cells.size():
 			var l := Label.new()
 			l.text = String(cells[i])
-			l.add_theme_font_size_override("font_size", VI.FONT_TINY)
-			l.add_theme_color_override("font_color", VI.INK if i != 3 else VI.GREEN)
+			l.add_theme_font_size_override("font_size", VI.FONT_SMALL)
+			l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+			l.add_theme_color_override("font_color", VI.GOLD if i == 0 else (VI.INK if i != 3 else VI.GREEN))
 			grid.add_child(l)
 	var note := Label.new()
 	note.text = String(preview["note"])

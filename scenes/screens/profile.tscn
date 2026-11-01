@@ -24,3 +24,4 @@ grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("3_bg")
 slot = "menu"
+scrim = 0.55

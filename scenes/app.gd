@@ -193,6 +193,12 @@ func _ready() -> void:
 		motion_node.set_script(motion)
 		add_child(motion_node)
 		motion_node.call_deferred("run", self)
+	elif dbg_args.has("--shots-h"):
+		var shots_h: GDScript = load("res://scenes/debug/shots_h.gd")
+		var shots_h_node := Node.new()
+		shots_h_node.set_script(shots_h)
+		add_child(shots_h_node)
+		shots_h_node.call_deferred("run", self)
 	elif dbg_args.has("--shots-g"):
 		var shots_g: GDScript = load("res://scenes/debug/shots_g.gd")
 		var shots_g_node := Node.new()
