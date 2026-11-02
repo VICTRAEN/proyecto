@@ -111,7 +111,7 @@ func _build_results_area() -> void:
 
 
 func refresh() -> void:
-	if _banner_id.is_empty():
+	if _banner_id.is_empty() or not GameState.banner_active(_banner_id):
 		_banner_id = _default_banner_id()
 	var banner := DB.get_banner(_banner_id)
 	_gems_chip.call("set_value", GameState.gems)
@@ -284,6 +284,9 @@ func _refresh_stage(banner: Dictionary) -> void:
 			parts.append(text)
 	_stage_rates.text = "Probabilidad por tirada:   " + "    ".join(parts)
 	_stage_pity.text = _pity_line(_banner_id)
+	var rot_text := GameState.banner_rotation_text(_banner_id)
+	if not rot_text.is_empty():
+		_stage_pity.text = (_stage_pity.text + "\n" if not _stage_pity.text.is_empty() else "") + rot_text
 	_stage_pity.visible = not _stage_pity.text.is_empty()
 	# Presentacion propia del banner: "theme" en su JSON (color y lema). Un banner
 	# sin tema usa el marco dorado de siempre.
@@ -345,7 +348,7 @@ func _refresh_stage(banner: Dictionary) -> void:
 	for child in _tabs.get_children():
 		_tabs.remove_child(child)
 		child.queue_free()
-	for raw in DB.all_banners():
+	for raw in GameState.available_banners():
 		var b: Dictionary = raw
 		var tab := Button.new()
 		tab.text = String(b.get("name", b.get("id", ""))).to_upper()
@@ -435,7 +438,7 @@ func _build_featured(banner: Dictionary) -> void:
 
 
 func _default_banner_id() -> String:
-	var banners: Array = DB.all_banners()
+	var banners: Array = GameState.available_banners()
 	if banners.is_empty():
 		return ""
 	return String((banners[0] as Dictionary).get("id", ""))

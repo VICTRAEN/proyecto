@@ -172,6 +172,13 @@ func check_missing_resources() -> void:
 				_add("error", "recursos", "cosmetico '%s': el personaje '%s' no existe" % [id, ch])
 			elif not ResourceLoader.exists(_art_path(ch, DB.characters[ch], "front")):
 				_add("error", "recursos", "cosmetico '%s': '%s' no tiene ilustracion front.png (se veria una silueta)" % [id, ch])
+		elif ["frame", "theme", "decoration"].has(String(c.get("type", ""))):
+			# v16: marcos, temas y decoraciones se definen solo con colores/modo en su JSON.
+			var color_key := "tint" if String(c.get("type", "")) == "theme" else "color"
+			if not String(c.get(color_key, "")).is_valid_html_color():
+				_add("error", "recursos", "cosmetico '%s': '%s' no es un color valido" % [id, color_key])
+			if String(c.get("type", "")) == "decoration" and not ["motes", "stars", "embers"].has(String(c.get("mode", ""))):
+				_add("error", "recursos", "cosmetico '%s': modo de decoracion desconocido '%s'" % [id, c.get("mode", "")])
 		else:
 			_add("error", "recursos", "cosmetico '%s': tipo desconocido '%s'" % [id, c.get("type", "")])
 	# Fondos pedidos por mundos, stages, eventos y torres.

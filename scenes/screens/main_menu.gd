@@ -296,6 +296,23 @@ func refresh() -> void:
 	var bg := get_node_or_null("Background")
 	if bg != null and bg.has_method("show_slot"):
 		bg.call("show_slot", GameState.account.menu_background_slot())
+		# v16: decoracion y tema de color elegidos en PERSONALIZAR MENU.
+		var deco: Dictionary = GameState.profile.equipped_data("decoration")
+		if bg.has_method("set_ambient_override"):
+			bg.call("set_ambient_override", [] if deco.is_empty() else [String(deco.get("mode", "motes")), int(deco.get("count", 24)), Color(String(deco.get("color", "#ffffff"))), Color(String(deco.get("color2", "#ffffff")))])
+		var tint := get_node_or_null("ThemeTint") as ColorRect
+		if tint == null:
+			tint = ColorRect.new()
+			tint.name = "ThemeTint"
+			tint.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			add_child(tint)
+			move_child(tint, bg.get_index() + 1)
+			tint.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		var theme_data: Dictionary = GameState.profile.equipped_data("theme")
+		tint.visible = not theme_data.is_empty()
+		if not theme_data.is_empty():
+			var c := Color(String(theme_data.get("tint", "#7a3dff")))
+			tint.color = Color(c.r, c.g, c.b, 0.22)
 	if profile_button != null:
 		var pr: Dictionary = GameState.account.progress()
 		var pending: int = GameState.account.pending_levels().size() + GameState.collections.unclaimed_count()

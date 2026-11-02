@@ -1,0 +1,10 @@
+{
+ "id": "deco_brasas",
+ "type": "decoration",
+ "name": "Brasas",
+ "description": "Efecto decorativo animado para el menu principal.",
+ "mode": "embers",
+ "count": 28,
+ "color": "#ff8a3d",
+ "color2": "#ffd45a"
+}

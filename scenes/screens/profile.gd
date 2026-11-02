@@ -4,6 +4,7 @@ const NAV := preload("res://scenes/nav.gd")
 const VI := preload("res://ui/visual_identity.gd")
 const Rewards := preload("res://core/rewards.gd")
 const Families := preload("res://core/families.gd")
+const PW := preload("res://ui/profile_widgets.gd")
 
 ## PERFIL (v15, rediseñado en v16): nivel de cuenta, barra de experiencia, recompensas por
 ## nivel y los cosmeticos (fondos del menu e ilustracion de perfil). Solo LEE
@@ -18,7 +19,8 @@ var _title_label: Label
 var _bar: ProgressBar
 var _xp_label: Label
 var _portrait: TextureRect
-var _chips: HBoxContainer
+var _chips: GridContainer
+var _frame_panel: PanelContainer
 var _feedback: Label
 var _list: VBoxContainer
 
@@ -40,9 +42,11 @@ func _ready() -> void:
 	main.add_child(title)
 	VI.screen_title(title, VI.GOLD)
 	main.add_child(_build_hero())
-	_chips = HBoxContainer.new()
+	_chips = GridContainer.new()
 	_chips.name = "Stats"
-	_chips.add_theme_constant_override("separation", 10)
+	_chips.columns = 3
+	_chips.add_theme_constant_override("h_separation", 10)
+	_chips.add_theme_constant_override("v_separation", 10)
 	main.add_child(_chips)
 	_feedback = Label.new()
 	_feedback.name = "Feedback"
@@ -78,9 +82,11 @@ func _build_hero() -> Control:
 	row.add_theme_constant_override("separation", 18)
 	card.add_child(row)
 	var frame := PanelContainer.new()
+	frame.name = "AvatarFrame"
 	frame.custom_minimum_size = Vector2(190, 190)
 	frame.add_theme_stylebox_override("panel", VI.card(VI.VIOLET, true))
 	row.add_child(frame)
+	_frame_panel = frame
 	_portrait = TextureRect.new()
 	_portrait.name = "Portrait"
 	_portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
@@ -136,6 +142,12 @@ func refresh() -> void:
 
 
 func _portrait_texture() -> Texture2D:
+	# v16: el AVATAR elegido (una forma que de verdad se posee) manda sobre todo lo demas.
+	var av: Dictionary = GameState.profile.avatar
+	if GameState.profile.is_valid_choice(av):
+		var t := PW.choice_texture(av)
+		if t != null:
+			return t
 	var id: String = GameState.account.illustration_character()
 	if id.is_empty():
 		id = String(GameState.party[0]) if not GameState.party.is_empty() else ""
@@ -162,12 +174,18 @@ func _rebuild() -> void:
 	for child in _chips.get_children():
 		_chips.remove_child(child)
 		child.queue_free()
-	_chips.add_child(_chip("%d / %d" % [Families.owned_roots(GameState), Families.all_roots().size()], "PERSONAJES", VI.VIOLET))
-	_chips.add_child(_chip(str(GameState.counter_value("combates_jugados")), "COMBATES", VI.BLUE))
-	_chips.add_child(_chip(str(GameState.counter_value("victorias")), "VICTORIAS", VI.GREEN))
+	_frame_panel.add_theme_stylebox_override("panel", PW.frame_style(GameState.profile.equipped_data("frame")))
+	var st: Dictionary = GameState.profile.stats()
+	_chips.add_child(_chip("%d / %d" % [int(st["families"]), int(st["families_total"])], "PERSONAJES", VI.VIOLET))
+	_chips.add_child(_chip(str(int(st["summons"])), "INVOCACIONES", VI.CYAN))
+	_chips.add_child(_chip(str(int(st["evolutions"])), "EVOLUCIONES", VI.GOLD))
+	_chips.add_child(_chip(str(int(st["battles_won"])), "VICTORIAS", VI.GREEN))
+	_chips.add_child(_chip("%d / %d" % [int(st["stages_completed"]), int(st["stages_total"])], "STAGES", VI.BLUE))
+	_chips.add_child(_chip(str(int(st["battles_played"])), "COMBATES", VI.VIOLET))
 	for child in _list.get_children():
 		_list.remove_child(child)
 		child.queue_free()
+	_build_identity_sections(st)
 	var pending: Array = acc.pending_levels()
 	_list.add_child(_section("RECOMPENSAS DE NIVEL"))
 	if pending.is_empty():
@@ -207,6 +225,153 @@ func _rebuild() -> void:
 		ills.add_child(_cosmetic_card(String(id), String(DB.get_cosmetic(String(id)).get("name", id)), "illustration", acc.illustration_equipped == id))
 	if acc.owned_of_type("background").is_empty() and acc.owned_of_type("illustration").is_empty():
 		_list.add_child(_note("Los fondos e ilustraciones se ganan con niveles de cuenta y colecciones."))
+
+
+## Rarezas, favorito, vitrina y botones de personalizacion.
+func _build_identity_sections(st: Dictionary) -> void:
+	var prof = GameState.profile
+	var rar := Label.new()
+	rar.name = "RarityLine"
+	var parts: Array = []
+	for r in ["R", "SR", "SSR", "UR", "LR"]:
+		if int((st["by_rarity"] as Dictionary).get(r, 0)) > 0:
+			parts.append("%s %d" % [r, int(st["by_rarity"][r])])
+	rar.text = "Por rareza:  " + ("   ".join(parts) if not parts.is_empty() else "ninguno todavia")
+	rar.add_theme_font_size_override("font_size", VI.FONT_SMALL)
+	rar.add_theme_color_override("font_color", VI.INK_SOFT)
+	_list.add_child(rar)
+	var fav: Dictionary = prof.favorite if prof.is_valid_choice(prof.favorite) else {}
+	var fav_label := Label.new()
+	fav_label.name = "FavoriteLabel"
+	fav_label.text = "Favorito:  %s" % ("%s (%s)" % [GameState.display_name(prof.character_of(fav)), String(fav["form"]).to_upper()] if not fav.is_empty() else "ninguno")
+	fav_label.add_theme_font_size_override("font_size", VI.FONT_BODY)
+	fav_label.add_theme_color_override("font_color", VI.GOLD_LIGHT)
+	_list.add_child(fav_label)
+	_list.add_child(_section("VITRINA"))
+	var row := HBoxContainer.new()
+	row.name = "Showcase"
+	row.add_theme_constant_override("separation", 8)
+	_list.add_child(row)
+	var view: Array = prof.showcase_view()
+	var frame_data: Dictionary = prof.equipped_data("frame")
+	for i in view.size():
+		var b := Button.new()
+		b.name = "Showcase_%d" % i
+		b.flat = true
+		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		b.custom_minimum_size = Vector2(0, 150)
+		var cell := PW.framed(view[i] as Dictionary, 138, frame_data)
+		cell.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		cell.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		b.add_child(cell)
+		b.pressed.connect(_pick_showcase.bind(i))
+		row.add_child(b)
+	_list.add_child(_note("Toca un hueco para elegir uno de tus personajes. Solo salen las formas que ya has desbloqueado."))
+	_list.add_child(_section("PERSONALIZAR"))
+	var grid := GridContainer.new()
+	grid.columns = 2
+	grid.add_theme_constant_override("h_separation", 12)
+	grid.add_theme_constant_override("v_separation", 12)
+	_list.add_child(grid)
+	for def in [["AvatarButton", "AVATAR", _pick_avatar], ["TitleButton", "TITULO", _pick_title], ["FrameButton", "MARCO", _pick_frame], ["FavoriteButton", "FAVORITO", _pick_favorite]]:
+		var b := Button.new()
+		b.name = String(def[0])
+		b.text = String(def[1])
+		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		b.custom_minimum_size = Vector2(0, 84)
+		b.add_theme_font_size_override("font_size", VI.FONT_BODY)
+		VI.tint_button(b, VI.VIOLET)
+		b.pressed.connect(def[2])
+		grid.add_child(b)
+	var menu_b := Button.new()
+	menu_b.name = "CustomizeMenuButton"
+	menu_b.text = "PERSONALIZAR MENU PRINCIPAL"
+	menu_b.custom_minimum_size = Vector2(0, 88)
+	menu_b.add_theme_font_size_override("font_size", VI.FONT_BODY)
+	VI.tint_button(menu_b, VI.GOLD)
+	menu_b.pressed.connect(_open_menu_customize)
+	_list.add_child(menu_b)
+
+
+## Opciones {key "root|form", label, icon} de todo lo que se puede elegir de verdad.
+func _character_options(selected: Dictionary) -> Array:
+	var out: Array = []
+	for root in GameState.profile.selectable_roots():
+		for e in GameState.profile.available_forms(String(root)):
+			var choice := { "root": String(root), "form": String((e as Dictionary)["form"]) }
+			out.append({
+				"key": "%s|%s" % [root, choice["form"]],
+				"label": "%s  (%s)" % [GameState.display_name(String((e as Dictionary)["id"])), String(choice["form"]).to_upper()],
+				"selected": selected.get("root", "") == root and selected.get("form", "") == choice["form"],
+				"icon": PW.choice_texture(choice) })
+	return out
+
+
+func _split_key(key: String) -> PackedStringArray:
+	return key.split("|")
+
+
+func _pick_avatar() -> void:
+	PW.open_picker(self, "ELIGE TU AVATAR", _character_options(GameState.profile.avatar), func(key):
+		var p := _split_key(key)
+		if p.size() == 2 and GameState.profile.set_avatar(p[0], p[1]):
+			_saved())
+
+
+func _pick_favorite() -> void:
+	var opts: Array = [{ "key": "none", "label": "Ninguno", "selected": GameState.profile.favorite.is_empty() }]
+	opts.append_array(_character_options(GameState.profile.favorite))
+	PW.open_picker(self, "PERSONAJE FAVORITO", opts, func(key):
+		if key == "none":
+			GameState.profile.clear_favorite()
+			_saved()
+			return
+		var p := _split_key(key)
+		if p.size() == 2 and GameState.profile.set_favorite(p[0], p[1]):
+			_saved())
+
+
+func _pick_showcase(slot: int) -> void:
+	var opts: Array = [{ "key": "none", "label": "Vaciar hueco", "selected": false }]
+	opts.append_array(_character_options(GameState.profile.showcase_view()[slot]))
+	PW.open_picker(self, "VITRINA - HUECO %d" % (slot + 1), opts, func(key):
+		if key == "none":
+			GameState.profile.clear_showcase_slot(slot)
+			_saved()
+			return
+		var p := _split_key(key)
+		if p.size() == 2 and GameState.profile.set_showcase_slot(slot, p[0], p[1]):
+			_saved())
+
+
+func _pick_title() -> void:
+	var opts: Array = []
+	var cat: Dictionary = GameState.meta.title_catalog()
+	for id in GameState.meta.owned_titles():
+		opts.append({ "key": String(id), "label": String(cat.get(String(id), id)), "selected": GameState.meta.equipped_title() == String(id) })
+	PW.open_picker(self, "ELIGE TU TITULO", opts, func(key):
+		if GameState.meta.equip_title(key):
+			_saved())
+
+
+func _pick_frame() -> void:
+	var opts: Array = [{ "key": "none", "label": "Sin marco", "selected": GameState.profile.equipped_id("frame").is_empty() }]
+	for id in GameState.account.owned_of_type("frame"):
+		opts.append({ "key": String(id), "label": String(DB.get_cosmetic(String(id)).get("name", id)), "selected": GameState.profile.equipped_id("frame") == String(id) })
+	PW.open_picker(self, "ELIGE UN MARCO", opts, func(key):
+		if GameState.profile.equip("frame", "" if key == "none" else key):
+			_saved())
+
+
+func _saved() -> void:
+	GameState.save_game()
+	_rebuild()
+
+
+func _open_menu_customize() -> void:
+	var app := NAV.app_of(self)
+	if app != null and app.has_method("open_screen"):
+		app.call("open_screen", "menu_customize")
 
 
 func _chip(value: String, caption: String, color: Color) -> Control:

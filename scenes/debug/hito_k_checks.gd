@@ -178,7 +178,7 @@ func _check_pity_single_multi() -> void:
 		else:
 			gap += 1
 			worst_gap = maxi(worst_gap, gap)
-	_out("[DBG25] INFO banner del duo con pity: duo en %.2f%% de las tiradas (sin pity seria 7%%), maximo %d tiradas seguidas sin duo" % [100.0 * float(duo_hits) / 3000.0, worst_gap])
+	_out("[DBG25] INFO banner del duo con pity: duo en %.2f%% de las tiradas (sin pity seria 3%%), maximo %d tiradas seguidas sin duo" % [100.0 * float(duo_hits) / 3000.0, worst_gap])
 	_check("en 3000 tiradas nunca pasan 9 seguidas sin el duo", worst_gap <= 9)
 	DB.banners.erase("t_pity")
 
@@ -217,7 +217,7 @@ func _check_pity_natural_reset() -> void:
 		if GameState._pick_candidate("banner_david_lucy", "SSR", ssr_pool) == DUO:
 			hits += 1
 	var freq := float(hits) / 20000.0
-	_check("las tasas actuales se conservan: el duo es el 7%% por tirada (%.3f de los SSR, esperado 0.467)" % freq, absf(freq - 7.0 / 15.0) < 0.02)
+	_check("las tasas actuales se conservan: el duo es el 3%% por tirada (%.3f de los SSR, esperado 0.2)" % freq, absf(freq - 3.0 / 15.0) < 0.02)
 	DB.banners.erase("t_nat")
 
 
@@ -316,7 +316,7 @@ func _check_banner_info() -> void:
 		for rarity in rates.keys():
 			matches = matches and absf(float(by_rarity.get(rarity, 0.0)) - float(rates[rarity])) < 1e-9
 		_check("%s: las probabilidades por personaje suman 1 y cuadran con cada rareza" % bid, matches)
-	_check("las tasas reales del banner del duo: duo 7%% y SSR total 15%%", absf(GameState.banner_character_rate("banner_david_lucy", DUO) - 0.07) < 1e-9)
+	_check("las tasas reales del banner del duo: duo 3%% y SSR total 15%%", absf(GameState.banner_character_rate("banner_david_lucy", DUO) - 0.03) < 1e-9)
 	var apertura_rate := GameState.banner_character_rate("banner_apertura", "gojo")
 	var ssr_count := 0
 	for id in GameState.banner_pool("banner_apertura"):
@@ -381,7 +381,7 @@ func _check_screens() -> void:
 	screen.set("_banner_id", "banner_david_lucy")
 	screen.call("_on_info_pressed")
 	var duo_text := _all_text(screen.get_node("BannerInfoPanel"))
-	_check("la info del banner del duo ensena 7% propio y [cuenta para el pity]", duo_text.contains("7%") and duo_text.contains("cuenta para el pity") and duo_text.contains("llega a LR"))
+	_check("la info del banner del duo ensena 3% propio y [cuenta para el pity]", duo_text.contains("3%") and duo_text.contains("cuenta para el pity") and duo_text.contains("llega a LR"))
 	screen.get_node("BannerInfoPanel").queue_free()
 	await get_tree().process_frame
 	# invocar desde la pantalla: se cobra una vez y se bloquea el doble toque

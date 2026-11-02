@@ -1,0 +1,8 @@
+{
+ "id": "theme_violeta",
+ "type": "theme",
+ "name": "Tema Violeta",
+ "description": "Tine el menu principal con este color de acento.",
+ "tint": "#7a3dff",
+ "accent": "#7a3dff"
+}

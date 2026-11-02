@@ -1,0 +1,8 @@
+{
+ "id": "frame_legendario",
+ "type": "frame",
+ "name": "Marco Legendario",
+ "description": "Marco para tu avatar y tu vitrina.",
+ "color": "#ff5ad2",
+ "color2": "#ffd45a"
+}

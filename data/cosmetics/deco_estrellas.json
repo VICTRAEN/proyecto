@@ -1,0 +1,10 @@
+{
+ "id": "deco_estrellas",
+ "type": "decoration",
+ "name": "Lluvia de estrellas",
+ "description": "Efecto decorativo animado para el menu principal.",
+ "mode": "stars",
+ "count": 28,
+ "color": "#ffe9a8",
+ "color2": "#ffffff"
+}

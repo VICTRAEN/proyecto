@@ -1,0 +1,8 @@
+{
+ "id": "theme_cian",
+ "type": "theme",
+ "name": "Tema Cian",
+ "description": "Tine el menu principal con este color de acento.",
+ "tint": "#19c9e0",
+ "accent": "#19c9e0"
+}

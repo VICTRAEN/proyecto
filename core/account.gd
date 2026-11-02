@@ -202,6 +202,17 @@ func claim_all_levels() -> Array:
 	return out
 
 
+## Un guardado anterior ya cobro niveles cuyo premio ahora incluye cosmeticos nuevos
+## (v16): se entregan una vez, sin tocar monedas ni nada mas. Idempotente.
+func regrant_claimed_cosmetics() -> int:
+	var given := 0
+	for l in claimed_levels:
+		for id in level_reward(int(l)).get("cosmetics", []):
+			if grant_cosmetic(String(id)):
+				given += 1
+	return given
+
+
 ## --- Cosmeticos -----------------------------------------------------------------
 
 func owns_cosmetic(id: String) -> bool:

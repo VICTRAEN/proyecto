@@ -1,0 +1,41 @@
+{
+	"id": "banner_diario_dom",
+	"name": "Domingo de leyendas",
+	"description": "Leyendas, guardianes y despertados. Banner DIARIO: solo esta disponible el dia que le toca. 15% de SSR por tirada y 2 destacados con 3% cada uno.",
+	"rotation": {
+		"type": "daily",
+		"order": 6
+	},
+	"cost_gems": 10,
+	"multi_pulls": 10,
+	"multi_cost_gems": 90,
+	"rates": {
+		"SR": 0.85,
+		"SSR": 0.15
+	},
+	"pool_categories": [
+		"leyendas",
+		"guardianes",
+		"despertados"
+	],
+	"featured": [
+		"reinhard",
+		"kaori"
+	],
+	"featured_rates": {
+		"reinhard": 0.03,
+		"kaori": 0.03
+	},
+	"featured_bonus": 0.0,
+	"theme": {
+		"accent": "#ffd54f",
+		"accent2": "#ff7ac6",
+		"tagline": "BANNER DIARIO",
+		"hero": "reinhard"
+	},
+	"pity": {
+		"pulls": 0,
+		"rarity": ""
+	},
+	"notes": "Banner diario (v16). Probabilidades POR TIRADA, explicitas y sumando 1: SR 85%, SSR 15%. Cada destacado tiene tasa propia del 3% por tirada (dentro del SSR); el resto del SSR se reparte entre los demas SSR del pool de categorias. Sin pity."
+}

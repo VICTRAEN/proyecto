@@ -1,0 +1,40 @@
+{
+	"id": "banner_diario_vie",
+	"name": "Viernes escolar",
+	"description": "Romance, escuela y estrellas del escenario. Banner DIARIO: solo esta disponible el dia que le toca. 15% de SSR por tirada y 2 destacados con 3% cada uno.",
+	"rotation": {
+		"type": "daily",
+		"order": 4
+	},
+	"cost_gems": 10,
+	"multi_pulls": 10,
+	"multi_cost_gems": 90,
+	"rates": {
+		"SR": 0.85,
+		"SSR": 0.15
+	},
+	"pool_categories": [
+		"romance",
+		"school"
+	],
+	"featured": [
+		"momo",
+		"ai_hoshino"
+	],
+	"featured_rates": {
+		"momo": 0.03,
+		"ai_hoshino": 0.03
+	},
+	"featured_bonus": 0.0,
+	"theme": {
+		"accent": "#ff7ac6",
+		"accent2": "#ffd1ef",
+		"tagline": "BANNER DIARIO",
+		"hero": "momo"
+	},
+	"pity": {
+		"pulls": 0,
+		"rarity": ""
+	},
+	"notes": "Banner diario (v16). Probabilidades POR TIRADA, explicitas y sumando 1: SR 85%, SSR 15%. Cada destacado tiene tasa propia del 3% por tirada (dentro del SSR); el resto del SSR se reparte entre los demas SSR del pool de categorias. Sin pity."
+}

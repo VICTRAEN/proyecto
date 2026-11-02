@@ -1,0 +1,265 @@
+[DBG27] --- comprobaciones v15 ---
+[DBG27] == DATOS DE COLECCIONES ==
+[DBG27] hay 28 colecciones (12 series, 13 categorias, 2 rarezas, 1 evento) -> OK
+[DBG27] reparto por tipo 12/13/2/1 -> OK
+[DBG27] ninguna coleccion tiene problemas de configuracion (ok) -> OK
+[DBG27] con todos los personajes y el evento completado, las 28 colecciones se completan () -> OK
+[DBG27] cada cosmetico lo da UNA sola fuente -> OK
+[DBG27] los 46 cosmeticos se pueden conseguir -> OK
+[DBG27] todas las ilustraciones cosmeticas tienen su front.png -> OK
+[DBG27] Gran coleccion se completa con todas las familias -> OK
+[DBG27] ... aunque Sakuta y Mai ya hayan evolucionado a su forma LR (id original consumido) -> OK
+[DBG27] las familias son menos que los ids (Sakuta y Mai son una sola) -> OK
+[DBG27] la raiz de sakuta_mai_lr es sakuta_mai -> OK
+[DBG27] == COBRO DE COLECCIONES ==
+[DBG27] Black Clover: 3/4 y ningun tramo completo -> OK
+[DBG27] el tramo del 50% (3 de 4: asta, yuno y yami) esta alcanzado y el 100% no -> OK
+[DBG27] falta: noelle, con su fuente -> OK
+[DBG27] reclamar el tramo paga monedas y materiales -> OK
+[DBG27] no se puede reclamar dos veces -> OK
+[DBG27] no se puede reclamar un tramo sin alcanzar -> OK
+[DBG27] al conseguir a Noelle la coleccion esta completa -> OK
+[DBG27] el 100% da gemas, un titulo y una ilustracion -> OK
+[DBG27] el titulo aparece en el catalogo de titulos equipables -> OK
+[DBG27] la coleccion queda con todo reclamado -> OK
+[DBG27] dar dos veces el mismo cosmetico no lo duplica -> OK
+[DBG27] objeto desconocido en una recompensa no se entrega ni rompe -> OK
+[DBG27] reclamar todo cobra todos los tramos listos (45) -> OK
+[DBG27] ... y no hay tramo del evento cobrado sin haberlo completado -> OK
+[DBG27] la coleccion del evento no se completa sin completar el evento -> OK
+[DBG27] completado el evento, el tramo se puede cobrar -> OK
+[DBG27] Seishun Buta Yarou: Sakuta y Mai cuenta con su id original -> OK
+[DBG27] ... y sigue completa tras evolucionar a Sakuta (el id original ya no existe) -> OK
+[DBG27] ... y tras evolucionar a la forma LR -> OK
+[DBG27] Sakuta y Mai se consigue solo en el evento -> OK
+[DBG27] Sakuta (UR) se consigue por evolucion -> OK
+[DBG27] David y Lucy (duo) sale en su banner -> OK
+[DBG27] todos los personajes del juego son alcanzables -> OK
+[DBG27] == MISIONES PERSONALES ==
+[DBG27] hay 12 misiones personales de 3 personajes (Sakuta y Mai, Goku, David y Lucy) -> OK
+[DBG27] las personales no entran en las PERMANENTES ni en las periodicas -> OK
+[DBG27] las demas misiones siguen ahi: 30 misiones en total -> OK
+[DBG27] combate con Sakuta y Mai: cuenta para Compania de batalla -> OK
+[DBG27] ... y para Dos personas, una promesa (con Mai en el equipo) -> OK
+[DBG27] sin Mai en el equipo NO cuenta para Dos personas, una promesa -> OK
+[DBG27] una derrota cuenta como combate jugado pero no como victoria -> OK
+[DBG27] un combate sin el personaje no suma -> OK
+[DBG27] con la forma evolucionada (Sakuta) tambien cuenta, y el jefe suma -> OK
+[DBG27] ... y con la forma LR -> OK
+[DBG27] Goku en solitario: Entrenamiento diario y El mas fuerte del universo suman -> OK
+[DBG27] Goku con Vegeta: Orgullo saiyan suma, y la de en solitario NO -> OK
+[DBG27] Goku sin Vegeta ni Gohan: Orgullo saiyan NO suma -> OK
+[DBG27] evolucionar a otro personaje no suma -> OK
+[DBG27] evolucionar a Sakuta suma Despertar compartido -> OK
+[DBG27] el progreso no pasa del objetivo (20/20) -> OK
+[DBG27] GameState.claim_mission cobra una personal (monedas y materiales) -> OK
+[DBG27] ... una sola vez -> OK
+[DBG27] una personal sin completar no se puede cobrar -> OK
+[DBG27] completar El mas fuerte del universo da su titulo -> OK
+[DBG27] al reiniciar el estado el progreso personal se pierde (prueba de control) -> OK
+[DBG27] ... y al cargar lo guardado se recupera, con lo ya cobrado -> OK
+[DBG27] un guardado con una mision retirada la ignora sin romper -> OK
+[DBG27] cobrar 3 veces la misma batalla suma 1 en la personal (y el jefe 1) -> OK
+[DBG27] ... y entra en la cuenta una sola vez (8 + 12 + 30 XP) -> OK
+[DBG27] se listan las personales de un personaje (4 de Goku) -> OK
+[DBG27] == NIVEL DE CUENTA ==
+[DBG27] antes de la v15 no existia nivel de cuenta: ahora empieza en 1 -> OK
+[DBG27] la tabla tiene 29 recompensas (niveles 2 a 30) -> OK
+[DBG27] XP para nivel 2 = 120 y crece 40 por nivel -> OK
+[DBG27] XP de una victoria con jefe = 8 + 12 + 30 -> OK
+[DBG27] la XP de cuenta no da monedas ni gemas por si sola (no hay moneda nueva) -> OK
+[DBG27] 500 XP: nivel 4 (120+160+200 = 480, sobran 20) -> OK
+[DBG27] niveles 2, 3 y 4 con recompensa pendiente -> OK
+[DBG27] cobrar el nivel 2 paga sus monedas (140) -> OK
+[DBG27] no se cobra dos veces -> OK
+[DBG27] no se cobra un nivel que no se ha alcanzado -> OK
+[DBG27] cobrar todo reclama lo que queda -> OK
+[DBG27] el nivel se queda en el maximo y la XP no se desborda -> OK
+[DBG27] el nivel 5 desbloquea el fondo Equipo y el 10 el titulo Aventurero -> OK
+[DBG27] cobrados los 29 niveles: cosmeticos y titulos de cuenta entregados -> OK
+[DBG27] equipar un fondo que se posee funciona y cambia el slot del menu -> OK
+[DBG27] no se equipa un fondo que no se posee -> OK
+[DBG27] no se equipa una ilustracion como fondo -> OK
+[DBG27] quitar el fondo devuelve el del menu -> OK
+[DBG27] equipar una ilustracion cambia el personaje del escaparate -> OK
+[DBG27] invocar x10 (40) + piso (25) + fase de evento (30) + evolucion (50) = 145 XP -> OK
+[DBG27] un guardado v14 estima la XP de cuenta desde sus contadores (50x8 + 30x12 + 20x4 = 840) -> OK
+[DBG27] ... una sola vez (segunda llamada no suma) -> OK
+[DBG27] ... y al volver a cargar ya no se re-estima -> OK
+[DBG27] un guardado con cosmeticos retirados o equipados sin poseer se limpia -> OK
+[DBG27] == GUARDADO Y CARGA ==
+[DBG27] el guardado incluye cuenta, colecciones y misiones personales -> OK
+[DBG27] SAVE_VERSION sigue en 3 (los bloques nuevos son aditivos) -> OK
+[DBG27] el payload sobrevive a JSON y vuelta -> OK
+[DBG27] tras vaciar la memoria no queda nada (control) -> OK
+[DBG27] load_game devuelve true -> OK
+[DBG27] la XP de cuenta se recupera -> OK
+[DBG27] los niveles cobrados se recuperan -> OK
+[DBG27] el tramo de coleccion cobrado se recupera (no se puede cobrar otra vez) -> OK
+[DBG27] el progreso personal se recupera -> OK
+[DBG27] el cosmetico equipado se recupera -> OK
+[DBG27] las monedas se recuperan -> OK
+[DBG27] un guardado de la v14 carga sin errores -> OK
+[DBG27] ... conserva el roster, monedas y favoritos -> OK
+[DBG27] ... las colecciones empiezan sin tramos cobrados y se pueden cobrar -> OK
+[DBG27] ... y la XP de cuenta se estima desde sus contadores (10 combates, 4 victorias) -> OK
+[DBG27] ... y no hay misiones personales con progreso -> OK
+[DBG27] un archivo de guardado corrupto no rompe la carga -> OK
+[DBG27] == AUDIO Y TRANSICIONES ==
+[DBG27] los fundidos estan desactivados en headless por defecto -> OK
+[DBG27] sin fundidos el volumen es el de siempre -> OK
+[DBG27] duck baja la musica 10 dB y is_ducked lo dice -> OK
+[DBG27] unduck la devuelve -> OK
+[DBG27] la primera pista arranca sin esperar -> OK
+[DBG27] entra con fundido: al empezar casi en silencio -> OK
+[DBG27] ... y a los 0,7 s ya esta a su volumen (-13.9 dB) -> OK
+[DBG27] pedir la misma pista dos veces NO la reinicia -> OK
+[DBG27] cambiar de pista: la nueva cuenta como puesta YA -> OK
+[DBG27] durante el cambio solo suena UNA pista de musica (nunca se solapan) -> OK
+[DBG27] tras el fundido suena la nueva y a su volumen -> OK
+[DBG27] dos peticiones seguidas: gana la ultima y la intermedia no suena -> OK
+[DBG27] fade_out_music: la pista deja de contar como puesta ya -> OK
+[DBG27] ... y el reproductor se detiene al acabar el fundido -> OK
+[DBG27] despues de cortar la musica, la de resultados entra normal -> OK
+[DBG27] pedir musica en mitad del fundido de salida la deja sonando (no se corta) -> OK
+[DBG27] con la musica a 0 el reproductor queda en silencio -> OK
+[DBG27] subir el volumen mientras suena se aplica (-18.0 dB) -> OK
+[DBG27] durante la intro de un jefe la musica esta 10 dB mas baja -> OK
+[DBG27] ... y al cerrarla vuelve a su volumen -> OK
+[DBG27] stop_music corta y suelta el duck -> OK
+[DBG27] sin boss.ogg los jefes suenan con la musica de combate -> OK
+[DBG27] 'boss' esta en el catalogo y se lista como pendiente de aportar, no como fallo -> OK
+[DBG27] un jefe real se reconoce en el combate (GameState.current_battle_bosses) -> OK
+[DBG27] el mismo efecto 6 veces en el mismo instante suena 1 vez -> OK
+[DBG27] el total de efectos simultaneos nunca pasa del tope (14) -> OK
+[DBG27] con los efectos a 0 el nuevo efecto queda en silencio -> OK
+[DBG27] los fundidos vuelven a su estado original tras la prueba -> OK
+[DBG27] == CALIDAD DE VIDA ==
+[DBG27] comparar da las 6 estadisticas -> OK
+[DBG27] comparar es simetrico (cambiar el orden invierte quien gana) -> OK
+[DBG27] las estadisticas de comparar son las de combate (vida 1560, ataque 236) -> OK
+[DBG27] el texto de critico y esquiva sale en porcentaje -> OK
+[DBG27] el texto de diferencia: +, - e = -> OK
+[DBG27] comparar da rareza, tipo, nivel y pasivas -> OK
+[DBG27] Gojo (SSR) tiene prevision de evolucion normal a UR -> OK
+[DBG27] la evolucion normal vuelve a nivel 1 (lo dice la prevision y lo hace evolve) -> OK
+[DBG27] vida prevista a nivel 1 = base x 1,25 (1950) -> OK
+[DBG27] vida prevista al nivel 100 = base x 1,25 x crecimiento de nivel 100 -> OK
+[DBG27] evolucionar de verdad deja las estadisticas que predijo la prevision (vida 1950) -> OK
+[DBG27] Sakuta y Mai tiene prevision ESPECIAL hacia Sakuta (UR) -> OK
+[DBG27] la especial hereda el nivel (100) -> OK
+[DBG27] un personaje sin evolucion no tiene prevision -> OK
+[DBG27] un personaje que no tienes no tiene prevision -> OK
+[DBG27] una unidad del equipo activo es importante y pide confirmacion -> OK
+[DBG27] una unidad sin nada especial no pide nada -> OK
+[DBG27] nivel 60 la hace importante -> OK
+[DBG27] tener Dupes la hace importante -> OK
+[DBG27] un favorito BLOQUEA (protected) en vez de pedir confirmacion -> OK
+[DBG27] una mutacion la hace importante -> OK
+[DBG27] misiones personales con progreso hacen importante a Goku -> OK
+[DBG27] la evolucion especial de Sakuta y Mai CONSUME y pide confirmar (nivel 100, en el equipo) -> OK
+[DBG27] una evolucion normal no consume ni pide confirmar -> OK
+[DBG27] un favorito impide la evolucion especial (el bloqueo de siempre sigue) -> OK
+[DBG27] la info de una fase con jefe lo marca (con sus 2 fases) -> OK
+[DBG27] la info de historia dice que cada dificultad paga una vez -> OK
+[DBG27] la info de stage dice que se paga cada vez -> OK
+[DBG27] la info de torre dice que solo paga la primera vez -> OK
+[DBG27] tipos de los rivales sin repetir -> OK
+[DBG27] un objeto de primera vez aparece en la info -> OK
+[DBG27] == DIAGNOSTICO (solo desarrollo) ==
+[DBG27] sobre los datos reales no hay ningun ERROR (ok) -> OK
+[DBG27] el informe se puede imprimir -> OK
+[DBG27] cubre las 6 areas pedidas -> OK
+[DBG27] el arte que falta sale como AVISO (el juego dibuja una silueta), no como error -> OK
+[DBG27] detecta un cosmetico dado por dos fuentes -> OK
+[DBG27] detecta un titulo dado por dos fuentes -> OK
+[DBG27] detecta un personaje imposible de conseguir -> OK
+[DBG27] detecta una fase con un enemigo que no existe -> OK
+[DBG27] detecta una fase sin enemigos -> OK
+[DBG27] detecta un nivel que apunta a un 'next' inexistente -> OK
+[DBG27] detecta una fase de evento que exige una forma imposible -> OK
+[DBG27] detecta un cosmetico con un fondo que no existe -> OK
+[DBG27] ... y un cosmetico que nadie da -> OK
+[DBG27] detecta un id repetido entre objetos y cosmeticos -> OK
+[DBG27] detecta una mision personal de un personaje que no existe -> OK
+[DBG27] detecta un favorito que no esta en el roster -> OK
+[DBG27] detecta un objeto inexistente en el inventario -> OK
+[DBG27] detecta un nivel de cuenta cobrado sin alcanzarlo -> OK
+[DBG27] detecta un tramo cobrado sin haber cumplido su requisito -> OK
+[DBG27] restaurados los datos, vuelve a no haber ningun error -> OK
+[DBG27] en una compilacion de distribucion el diagnostico no hace nada -> OK
+[DBG27] ... y las herramientas de desarrollo estan desactivadas -> OK
+[DBG27] el diagnostico no escribe el guardado ni cambia el estado (monedas intactas) -> OK
+[DBG27] == v16: RAREZA NATURAL Y BANNERS ==
+[DBG27] ningun personaje nace UR ni LR (solo las formas evolucionadas: ) -> OK
+[DBG27] goku nace SSR -> OK
+[DBG27] frieren nace SSR -> OK
+[DBG27] makima nace SSR -> OK
+[DBG27] sukuna nace SSR -> OK
+[DBG27] ningun banner da UR ni LR y todos son validos (suman 1, sin rarezas huerfanas) -> OK
+[DBG27] los pools solo contienen SR y SSR -> OK
+[DBG27] 300 tiradas por banner: jamas sale algo que no sea SR o SSR -> OK
+[DBG27] Goku (SSR) puede evolucionar a UR al nivel 100 -> OK
+[DBG27] ... y tras evolucionar es UR con su pasiva de forma UR -> OK
+[DBG27] las colecciones siguen validas (Leyendas = Goku, Frieren, Makima, Sukuna) -> OK
+[DBG27] los cosmeticos no repiten su prefijo (Ilustracion: Ilustracion:) -> OK
+[DBG27] los nombres de cosmetico no llevan el prefijo del tipo -> OK
+[DBG27] el diagnostico detecta un personaje que nace UR -> OK
+[DBG27] == PANTALLAS NUEVAS ==
+[DBG27] la pantalla de colecciones abre -> OK
+[DBG27] SERIES: 12 tarjetas -> OK
+[DBG27] CATEGORIAS: 13 tarjetas -> OK
+[DBG27] RAREZAS: 2 tarjetas -> OK
+[DBG27] EVENTOS: 1 tarjeta -> OK
+[DBG27] la tarjeta de Dragon Ball existe y tiene sus botones de tramo -> OK
+[DBG27] reclamar desde la pantalla paga y la pantalla se repinta -> OK
+[DBG27] la pantalla dice lo que se ha entregado -> OK
+[DBG27] ver personajes muestra los que tienes -> OK
+[DBG27] el boton RECLAMAR TODO refleja lo pendiente -> OK
+[DBG27] el perfil abre -> OK
+[DBG27] el perfil muestra el nivel de cuenta (NIVEL 5) -> OK
+[DBG27] la barra de XP tiene el progreso del nivel -> OK
+[DBG27] hay una fila por nivel pendiente -> OK
+[DBG27] RECLAMAR TODO del perfil paga los niveles y entrega el fondo del nivel 5 -> OK
+[DBG27] el fondo ganado aparece para equiparlo -> OK
+[DBG27] equiparlo desde el perfil lo guarda -> OK
+[DBG27] el menu principal usa el fondo equipado (slot team) -> OK
+[DBG27] el menu muestra el nivel de cuenta y lo pendiente -> OK
+[DBG27] la ilustracion equipada sustituye al lider en el escaparate -> OK
+[DBG27] quitar el fondo y la ilustracion devuelve el menu de siempre -> OK
+[DBG27] MISIONES tiene ahora 5 pestanas (DIARIAS, SEMANALES, PERMANENTES, PERSONAJES, LOGROS) -> OK
+[DBG27] PERSONAJES: 12 tarjetas, sin etiqueta de reinicio -> OK
+[DBG27] PERMANENTES sigue con las 7 de siempre -> OK
+[DBG27] una personal en curso se ve con su progreso -> OK
+[DBG27] la coleccion tiene los botones RECOMPENSAS y COMPARAR -> OK
+[DBG27] la pantalla de comparar abre -> OK
+[DBG27] tiene los dos selectores y una fila por estadistica -> OK
+[DBG27] dice quien gana mas estadisticas (Gana en mas estadisticas: Satoru Gojo) -> OK
+[DBG27] la pantalla EVOLUCION muestra la tabla de estadisticas previstas -> OK
+[DBG27] la tabla tiene cabecera + 6 estadisticas x 4 columnas -> OK
+[DBG27] Sakuta y Mai esta lista para evolucionar (preparada la prueba: Listo para la evolucion especial a Sakuta Azusagawa.) -> OK
+[DBG27] PRIMER toque: NO evoluciona (la unidad importante se consume) -> OK
+[DBG27] ... y el boton pasa a pedir confirmacion -> OK
+[DBG27] ... y avisa de por que -> OK
+[DBG27] SEGUNDO toque: evoluciona -> OK
+[DBG27] ... y el nivel y el equipo pasan al personaje nuevo -> OK
+[DBG27] ... y la coleccion de Seishun Buta Yarou sigue completa -> OK
+[DBG27] ... y la evolucion cuenta para su mision personal -> OK
+[DBG27] la seleccion de batalla dice la regla de pago -> OK
+[DBG27] ... y marca al jefe (Vigia del Vacio es Makima) -> OK
+[DBG27] la torre dice que cada piso solo paga la primera vez -> OK
+[DBG27] ... y cada piso ensena lo que paga -> OK
+[DBG27] en depuracion el panel de desarrollo trae el boton de diagnostico -> OK
+[DBG27] en la version publica NO hay panel de desarrollo ni diagnostico -> OK
+[DBG27] == v16: PANTALLAS ==
+[DBG27] INFO DEL BANNER abre su ventana -> OK
+[DBG27] la ventana ocupa la pantalla entera ((1920.0, 1920.0) de (1920.0, 1920.0)) -> OK
+[DBG27] el contenido no esta vacio: 77 lineas, alto 2441 -> OK
+[DBG27] muestra probabilidades, pity y personajes -> OK
+[DBG27] no dice que nadie llegue a UR sin evolucion: Goku llega a UR -> OK
+[DBG27] el scroll tiene altura propia (no colapsa) -> OK
+[DBG27] el perfil tiene retrato, nivel con fuente grande y seis estadisticas -> OK
+[DBG27] cada nivel pendiente es una tarjeta con su boton -> OK
+[DBG27] ningun texto del perfil usa la fuente diminuta (<22): [] -> OK
+[DBG27] las ilustraciones ganadas aparecen en cuadricula -> OK
+[DBG27] --- fin: 252 comprobaciones, 0 FALLO(S) ---

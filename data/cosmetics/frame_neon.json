@@ -1,0 +1,8 @@
+{
+ "id": "frame_neon",
+ "type": "frame",
+ "name": "Marco Neon",
+ "description": "Marco para tu avatar y tu vitrina.",
+ "color": "#4be8ff",
+ "color2": "#b04bff"
+}

@@ -1,0 +1,10 @@
+{
+ "id": "deco_motas",
+ "type": "decoration",
+ "name": "Motas de luz",
+ "description": "Efecto decorativo animado para el menu principal.",
+ "mode": "motes",
+ "count": 28,
+ "color": "#9fd8ff",
+ "color2": "#ffffff"
+}

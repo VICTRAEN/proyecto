@@ -1594,6 +1594,9 @@ var meta = MetaProgress.new(self)
 const Account := preload("res://core/account.gd")
 const CollectionsSystem := preload("res://core/collections.gd")
 var account = Account.new(self)
+## v16: perfil, vitrina y personalizacion del menu (core/player_profile.gd).
+const PlayerProfile := preload("res://core/player_profile.gd")
+var profile = PlayerProfile.new(self)
 var collections = CollectionsSystem.new(self)
 
 
@@ -1725,6 +1728,91 @@ func _end_atomic() -> void:
 		save_game()
 
 
+## --- Banners DIARIOS rotativos (v16) ---------------------------------------------------
+## La rotacion es una funcion PURA de la fecha local real (el mismo reloj que las misiones
+## diarias, asi se prueba con meta.now_override): no se guarda nada y sobrevive a cerrar y
+## abrir el juego. Calendario y orden: data/rotation.json + "rotation.order" de cada banner.
+
+## Dias enteros (locales) desde 1970 de una fecha "YYYY-MM-DD".
+static func _day_of_date(text: String) -> int:
+	var unix := Time.get_unix_time_from_datetime_string(text + "T00:00:00")
+	return int(floor(float(unix) / 86400.0)) if unix > 0 else 0
+
+
+## Indice del dia actual en el calendario (0 = start_date; puede ser negativo antes).
+func rotation_day_index() -> int:
+	var start := _day_of_date(String(DB.rotation_config().get("start_date", "2026-01-01")))
+	return meta._local_day() - start
+
+
+## Id del banner diario de hoy ("" si ninguno rota). "overrides" de una fecha manda.
+func daily_banner_id(day_offset: int = 0) -> String:
+	var cycle: Array = DB.rotating_banners()
+	if cycle.is_empty():
+		return ""
+	var day := meta._local_day() + day_offset
+	var date_key := MetaProgress._date_text(day)
+	var overrides = DB.rotation_config().get("overrides", {})
+	if overrides is Dictionary and (overrides as Dictionary).has(date_key) and not DB.get_banner(String((overrides as Dictionary)[date_key])).is_empty():
+		return String((overrides as Dictionary)[date_key])
+	var idx := posmod(rotation_day_index() + day_offset, cycle.size())
+	return String((cycle[idx] as Dictionary).get("id", ""))
+
+
+func is_rotating_banner(banner_id: String) -> bool:
+	var rot = DB.get_banner(String(banner_id)).get("rotation", {})
+	return rot is Dictionary and String((rot as Dictionary).get("type", "")) == "daily"
+
+
+## Se puede invocar en este banner AHORA? Los permanentes, siempre (si estan activados);
+## los diarios, solo el dia que les toca.
+func banner_active(banner_id: String) -> bool:
+	var banner := DB.get_banner(String(banner_id))
+	if banner.is_empty() or not bool(banner.get("enabled", true)):
+		return false
+	if is_rotating_banner(banner_id):
+		return daily_banner_id() == String(banner_id)
+	return true
+
+
+## Banners que el jugador ve HOY: el diario de hoy primero y despues los permanentes.
+func available_banners() -> Array:
+	var out: Array = []
+	var today := daily_banner_id()
+	if not today.is_empty():
+		out.append(DB.get_banner(today))
+	for b in DB.all_banners():
+		if not is_rotating_banner(String((b as Dictionary).get("id", ""))):
+			out.append(b)
+	return out
+
+
+## Segundos hasta el cambio de banner diario (medianoche local).
+func seconds_to_banner_change() -> int:
+	return meta.seconds_left("daily")
+
+
+func banner_rotation_text(banner_id: String) -> String:
+	if not is_rotating_banner(banner_id):
+		return ""
+	var left := seconds_to_banner_change()
+	var hours := left / 3600
+	var minutes := (left % 3600) / 60
+	if banner_active(banner_id):
+		return "Banner DIARIO: disponible hoy. Cambia en %dh %02dmin." % [hours, minutes]
+	return "Banner DIARIO: hoy no esta disponible."
+
+
+## Proximos `days` dias: [{ offset, date, banner_id, name }] (para ensenar el calendario).
+func banner_schedule(days: int) -> Array:
+	var out: Array = []
+	for i in range(0, maxi(1, days)):
+		var id := daily_banner_id(i)
+		out.append({ "offset": i, "date": MetaProgress._date_text(meta._local_day() + i), "banner_id": id,
+			"name": String(DB.get_banner(id).get("name", id)) if not id.is_empty() else "" })
+	return out
+
+
 ## Coste de una invocacion de `count` tiradas, leido del banner. El precio de la
 ## multi vive en los datos, asi que cambiar de banner no toca ningun script.
 func banner_cost(banner_id: String, count: int) -> int:
@@ -1785,6 +1873,9 @@ func summon(banner_id: String, count: int = 1, stage_reveal: bool = false) -> Di
 		return report
 	if not bool(DB.get_banner(key).get("enabled", true)):
 		report["reason"] = "Ese banner no esta disponible."
+		return report
+	if not banner_active(key):
+		report["reason"] = "Ese banner diario no esta disponible hoy."
 		return report
 	# Una secuencia de revelado a medias bloquea nuevas invocaciones: primero se
 	# ensenan (o se cierran) los resultados que el jugador ya ha pagado.
@@ -4874,6 +4965,7 @@ func build_save_payload() -> Dictionary:
 		"summon_banner_totals": summon_banner_totals,
 		"meta_progress": meta.to_dict(),
 		"account": account.to_dict(),
+		"profile": profile.to_dict(),
 		"collections": collections.to_dict(),
 	}
 	return payload
@@ -5068,8 +5160,10 @@ func load_game() -> bool:
 	# estima UNA vez desde los contadores y las colecciones empiezan sin tramos cobrados
 	# (el progreso se lee del roster, asi que lo que ya cumplia sale listo para cobrar).
 	account.from_dict(data.get("account", {}))
+	profile.from_dict(data.get("profile", {}))
 	collections.from_dict(data.get("collections", {}))
 	account.bootstrap_if_needed()
+	account.regrant_claimed_cosmetics()
 
 	# Por si el archivo es de antes de anadir un personaje al roster.
 	ensure_defaults()

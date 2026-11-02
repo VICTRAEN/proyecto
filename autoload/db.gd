@@ -27,6 +27,8 @@ const TOWERS_DIR := "res://data/towers"
 const COLLECTIONS_DIR := "res://data/collections"
 const COSMETICS_DIR := "res://data/cosmetics"
 const ACCOUNT_FILE := "res://data/account/levels.json"
+## v16: calendario de la rotacion diaria de banners (un unico archivo de configuracion).
+const ROTATION_FILE := "res://data/rotation.json"
 ## Las Leader Skills son UN archivo de balance (tabla de lideres + quien lleva
 ## cual), igual que las mutaciones: por eso se lee aparte y no con _load_dir.
 const LEADERS_FILE := "res://data/leaders/leaders.json"
@@ -79,6 +81,7 @@ var dupe_rules: Dictionary = {}
 var collections: Dictionary = {}
 var cosmetics: Dictionary = {}
 var account_levels: Dictionary = {}
+var rotation: Dictionary = {}
 var load_errors: Array = []
 
 
@@ -105,6 +108,7 @@ func load_all() -> void:
 	collections = _load_dir(COLLECTIONS_DIR)
 	cosmetics = _load_dir(COSMETICS_DIR)
 	account_levels = _load_account_levels()
+	rotation = _load_rotation()
 	mutations_config = _load_mutations()
 	evolution_rules = _read_routes_file(EVOLUTION_FILE)
 	special_evolution_rules = _read_routes_file(SPECIAL_EVOLUTION_FILE)
@@ -322,6 +326,35 @@ func get_cosmetic(id: String) -> Dictionary:
 
 func all_cosmetics() -> Array:
 	return _all_sorted(cosmetics)
+
+
+func _load_rotation() -> Dictionary:
+	var data = _read_json(ROTATION_FILE)
+	if not (data is Dictionary):
+		load_errors.append("No se pudo leer el calendario de banners %s" % ROTATION_FILE)
+		return {}
+	return data
+
+
+func rotation_config() -> Dictionary:
+	return rotation
+
+
+## Banners del ciclo DIARIO (los que declaran "rotation": {"type": "daily", "order": N}),
+## en el orden del ciclo (por "order" y luego por id). Solo los activados.
+func rotating_banners() -> Array:
+	var out: Array = []
+	for b in all_banners():
+		var rot = (b as Dictionary).get("rotation", {})
+		if rot is Dictionary and String((rot as Dictionary).get("type", "")) == "daily":
+			out.append(b)
+	out.sort_custom(func(a, b):
+		var oa := int(((a as Dictionary)["rotation"] as Dictionary).get("order", 0))
+		var ob := int(((b as Dictionary)["rotation"] as Dictionary).get("order", 0))
+		if oa != ob:
+			return oa < ob
+		return String((a as Dictionary).get("id", "")) < String((b as Dictionary).get("id", "")))
+	return out
 
 
 func account_config() -> Dictionary:

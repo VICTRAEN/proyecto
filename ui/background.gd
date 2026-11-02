@@ -170,6 +170,8 @@ const AMBIENT := {
 
 var texture: Texture2D = null
 var _ambient: Control = null
+## v16: decoracion elegida por el jugador ([modo, cantidad, color1, color2]); manda sobre la del slot.
+var ambient_override: Array = []
 
 
 func _ready() -> void:
@@ -187,6 +189,12 @@ func show_slot(new_slot: String) -> void:
 
 ## Vuelve a buscar la imagen. Se llama al arrancar; si el jugador mete un PNG
 ## nuevo, la siguiente vez que se abra la pantalla se usa.
+## Pone (o quita con []) la decoracion del jugador y la aplica.
+func set_ambient_override(preset: Array) -> void:
+	ambient_override = preset
+	_update_ambient()
+
+
 func reload() -> void:
 	texture = load_texture(slot)
 	_update_ambient()
@@ -195,7 +203,7 @@ func reload() -> void:
 
 ## Crea, cambia o quita las particulas ambientales segun el slot actual.
 func _update_ambient() -> void:
-	var preset = AMBIENT.get(slot, null)
+	var preset = ambient_override if not ambient_override.is_empty() else AMBIENT.get(slot, null)
 	if preset == null:
 		if _ambient != null:
 			_ambient.queue_free()

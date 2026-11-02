@@ -1,248 +1,284 @@
 {
-	"id": "account_levels",
-	"description": "Nivel de CUENTA. La experiencia de cuenta entra por el mismo punto unico que las misiones (MetaProgress.record): una accion no se cuenta dos veces. Cada nivel tiene su recompensa (mismo formato que colecciones y misiones). Los desbloqueos son cosmeticos y titulos: no bloquean ninguna funcion que ya existiera, asi un guardado anterior no pierde nada.",
-	"max_level": 30,
-	"xp_to_next": {
-		"base": 120,
-		"step": 40,
-		"comment": "XP para pasar del nivel L al L+1 = base + step*(L-1)"
-	},
-	"xp_sources": {
-		"battle_played": 8,
-		"battle_won": 12,
-		"boss_defeated": 30,
-		"summon": 4,
-		"tower_floor": 25,
-		"event_stage": 30,
-		"evolve": 50
-	},
-	"retroactive": {
-		"combates_jugados": 8,
-		"victorias": 12,
-		"summon_total": 4,
-		"tower_floors": 25,
-		"comment": "Un guardado de la v14 no tiene XP de cuenta: se estima UNA vez desde sus contadores."
-	},
-	"level_rewards": [
-		{
-			"level": 2,
-			"reward": {
-				"coins": 140
-			}
-		},
-		{
-			"level": 3,
-			"reward": {
-				"coins": 160,
-				"materials": 2
-			}
-		},
-		{
-			"level": 4,
-			"reward": {
-				"coins": 180
-			}
-		},
-		{
-			"level": 5,
-			"reward": {
-				"coins": 200,
-				"gems": 25,
-				"cosmetics": [
-					"bg_equipo"
-				]
-			}
-		},
-		{
-			"level": 6,
-			"reward": {
-				"coins": 220,
-				"materials": 3
-			}
-		},
-		{
-			"level": 7,
-			"reward": {
-				"coins": 240
-			}
-		},
-		{
-			"level": 8,
-			"reward": {
-				"coins": 260
-			}
-		},
-		{
-			"level": 9,
-			"reward": {
-				"coins": 280,
-				"materials": 3
-			}
-		},
-		{
-			"level": 10,
-			"reward": {
-				"coins": 300,
-				"gems": 30,
-				"cosmetics": [
-					"bg_mapa"
-				],
-				"title": {
-					"id": "title_cuenta_10",
-					"name": "Aventurero"
-				}
-			}
-		},
-		{
-			"level": 11,
-			"reward": {
-				"coins": 320
-			}
-		},
-		{
-			"level": 12,
-			"reward": {
-				"coins": 340,
-				"materials": 4
-			}
-		},
-		{
-			"level": 13,
-			"reward": {
-				"coins": 360
-			}
-		},
-		{
-			"level": 14,
-			"reward": {
-				"coins": 380
-			}
-		},
-		{
-			"level": 15,
-			"reward": {
-				"coins": 400,
-				"gems": 35,
-				"materials": 4,
-				"cosmetics": [
-					"bg_historia"
-				]
-			}
-		},
-		{
-			"level": 16,
-			"reward": {
-				"coins": 420
-			}
-		},
-		{
-			"level": 17,
-			"reward": {
-				"coins": 440
-			}
-		},
-		{
-			"level": 18,
-			"reward": {
-				"coins": 460,
-				"materials": 5
-			}
-		},
-		{
-			"level": 19,
-			"reward": {
-				"coins": 480
-			}
-		},
-		{
-			"level": 20,
-			"reward": {
-				"coins": 500,
-				"gems": 40,
-				"cosmetics": [
-					"bg_stages"
-				],
-				"title": {
-					"id": "title_cuenta_20",
-					"name": "Estratega"
-				}
-			}
-		},
-		{
-			"level": 21,
-			"reward": {
-				"coins": 520,
-				"materials": 5
-			}
-		},
-		{
-			"level": 22,
-			"reward": {
-				"coins": 540
-			}
-		},
-		{
-			"level": 23,
-			"reward": {
-				"coins": 560
-			}
-		},
-		{
-			"level": 24,
-			"reward": {
-				"coins": 580,
-				"materials": 6
-			}
-		},
-		{
-			"level": 25,
-			"reward": {
-				"coins": 600,
-				"gems": 45,
-				"cosmetics": [
-					"bg_invocacion"
-				]
-			}
-		},
-		{
-			"level": 26,
-			"reward": {
-				"coins": 620
-			}
-		},
-		{
-			"level": 27,
-			"reward": {
-				"coins": 640,
-				"materials": 6
-			}
-		},
-		{
-			"level": 28,
-			"reward": {
-				"coins": 660
-			}
-		},
-		{
-			"level": 29,
-			"reward": {
-				"coins": 680
-			}
-		},
-		{
-			"level": 30,
-			"reward": {
-				"coins": 700,
-				"gems": 50,
-				"materials": 7,
-				"cosmetics": [
-					"bg_resultados"
-				],
-				"title": {
-					"id": "title_cuenta_30",
-					"name": "Maestro de Anime Battle"
-				}
-			}
-		}
-	]
+ "id": "account_levels",
+ "description": "Nivel de CUENTA. La experiencia de cuenta entra por el mismo punto unico que las misiones (MetaProgress.record): una accion no se cuenta dos veces. Cada nivel tiene su recompensa (mismo formato que colecciones y misiones). Los desbloqueos son cosmeticos y titulos: no bloquean ninguna funcion que ya existiera, asi un guardado anterior no pierde nada.",
+ "max_level": 30,
+ "xp_to_next": {
+  "base": 120,
+  "step": 40,
+  "comment": "XP para pasar del nivel L al L+1 = base + step*(L-1)"
+ },
+ "xp_sources": {
+  "battle_played": 8,
+  "battle_won": 12,
+  "boss_defeated": 30,
+  "summon": 4,
+  "tower_floor": 25,
+  "event_stage": 30,
+  "evolve": 50
+ },
+ "retroactive": {
+  "combates_jugados": 8,
+  "victorias": 12,
+  "summon_total": 4,
+  "tower_floors": 25,
+  "comment": "Un guardado de la v14 no tiene XP de cuenta: se estima UNA vez desde sus contadores."
+ },
+ "level_rewards": [
+  {
+   "level": 2,
+   "reward": {
+    "coins": 140
+   }
+  },
+  {
+   "level": 3,
+   "reward": {
+    "coins": 160,
+    "materials": 2,
+    "cosmetics": [
+     "frame_bronce"
+    ]
+   }
+  },
+  {
+   "level": 4,
+   "reward": {
+    "coins": 180,
+    "cosmetics": [
+     "deco_motas"
+    ]
+   }
+  },
+  {
+   "level": 5,
+   "reward": {
+    "coins": 200,
+    "gems": 25,
+    "cosmetics": [
+     "bg_equipo"
+    ]
+   }
+  },
+  {
+   "level": 6,
+   "reward": {
+    "coins": 220,
+    "materials": 3,
+    "cosmetics": [
+     "theme_violeta"
+    ]
+   }
+  },
+  {
+   "level": 7,
+   "reward": {
+    "coins": 240
+   }
+  },
+  {
+   "level": 8,
+   "reward": {
+    "coins": 260,
+    "cosmetics": [
+     "frame_plata"
+    ]
+   }
+  },
+  {
+   "level": 9,
+   "reward": {
+    "coins": 280,
+    "materials": 3,
+    "cosmetics": [
+     "theme_cian"
+    ]
+   }
+  },
+  {
+   "level": 10,
+   "reward": {
+    "coins": 300,
+    "gems": 30,
+    "cosmetics": [
+     "bg_mapa"
+    ],
+    "title": {
+     "id": "title_cuenta_10",
+     "name": "Aventurero"
+    }
+   }
+  },
+  {
+   "level": 11,
+   "reward": {
+    "coins": 320
+   }
+  },
+  {
+   "level": 12,
+   "reward": {
+    "coins": 340,
+    "materials": 4,
+    "cosmetics": [
+     "deco_estrellas"
+    ]
+   }
+  },
+  {
+   "level": 13,
+   "reward": {
+    "coins": 360,
+    "cosmetics": [
+     "frame_oro"
+    ]
+   }
+  },
+  {
+   "level": 14,
+   "reward": {
+    "coins": 380
+   }
+  },
+  {
+   "level": 15,
+   "reward": {
+    "coins": 400,
+    "gems": 35,
+    "materials": 4,
+    "cosmetics": [
+     "bg_historia"
+    ]
+   }
+  },
+  {
+   "level": 16,
+   "reward": {
+    "coins": 420,
+    "cosmetics": [
+     "theme_carmesi"
+    ]
+   }
+  },
+  {
+   "level": 17,
+   "reward": {
+    "coins": 440
+   }
+  },
+  {
+   "level": 18,
+   "reward": {
+    "coins": 460,
+    "materials": 5,
+    "cosmetics": [
+     "frame_neon"
+    ]
+   }
+  },
+  {
+   "level": 19,
+   "reward": {
+    "coins": 480
+   }
+  },
+  {
+   "level": 20,
+   "reward": {
+    "coins": 500,
+    "gems": 40,
+    "cosmetics": [
+     "bg_stages"
+    ],
+    "title": {
+     "id": "title_cuenta_20",
+     "name": "Estratega"
+    }
+   }
+  },
+  {
+   "level": 21,
+   "reward": {
+    "coins": 520,
+    "materials": 5
+   }
+  },
+  {
+   "level": 22,
+   "reward": {
+    "coins": 540,
+    "cosmetics": [
+     "deco_brasas"
+    ]
+   }
+  },
+  {
+   "level": 23,
+   "reward": {
+    "coins": 560
+   }
+  },
+  {
+   "level": 24,
+   "reward": {
+    "coins": 580,
+    "materials": 6,
+    "cosmetics": [
+     "theme_dorado"
+    ]
+   }
+  },
+  {
+   "level": 25,
+   "reward": {
+    "coins": 600,
+    "gems": 45,
+    "cosmetics": [
+     "bg_invocacion"
+    ]
+   }
+  },
+  {
+   "level": 26,
+   "reward": {
+    "coins": 620
+   }
+  },
+  {
+   "level": 27,
+   "reward": {
+    "coins": 640,
+    "materials": 6
+   }
+  },
+  {
+   "level": 28,
+   "reward": {
+    "coins": 660,
+    "cosmetics": [
+     "frame_legendario"
+    ]
+   }
+  },
+  {
+   "level": 29,
+   "reward": {
+    "coins": 680
+   }
+  },
+  {
+   "level": 30,
+   "reward": {
+    "coins": 700,
+    "gems": 50,
+    "materials": 7,
+    "cosmetics": [
+     "bg_resultados"
+    ],
+    "title": {
+     "id": "title_cuenta_30",
+     "name": "Maestro de Anime Battle"
+    }
+   }
+  }
+ ]
 }

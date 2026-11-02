@@ -97,6 +97,14 @@ static func pct(rate: float) -> String:
 func _fill() -> void:
 	var banner := DB.get_banner(banner_id)
 	_line(String(banner.get("description", "")), VI.INK_SOFT)
+	var rot_text := GameState.banner_rotation_text(banner_id)
+	if not rot_text.is_empty():
+		_line(rot_text, VI.CYAN)
+		var days: Array = GameState.banner_schedule(7)
+		var parts: Array = []
+		for d in days:
+			parts.append("%s: %s" % [String(d["date"]).substr(5), String(d["name"])])
+		_line("PROXIMOS DIAS\n" + "\n".join(parts), VI.INK_SOFT)
 	_line("Coste: %d gemas (x1)  -  %d gemas (x%d)" % [
 		GameState.banner_cost(banner_id, 1), GameState.banner_cost(banner_id, 10),
 		maxi(2, int(banner.get("multi_pulls", 10)))], VI.GOLD_LIGHT)

@@ -1,0 +1,8 @@
+{
+ "id": "theme_dorado",
+ "type": "theme",
+ "name": "Tema Dorado",
+ "description": "Tine el menu principal con este color de acento.",
+ "tint": "#ffc83a",
+ "accent": "#ffc83a"
+}

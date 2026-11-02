@@ -1,0 +1,6 @@
+{
+	"id": "banner_rotation",
+	"description": "Rotacion DIARIA de banners por la fecha local real. Cada banner con \"rotation\": {\"type\":\"daily\",\"order\":N} entra en el ciclo por orden; el dia D se muestra el de la posicion (D - start_date) mod N. No se guarda nada: es una funcion pura de la fecha, asi que sobrevive a cerrar y abrir el juego. Para anadir un banner basta un JSON nuevo con su \"order\" (el ciclo se alarga solo). \"overrides\" fija un banner concreto en una fecha (YYYY-MM-DD) para eventos especiales.",
+	"start_date": "2026-11-02",
+	"overrides": {}
+}

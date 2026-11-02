@@ -141,7 +141,7 @@ func _check_collection_data() -> void:
 		if int(sources[c]) > 1:
 			dup = true
 	_check("cada cosmetico lo da UNA sola fuente", not dup)
-	_check("los 34 cosmeticos se pueden conseguir", sources.size() == DB.cosmetics.size() and DB.cosmetics.size() == 34)
+	_check("los 46 cosmeticos se pueden conseguir", sources.size() == DB.cosmetics.size() and DB.cosmetics.size() == 46)
 	# Las ilustraciones usan arte que existe de verdad.
 	var art_ok := true
 	for id in DB.cosmetics:
@@ -1059,6 +1059,7 @@ func _check_v16_screens() -> void:
 	_app.call("open_screen", "summon")
 	await _wait(0.4)
 	var summon = _app.get("_screens").get("summon", null)
+	summon.call("_on_banner_tab", "banner_ur")
 	summon.call("_on_info_pressed")
 	await _wait(0.3)
 	var panel = summon.get_node_or_null("BannerInfoPanel")
@@ -1082,7 +1083,7 @@ func _check_v16_screens() -> void:
 	_app.call("open_screen", "profile")
 	await _wait(0.4)
 	var profile = _app.get("_screens").get("profile", null)
-	_check("el perfil tiene retrato, nivel con fuente grande y tres estadisticas", profile.find_child("Portrait", true, false).texture != null and profile.find_child("LevelLabel", true, false).get_theme_font_size("font_size") >= 44 and profile.find_child("Stats", true, false).get_child_count() == 3)
+	_check("el perfil tiene retrato, nivel con fuente grande y seis estadisticas", profile.find_child("Portrait", true, false).texture != null and profile.find_child("LevelLabel", true, false).get_theme_font_size("font_size") >= 44 and profile.find_child("Stats", true, false).get_child_count() == 6)
 	var lv: Node = profile.find_child("Level_2", true, false)
 	_check("cada nivel pendiente es una tarjeta con su boton", lv is PanelContainer and lv.find_children("*", "Button", true, false).size() == 1)
 	var small: Array = []

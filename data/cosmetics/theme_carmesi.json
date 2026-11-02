@@ -1,0 +1,8 @@
+{
+ "id": "theme_carmesi",
+ "type": "theme",
+ "name": "Tema Carmesi",
+ "description": "Tine el menu principal con este color de acento.",
+ "tint": "#e0264f",
+ "accent": "#e0264f"
+}

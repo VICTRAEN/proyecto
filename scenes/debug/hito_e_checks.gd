@@ -220,7 +220,7 @@ func _check_state_api() -> void:
 		var picked := GameState._pick_candidate(BANNER, "SSR", ["david_lucy_duo", "gojo", "deku"])
 		if picked == DUO:
 			duo_hits += 1
-	_check("la tasa propia del duo dentro del SSR ronda el 7/15 (%d/%d)" % [duo_hits, total], absf(float(duo_hits) / total - 0.07 / 0.15) < 0.04)
+	_check("la tasa propia del duo dentro del SSR ronda el 3/15 (%d/%d)" % [duo_hits, total], absf(float(duo_hits) / total - 0.03 / 0.15) < 0.04)
 	# Los otros banners: sus tablas no han cambiado.
 	var ok_tables := true
 	for bid in ["banner_apertura", "banner_destacado", "banner_shonen", "banner_ur"]:
@@ -302,7 +302,7 @@ func _check_banner() -> void:
 			duo_rate = float(row["rate"])
 		elif String(row["rarity"]) == "SSR":
 			ssr_rest = float(row["rate"])
-	_check("la tabla efectiva (filas) suma 100%% y el duo tiene su 7%% (%.4f)" % rows_total, absf(rows_total - 1.0) < 1e-9 and absf(duo_rate - 0.07) < 1e-12 and absf(ssr_rest - 0.08) < 1e-12)
+	_check("la tabla efectiva (filas) suma 100%% y el duo tiene su 3%% (%.4f)" % rows_total, absf(rows_total - 1.0) < 1e-9 and absf(duo_rate - 0.03) < 1e-12 and absf(ssr_rest - 0.12) < 1e-12)
 	_check("el duo esta en el pool de SU banner", GameState.banner_pool(BANNER).has(DUO))
 	var leaked: Array = []
 	for raw in DB.all_banners():
@@ -342,7 +342,7 @@ func _check_banner() -> void:
 				duo_hits += 1
 		elif rarity != "SR":
 			other_rarity += 1
-	_check("muestreo: SSR ~15%% (%.3f) y duo ~7%% (%.3f) en %d tiradas" % [float(ssr_hits) / n, float(duo_hits) / n, n], absf(float(ssr_hits) / n - 0.15) < 0.012 and absf(float(duo_hits) / n - 0.07) < 0.01 and other_rarity == 0)
+	_check("muestreo: SSR ~15%% (%.3f) y duo ~3%% (%.3f) en %d tiradas" % [float(ssr_hits) / n, float(duo_hits) / n, n], absf(float(ssr_hits) / n - 0.15) < 0.012 and absf(float(duo_hits) / n - 0.03) < 0.01 and other_rarity == 0)
 	_reset()
 	GameState.gems = 100000
 	var report := GameState.summon(BANNER, 10)
