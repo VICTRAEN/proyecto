@@ -1,5 +1,6 @@
 {
  "id": "sandevistan",
+ "kind": "equipment",
  "name": "Sandevistan",
  "anime": "Cyberpunk: Edgerunners",
  "rarity": "UR",

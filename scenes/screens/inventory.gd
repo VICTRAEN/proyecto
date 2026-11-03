@@ -380,6 +380,8 @@ func _make_card(item: Dictionary) -> Control:
 	var type_text := String(item.get("type", ""))
 	if not type_text.is_empty():
 		parts.append(type_text)
+	if String(item.get("kind", "")) == "evolutive" or type_text == "evolution_material":
+		parts.append("OBJETO EVOLUTIVO: sube de rareza, no se equipa")
 	if parts.size() > 0:
 		var meta := Label.new()
 		meta.text = "  -  ".join(parts)

@@ -90,8 +90,8 @@
 [DBG17] TEST 9: el MUTAR del ritual cuesta 150 monedas -> OK
 [DBG17] y deja una mutacion activa -> OK
 [DBG17] una segunda tirada SUSTITUYE (sigue habiendo una) y cobra otra vez -> OK
-[DBG17] rango anterior D -> rango actual D
-[DBG17] ATAQUE: base 236 -> con mutacion 238
+[DBG17] rango anterior D -> rango actual A
+[DBG17] VELOCIDAD: base 130 -> con mutacion 138
 [DBG17] la mutacion mueve la stat sobre la BASE (no sobre el valor buffeado) -> OK
 [DBG17] sin monedas suficientes NO cobra nada y NO cambia la mutacion -> OK
 [DBG17] el ritual se puede cerrar sin mutar -> OK

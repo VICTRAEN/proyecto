@@ -160,7 +160,20 @@ func check_missing_resources() -> void:
 		var icon := DB.item_icon(String(id))
 		if not ResourceLoader.exists(icon):
 			_add("warning", "recursos", "objeto '%s': falta el icono %s" % [id, icon])
-	# X.2: objetos equipables y sus banners.
+	# X.2: objetos equipables y sus banners. Equipables y evolutivos son familias distintas.
+	for route in DB.special_evolution_routes():
+		for cost in (route as Dictionary).get("item_cost", []):
+			var cost_id := String((cost as Dictionary).get("item", ""))
+			if DB.equipment.has(cost_id):
+				_add("error", "recursos", "la evolucion %s -> %s pide '%s', que es un EQUIPABLE (solo valen objetos evolutivos)" % [(route as Dictionary).get("from", ""), (route as Dictionary).get("to", ""), cost_id])
+			elif not DB.items.has(cost_id):
+				_add("error", "recursos", "la evolucion %s -> %s pide '%s', que no existe" % [(route as Dictionary).get("from", ""), (route as Dictionary).get("to", ""), cost_id])
+	for eid in DB.equipment.keys():
+		if DB.items.has(String(eid)):
+			_add("error", "recursos", "el id '%s' esta en data/items Y en data/equipment: un objeto es equipable o evolutivo, no ambos" % eid)
+	for iid in DB.items.keys():
+		if String((DB.items[iid] as Dictionary).get("type", "")) == "evolution_material" and String((DB.items[iid] as Dictionary).get("kind", "")) != "evolutive":
+			_add("error", "recursos", "el objeto evolutivo '%s' no declara \"kind\": \"evolutive\"" % iid)
 	for eid in DB.equipment.keys():
 		for problem in GameState.Equipment.problems_of(String(eid)):
 			_add("error", "recursos", "objeto equipable '%s': %s" % [eid, problem])

@@ -38,6 +38,15 @@ static func data_of(item_id: String) -> Dictionary:
 	return DB.get_equipment(item_id)
 
 
+## DOS familias de objetos, separadas a proposito:
+##   - EQUIPABLES (esto, data/equipment): se llevan puestos y NO sirven para evolucionar.
+##   - EVOLUTIVOS (data/items, "kind": "evolutive", ej. Uniforme de conejita): suben de
+##     rareza a un personaje y NO se pueden equipar.
+## Sus catalogos, inventarios y recompensas ("items" vs "equipment") no se mezclan.
+static func is_evolutive(item_id: String) -> bool:
+	return DB.items.has(String(item_id)) and not DB.equipment.has(String(item_id))
+
+
 static func exists(item_id: String) -> bool:
 	return not data_of(item_id).is_empty()
 
@@ -67,7 +76,7 @@ func owns(item_id: String) -> bool:
 
 ## Da `amount` copias. Falso si el objeto no existe en los datos.
 func add(item_id: String, amount: int = 1) -> bool:
-	if amount <= 0 or not exists(item_id):
+	if amount <= 0 or not exists(item_id) or DB.items.has(String(item_id)):
 		return false
 	owned[String(item_id)] = count_of(item_id) + amount
 	return true
@@ -132,6 +141,8 @@ func can_equip(character_id: String, item_id: String) -> Dictionary:
 	var item := String(item_id)
 	if gs == null or not gs.is_owned(ch):
 		return { "ok": false, "reason": "Ese personaje no es tuyo." }
+	if is_evolutive(item):
+		return { "ok": false, "reason": "%s es un objeto evolutivo: sirve para evolucionar, no se equipa." % String(DB.items[item].get("name", item)) }
 	if not exists(item):
 		return { "ok": false, "reason": "Ese objeto no existe." }
 	if count_of(item) <= 0:
@@ -362,6 +373,10 @@ static func problems_of(item_id: String) -> Array:
 	for key in ["name", "anime", "description", "icon"]:
 		if String(d.get(key, "")).is_empty():
 			out.append("falta '%s'" % key)
+	if String(d.get("kind", "")) != "equipment":
+		out.append("kind debe ser 'equipment'")
+	if DB.items.has(item_id):
+		out.append("su id coincide con un objeto evolutivo de data/items")
 	if not RARITIES.has(String(d.get("rarity", ""))):
 		out.append("rareza invalida '%s'" % d.get("rarity", ""))
 	var passive = d.get("passive", {})

@@ -1,5 +1,6 @@
 {
  "id": "bata_laboratorio",
+ "kind": "equipment",
  "name": "Bata de laboratorio",
  "anime": "Dr. Stone",
  "rarity": "N",

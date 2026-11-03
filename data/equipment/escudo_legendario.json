@@ -1,5 +1,6 @@
 {
  "id": "escudo_legendario",
+ "kind": "equipment",
  "name": "Escudo Legendario",
  "anime": "The Rising of the Shield Hero",
  "rarity": "SSR",

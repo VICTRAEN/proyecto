@@ -59,6 +59,7 @@ func run(app: Node) -> void:
 	_check_effects_apply_and_vanish()
 	_check_wheel()
 	_check_save_load()
+	_check_evolutive_vs_equipable()
 	await _check_screens()
 	_app.call("_restore_save")
 	_out("[DBG29] --- fin: %d comprobaciones, %d FALLO(S) ---" % [_checks, _fails])
@@ -502,6 +503,94 @@ func _check_save_load() -> void:
 	eq.from_dict({})
 
 
+## --- Evolutivos vs equipables ------------------------------------------------------------------------------------
+func _check_evolutive_vs_equipable() -> void:
+	_out("[DBG29] == EVOLUTIVOS vs EQUIPABLES ==")
+	_fresh()
+	var eq = GameState.equipment
+	var a := String(GameState.party[0])
+	var overlap := 0
+	for id in DB.equipment:
+		if DB.items.has(String(id)):
+			overlap += 1
+	_check("ningun id esta a la vez en objetos evolutivos y equipables", overlap == 0)
+	_check("el Uniforme de conejita es evolutivo y no equipable", Equipment.is_evolutive("rabbit_costume") and not Equipment.exists("rabbit_costume"))
+	_check("los evolutivos declaran kind evolutive", String(DB.items["rabbit_costume"].get("kind", "")) == "evolutive" and String(DB.items["mai_token"].get("kind", "")) == "evolutive")
+	_check("los equipables declaran kind equipment", String(DB.get_equipment("traje_conejita").get("kind", "")) == "equipment")
+	GameState.add_item("rabbit_costume", 3)
+	var res: Dictionary = eq.equip(a, "rabbit_costume")
+	_check("un objeto evolutivo NO se puede equipar (%s)" % res["reason"], not bool(res["ok"]) and eq.item_of(a).is_empty() and String(res["reason"]).contains("evolutivo"))
+	eq.equipped[a] = "rabbit_costume"
+	eq.sanitize()
+	_check("ni siquiera forzandolo en un guardado: se descarta al limpiar", eq.item_of(a).is_empty() and not eq.equipped.has(a))
+	_check("los evolutivos no entran en la lista de objetos equipables", not eq.owned_ids().has("rabbit_costume"))
+	_check("un evolutivo no se puede añadir como equipable", not eq.add("rabbit_costume", 1) and eq.count_of("rabbit_costume") == 0)
+	# Un equipable no entra en el inventario evolutivo
+	var inv_before := GameState.inventory.duplicate()
+	var rep: Dictionary = GameState.add_item("traje_conejita", 5)
+	_check("un equipable no se puede meter en el inventario de evolutivos", int(rep["added"]) == 0 and GameState.item_count("traje_conejita") == 0 and GameState.inventory == inv_before)
+	eq.add("traje_conejita", 30)
+	_check("tener 30 equipables no cuenta como objeto evolutivo", not GameState.has_item("traje_conejita", 1))
+	var Rewards = load("res://core/rewards.gd")
+	var coins_before := GameState.coins
+	var paid: Dictionary = Rewards.pay(GameState, { "items": { "traje_conejita": 2 }, "equipment": { "rabbit_costume": 2 } })
+	_check("una recompensa 'items' con un equipable, o 'equipment' con un evolutivo, no paga nada", (paid["items"] as Dictionary).is_empty() and (paid["equipment"] as Dictionary).is_empty() and GameState.item_count("traje_conejita") == 0 and eq.count_of("rabbit_costume") == 0)
+	_check("Rewards.problems avisa de la mezcla", not Rewards.problems({ "items": { "traje_conejita": 1 } }, "x").is_empty() and not Rewards.problems({ "equipment": { "rabbit_costume": 1 } }, "x").is_empty())
+	# La evolucion especial pide el evolutivo, y los 30 equipables no la sustituyen
+	var route := {}
+	for r in DB.special_evolution_routes():
+		for c in (r as Dictionary).get("item_cost", []):
+			if String((c as Dictionary).get("item", "")) == "rabbit_costume":
+				route = r
+	_check("hay una evolucion especial que pide uniformes de conejita", not route.is_empty())
+	if not route.is_empty():
+		var from_id := String(route["from"])
+		if not GameState.roster.has(from_id):
+			GameState.roster.append(from_id)
+			GameState.progress[from_id] = { "level": 100, "xp": 0 }
+		GameState.progress[from_id] = { "level": 100, "xp": 0 }
+		GameState.coins = 10000000
+		var need := 0
+		for c in route["item_cost"]:
+			if String((c as Dictionary).get("item", "")) == "rabbit_costume":
+				need = int((c as Dictionary).get("amount", 1))
+		GameState.inventory.erase("rabbit_costume")
+		var without: Dictionary = GameState.can_special_evolve(from_id)
+		var missing_rabbit := false
+		for m in without.get("missing_items", []):
+			if String((m as Dictionary).get("item", "")) == "rabbit_costume":
+				missing_rabbit = true
+		_check("con 30 Trajes de conejita EQUIPABLES la evolucion sigue pidiendo el Uniforme evolutivo", missing_rabbit)
+		GameState.inventory["rabbit_costume"] = need
+		var withit: Dictionary = GameState.can_special_evolve(from_id)
+		var still_missing := false
+		for m in withit.get("missing_items", []):
+			if String((m as Dictionary).get("item", "")) == "rabbit_costume":
+				still_missing = true
+		_check("con los uniformes evolutivos necesarios ya no faltan", not still_missing)
+		GameState.inventory.erase("rabbit_costume")
+		GameState.coins = coins_before
+	GameState.inventory = inv_before
+	eq.from_dict({})
+	var diag = load("res://dev/diagnostics.gd").new()
+	diag.run_all()
+	var bad := 0
+	for f in diag.findings:
+		if String(f["severity"]) == "error":
+			bad += 1
+	_check("el diagnostico valida la separacion de familias (%d errores)" % bad, bad == 0)
+	# Un dato mal puesto (equipable e id evolutivo a la vez) se detecta.
+	DB.items["rueda_adaptabilidad"] = { "id": "rueda_adaptabilidad", "name": "X", "type": "evolution_material" }
+	var diag2 = load("res://dev/diagnostics.gd").new()
+	diag2.run_all()
+	var caught := false
+	for f in diag2.findings:
+		if String(f["text"]).contains("rueda_adaptabilidad") and String(f["severity"]) == "error":
+			caught = true
+	DB.items.erase("rueda_adaptabilidad")
+	_check("el diagnostico detecta un id repetido entre equipables y evolutivos", caught)
+
+
 ## --- 7. Pantallas -------------------------------------------------------------------------------------------------
 func _check_screens() -> void:
 	_out("[DBG29] == PANTALLAS ==")
@@ -522,6 +611,7 @@ func _check_screens() -> void:
 	_check("NO muestra los que no tienes", s.find_child("Item_zangetsu", true, false) == null)
 	var card: Node = s.find_child("Item_rueda_adaptabilidad", true, false)
 	_check("cada objeto muestra rareza y pasiva", (card.find_child("Rarity", true, false) as Label).text.begins_with("LR") and (card.find_child("Passive", true, false) as Label).text.contains("10%"))
+	_check("cada equipable avisa de que NO sirve para evolucionar", (card.find_child("KindNote", true, false) as Label).text.contains("no sirve para evolucionar"))
 	var rows: Array = s.find_child("List", true, false).get_children()
 	_check("el objeto de mayor rareza sale primero", rows.size() >= 3 and String(rows[1].name) == "Head" or rows.size() >= 3)
 	_check("hay botones para invocar objetos", s.find_child("SummonOne", true, false) != null and s.find_child("SummonMulti", true, false) != null)

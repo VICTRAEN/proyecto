@@ -183,6 +183,9 @@ func _item_card(id: String) -> Control:
 	rar.name = "Rarity"
 	col.add_child(rar)
 	col.add_child(_label(String(data.get("description", "")), VI.FONT_TINY, VI.INK_SOFT))
+	var kind_note := _label("EQUIPABLE: se lleva puesto, no sirve para evolucionar", VI.FONT_TINY, VI.INK_DIM)
+	kind_note.name = "KindNote"
+	col.add_child(kind_note)
 	var passive: Dictionary = data.get("passive", {})
 	var pas := _label("PASIVA - %s: %s" % [String(passive.get("name", "")), String(passive.get("description", ""))], VI.FONT_TINY, VI.CYAN)
 	pas.name = "Passive"

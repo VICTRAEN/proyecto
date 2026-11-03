@@ -2363,7 +2363,8 @@ func has_item(item_id: String, amount: int = 1) -> bool:
 ## pantalla lo anuncie.
 func add_item(item_id: String, amount: int = 1) -> Dictionary:
 	var key := String(item_id)
-	if amount <= 0:
+	# Un EQUIPABLE (data/equipment) nunca entra en el inventario de objetos evolutivos/materiales.
+	if amount <= 0 or DB.equipment.has(key):
 		return { "id": key, "added": 0, "count": item_count(key), "known": DB.items.has(key) }
 	inventory[key] = item_count(key) + amount
 	add_counter("objetos_obtenidos", amount)

@@ -1,5 +1,6 @@
 {
  "id": "equipo_maniobras",
+ "kind": "equipment",
  "name": "Equipo de Maniobras Tridimensionales",
  "anime": "Shingeki no Kyojin",
  "rarity": "SR",

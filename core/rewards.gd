@@ -41,7 +41,7 @@ static func pay(gs, reward: Dictionary) -> Dictionary:
 	if items is Dictionary:
 		for item_id in items:
 			var amount := maxi(0, int((items as Dictionary)[item_id]))
-			if amount > 0 and DB.items.has(String(item_id)):
+			if amount > 0 and DB.items.has(String(item_id)) and not DB.equipment.has(String(item_id)):
 				gs.add_item(String(item_id), amount)
 				out["items"][String(item_id)] = amount
 	# X.2: objetos equipables { "equipment": { "id": cantidad } }.
@@ -49,7 +49,7 @@ static func pay(gs, reward: Dictionary) -> Dictionary:
 	if equip is Dictionary:
 		for eid in equip:
 			var n := maxi(0, int((equip as Dictionary)[eid]))
-			if n > 0 and gs.equipment.add(String(eid), n):
+			if n > 0 and not DB.items.has(String(eid)) and gs.equipment.add(String(eid), n):
 				out["equipment"][String(eid)] = n
 	var title = reward.get("title", {})
 	if title is Dictionary and not String((title as Dictionary).get("id", "")).is_empty():
@@ -114,14 +114,18 @@ static func problems(reward: Variant, label: String) -> Array:
 	var items = r.get("items", {})
 	if items is Dictionary:
 		for item_id in items:
-			if not DB.items.has(String(item_id)):
+			if DB.equipment.has(String(item_id)):
+				out.append("%s: '%s' es un EQUIPABLE; va en la clave \"equipment\", no en \"items\"" % [label, item_id])
+			elif not DB.items.has(String(item_id)):
 				out.append("%s: el objeto '%s' no existe" % [label, item_id])
 			elif int((items as Dictionary)[item_id]) <= 0:
 				out.append("%s: cantidad no positiva de '%s'" % [label, item_id])
 	var equip_p = r.get("equipment", {})
 	if equip_p is Dictionary:
 		for eid in equip_p:
-			if not DB.equipment.has(String(eid)):
+			if DB.items.has(String(eid)):
+				out.append("%s: '%s' es un objeto EVOLUTIVO; va en la clave \"items\", no en \"equipment\"" % [label, eid])
+			elif not DB.equipment.has(String(eid)):
 				out.append("%s: el objeto equipable '%s' no existe" % [label, eid])
 	var title = r.get("title", {})
 	if r.has("title"):

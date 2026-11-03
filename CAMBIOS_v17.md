@@ -13,6 +13,12 @@
 - Combate: el `BattleManager` monta el objeto en cada ALIADO (y reservas) al empezar la batalla: mods `static` por `StatBlock` con origen `equip:*` y reglas por disparador en `CombatUnit.equipment_rules`. Nada se guarda ni se acumula entre batallas, cambios de equipo o recargas. Las stats base no se tocan.
 - Obtencion: banner de objetos (x1 20 gemas / x10 180), recompensas (`"equipment": {id: n}` en `Rewards`) y drops raros de evento (`{"equipment": id, "chance": 0.1}`; Traje de conejita en el stage 3 de Sindromes de la Pubertad).
 
+## Evolutivos vs equipables (dos familias separadas)
+- EVOLUTIVOS (`data/items`, `"kind": "evolutive"`, p.ej. Uniforme de conejita, Ficha de Mai): suben de rareza a un personaje; NO se equipan. Viven en el inventario de siempre.
+- EQUIPABLES (`data/equipment`, `"kind": "equipment"`): se llevan puestos; NO valen como material de evolucion. Viven en su propio inventario.
+- Se refuerza en el codigo: `can_equip` rechaza un evolutivo con motivo claro, `add_item` rechaza ids equipables, `Rewards` separa las claves `items` / `equipment`, y las evoluciones solo leen el inventario evolutivo. El diagnostico marca ids repetidos entre ambos catalogos, costes de evolucion con un equipable y recompensas mal clasificadas.
+- La pantalla OBJETOS marca cada equipable como "no sirve para evolucionar" y el inventario marca los evolutivos como "no se equipa".
+
 ## Pantalla OBJETOS (menu principal)
 Icono, nombre, rareza, descripcion y pasiva de cada objeto; quien lo lleva; EQUIPAR / RETIRAR; invocar objetos.
 
@@ -26,4 +32,4 @@ Icono, nombre, rareza, descripcion y pasiva de cada objeto; quien lo lleva; EQUI
 Ver el campo `passive.description` de cada JSON (se ve tambien en la pantalla).
 
 ## Pruebas
-- DBG29 (`--dbg29`): 95 comprobaciones. DBG17-28 y `--diag` sin errores.
+- DBG29 (`--dbg29`): 113 comprobaciones. DBG17-28 y `--diag` sin errores.
