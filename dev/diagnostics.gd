@@ -160,6 +160,16 @@ func check_missing_resources() -> void:
 		var icon := DB.item_icon(String(id))
 		if not ResourceLoader.exists(icon):
 			_add("warning", "recursos", "objeto '%s': falta el icono %s" % [id, icon])
+	# X.2: objetos equipables y sus banners.
+	for eid in DB.equipment.keys():
+		for problem in GameState.Equipment.problems_of(String(eid)):
+			_add("error", "recursos", "objeto equipable '%s': %s" % [eid, problem])
+		var icon := String((DB.equipment[eid] as Dictionary).get("icon", ""))
+		if not icon.is_empty() and not ResourceLoader.exists(icon):
+			_add("warning", "recursos", "objeto equipable '%s': falta el icono %s (se dibuja un recuadro)" % [eid, icon])
+	for bid in DB.equipment_banners.keys():
+		for problem in GameState.Equipment.banner_problems(String(bid)):
+			_add("error", "recursos", "banner de objetos '%s': %s" % [bid, problem])
 	# Cosmeticos: el fondo o la ilustracion tienen que existir de verdad.
 	for id in DB.cosmetics.keys():
 		var c: Dictionary = DB.cosmetics[id]
@@ -584,7 +594,14 @@ func check_stages() -> void:
 			if not grant.is_empty() and not DB.characters.has(grant):
 				_add("error", "fases", "evento %s/%s: concede a '%s', que no existe" % [event_id, sid, grant])
 			for drop in (st as Dictionary).get("drops", []):
-				if drop is Dictionary and not DB.items.has(String((drop as Dictionary).get("item", ""))):
+				if drop is Dictionary and (drop as Dictionary).has("equipment"):
+					# X.2: drop raro de objeto equipable.
+					var drop_chance := float((drop as Dictionary).get("chance", 0.05))
+					if not DB.equipment.has(String((drop as Dictionary)["equipment"])):
+						_add("error", "fases", "evento %s/%s: suelta el objeto equipable '%s', que no existe" % [event_id, sid, (drop as Dictionary)["equipment"]])
+					elif drop_chance <= 0.0 or drop_chance > 1.0:
+						_add("error", "fases", "evento %s/%s: probabilidad de drop fuera de rango" % [event_id, sid])
+				elif drop is Dictionary and not DB.items.has(String((drop as Dictionary).get("item", ""))):
 					_add("error", "fases", "evento %s/%s: suelta '%s', que no existe" % [event_id, sid, (drop as Dictionary).get("item", "")])
 			_check_position("%s/%s" % [event_id, sid], (st as Dictionary).get("position", {}))
 		var reward_char := String(DB.events[event_id].get("character_reward", ""))

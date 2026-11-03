@@ -1,0 +1,49 @@
+{
+ "id": "uniforme_blue_lock",
+ "name": "Uniforme de Blue Lock",
+ "anime": "Blue Lock",
+ "rarity": "R",
+ "description": "El uniforme del proyecto que busca al mejor delantero del mundo.",
+ "icon": "res://art/equipment/uniforme_blue_lock.png",
+ "passive": {
+  "name": "Ego de delantero",
+  "description": "VELOCIDAD +6%. Al derrotar a un enemigo, ATAQUE +10% durante 3 turnos."
+ },
+ "obtain": {
+  "banner": true,
+  "event": true
+ },
+ "rules": [
+  {
+   "id": "base",
+   "name": "Ego",
+   "trigger": "static",
+   "effects": [
+    {
+     "type": "stat_mod",
+     "target": "self",
+     "stat": "speed",
+     "kind": "mult",
+     "value": 0.06,
+     "turns": 0
+    }
+   ]
+  },
+  {
+   "id": "ego",
+   "name": "Ego de delantero",
+   "trigger": "on_kill",
+   "chance": 1.0,
+   "effects": [
+    {
+     "type": "stat_mod",
+     "target": "self",
+     "stat": "atk",
+     "kind": "mult",
+     "value": 0.1,
+     "turns": 3
+    }
+   ]
+  }
+ ]
+}

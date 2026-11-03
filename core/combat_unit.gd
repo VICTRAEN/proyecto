@@ -63,6 +63,8 @@ var undying_heal := 0.0
 ## pasiva con disparador). Las pone el BattleManager al empezar; no son pasivas del
 ## personaje, asi que no salen en su ficha.
 var link_rules: Array = []
+## X.2: reglas con disparador del objeto equipado (las monta el BattleManager al empezar).
+var equipment_rules: Array = []
 ## Control de las reglas con disparador: id -> { used, next_round }.
 var rule_state: Dictionary = {}
 ## True cuando ya se han resuelto las consecuencias de su caida (no se repiten).
@@ -360,6 +362,9 @@ func rules_for_trigger(trigger: String) -> Array:
 	for rule in link_rules:
 		if String(rule.get("trigger", "")) == trigger:
 			out.append(rule)
+	for rule in equipment_rules:
+		if String(rule.get("trigger", "")) == trigger:
+			out.append(rule)
 	return out
 
 
@@ -531,6 +536,8 @@ func _origin_label(source: String) -> String:
 		return "Habilidad"
 	if source.begins_with("link:"):
 		return "Link"
+	if source.begins_with("equip"):
+		return "Objeto"
 	return ""
 
 

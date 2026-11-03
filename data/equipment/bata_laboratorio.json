@@ -1,0 +1,49 @@
+{
+ "id": "bata_laboratorio",
+ "name": "Bata de laboratorio",
+ "anime": "Dr. Stone",
+ "rarity": "N",
+ "description": "La bata de Senku. Ciencia por encima de todo.",
+ "icon": "res://art/equipment/bata_laboratorio.png",
+ "passive": {
+  "name": "Analisis cientifico",
+  "description": "VELOCIDAD +5%. Al empezar el combate, todos los enemigos pierden un 5% de DEFENSA."
+ },
+ "obtain": {
+  "banner": true,
+  "event": true
+ },
+ "rules": [
+  {
+   "id": "base",
+   "name": "Analisis",
+   "trigger": "static",
+   "effects": [
+    {
+     "type": "stat_mod",
+     "target": "self",
+     "stat": "speed",
+     "kind": "mult",
+     "value": 0.05,
+     "turns": 0
+    }
+   ]
+  },
+  {
+   "id": "analisis",
+   "name": "Analisis cientifico",
+   "trigger": "battle_start",
+   "chance": 1.0,
+   "effects": [
+    {
+     "type": "stat_mod",
+     "target": "enemy_all",
+     "stat": "def",
+     "kind": "mult",
+     "value": -0.05,
+     "turns": 0
+    }
+   ]
+  }
+ ]
+}

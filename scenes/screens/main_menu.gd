@@ -165,6 +165,14 @@ func _rebuild_layout() -> void:
 	VI.tint_button(profile_button, VI.GOLD)
 	profile_button.pressed.connect(_goto.bind("profile"))
 	main.add_child(profile_button)
+	var equipment_button := Button.new()
+	equipment_button.name = "EquipmentButton"
+	equipment_button.text = "OBJETOS EQUIPABLES"
+	equipment_button.custom_minimum_size = Vector2(0, 72)
+	equipment_button.add_theme_font_size_override("font_size", VI.FONT_BODY)
+	VI.tint_button(equipment_button, VI.VIOLET)
+	equipment_button.pressed.connect(_goto.bind("equipment"))
+	main.add_child(equipment_button)
 
 	# --- Escaparate del lider ---
 	_hero = Control.new()

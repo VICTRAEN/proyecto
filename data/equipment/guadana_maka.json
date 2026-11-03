@@ -1,0 +1,41 @@
+{
+ "id": "guadana_maka",
+ "name": "Guadaña de Maka",
+ "anime": "Soul Eater",
+ "rarity": "SR",
+ "description": "Soul Eater en su forma de guadaña: corta almas, no solo carne.",
+ "icon": "res://art/equipment/guadana_maka.png",
+ "passive": {
+  "name": "Resonancia de almas",
+  "description": "ATAQUE +8% y PERFORACION +8%."
+ },
+ "obtain": {
+  "banner": true,
+  "event": true
+ },
+ "rules": [
+  {
+   "id": "base",
+   "name": "Resonancia",
+   "trigger": "static",
+   "effects": [
+    {
+     "type": "stat_mod",
+     "target": "self",
+     "stat": "atk",
+     "kind": "mult",
+     "value": 0.08,
+     "turns": 0
+    },
+    {
+     "type": "stat_mod",
+     "target": "self",
+     "stat": "pierce",
+     "kind": "flat",
+     "value": 0.08,
+     "turns": 0
+    }
+   ]
+  }
+ ]
+}

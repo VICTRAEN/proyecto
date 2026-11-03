@@ -1,0 +1,47 @@
+{
+ "id": "espada_dragon_reid",
+ "name": "Espada del Dragon Reid",
+ "anime": "Re:Zero",
+ "rarity": "SSR",
+ "description": "La espada de la familia Reid, bendecida por el dragon.",
+ "icon": "res://art/equipment/espada_dragon_reid.png",
+ "passive": {
+  "name": "Bendicion del dragon",
+  "description": "ATAQUE +12%. Al asestar un critico, cura un 6% de su VIDA MAX."
+ },
+ "obtain": {
+  "banner": true,
+  "event": true
+ },
+ "rules": [
+  {
+   "id": "base",
+   "name": "Espada",
+   "trigger": "static",
+   "effects": [
+    {
+     "type": "stat_mod",
+     "target": "self",
+     "stat": "atk",
+     "kind": "mult",
+     "value": 0.12,
+     "turns": 0
+    }
+   ]
+  },
+  {
+   "id": "bendicion",
+   "name": "Bendicion del dragon",
+   "trigger": "on_crit",
+   "chance": 1.0,
+   "effects": [
+    {
+     "type": "heal",
+     "target": "self",
+     "of": "max_hp",
+     "amount": 0.06
+    }
+   ]
+  }
+ ]
+}

@@ -54,6 +54,8 @@ const SCREENS := {
 	"collection_rewards": preload("res://scenes/screens/collection_rewards.tscn"),
 	"profile": preload("res://scenes/screens/profile.tscn"),
 	"menu_customize": preload("res://scenes/screens/menu_customize.tscn"),
+	# X.2: objetos equipables (inventario de objetos, equipar e invocar).
+	"equipment": preload("res://scenes/screens/equipment.tscn"),
 	"compare": preload("res://scenes/screens/compare.tscn"),
 }
 
@@ -125,6 +127,13 @@ func _ready() -> void:
 	elif dbg_args.has("--diag"):
 		# v15: diagnostico de datos y guardado (solo desarrollo; dev/diagnostics.gd).
 		_run_diagnostics()
+	elif dbg_args.has("--dbg29"):
+		var hito_o: GDScript = load("res://scenes/debug/hito_o_checks.gd")
+		var hito_o_node := Node.new()
+		hito_o_node.set_script(hito_o)
+		hito_o_node.name = "HitoOChecks"
+		add_child(hito_o_node)
+		hito_o_node.call_deferred("run", self)
 	elif dbg_args.has("--dbg28"):
 		var hito_n: GDScript = load("res://scenes/debug/hito_n_checks.gd")
 		var hito_n_node := Node.new()

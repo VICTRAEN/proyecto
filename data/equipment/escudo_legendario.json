@@ -1,0 +1,49 @@
+{
+ "id": "escudo_legendario",
+ "name": "Escudo Legendario",
+ "anime": "The Rising of the Shield Hero",
+ "rarity": "SSR",
+ "description": "El escudo del heroe: nadie lo rompe, y crece con cada ataque que resiste.",
+ "icon": "res://art/equipment/escudo_legendario.png",
+ "passive": {
+  "name": "Escudo del heroe",
+  "description": "DEFENSA +14%, VIDA MAX +8% y REDUCCION DE DAÑO +5%."
+ },
+ "obtain": {
+  "banner": true,
+  "event": true
+ },
+ "rules": [
+  {
+   "id": "base",
+   "name": "Escudo",
+   "trigger": "static",
+   "effects": [
+    {
+     "type": "stat_mod",
+     "target": "self",
+     "stat": "def",
+     "kind": "mult",
+     "value": 0.14,
+     "turns": 0
+    },
+    {
+     "type": "stat_mod",
+     "target": "self",
+     "stat": "max_hp",
+     "kind": "mult",
+     "value": 0.08,
+     "turns": 0
+    },
+    {
+     "type": "stat_mod",
+     "target": "self",
+     "stat": "dmg_reduction",
+     "kind": "flat",
+     "value": 0.05,
+     "turns": 0
+    }
+   ]
+  }
+ ]
+}

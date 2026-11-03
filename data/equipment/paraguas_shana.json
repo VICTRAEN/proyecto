@@ -1,0 +1,48 @@
+{
+ "id": "paraguas_shana",
+ "name": "Paraguas de Shana",
+ "anime": "Shakugan no Shana",
+ "rarity": "R",
+ "description": "El paraguas del Fuego de la Mirada Ardiente.",
+ "icon": "res://art/equipment/paraguas_shana.png",
+ "passive": {
+  "name": "Llama protectora",
+  "description": "DEFENSA +5%. Al empezar el combate, un escudo del 10% de su VIDA MAX durante 3 turnos."
+ },
+ "obtain": {
+  "banner": true,
+  "event": true
+ },
+ "rules": [
+  {
+   "id": "base",
+   "name": "Paraguas",
+   "trigger": "static",
+   "effects": [
+    {
+     "type": "stat_mod",
+     "target": "self",
+     "stat": "def",
+     "kind": "mult",
+     "value": 0.05,
+     "turns": 0
+    }
+   ]
+  },
+  {
+   "id": "llama",
+   "name": "Llama protectora",
+   "trigger": "battle_start",
+   "chance": 1.0,
+   "effects": [
+    {
+     "type": "shield",
+     "target": "self",
+     "of": "max_hp",
+     "amount": 0.1,
+     "turns": 3
+    }
+   ]
+  }
+ ]
+}

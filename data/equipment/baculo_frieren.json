@@ -1,0 +1,54 @@
+{
+ "id": "baculo_frieren",
+ "name": "Baculo de Frieren",
+ "anime": "Frieren",
+ "rarity": "SSR",
+ "description": "El baculo de una maga que lleva mil años aprendiendo.",
+ "icon": "res://art/equipment/baculo_frieren.png",
+ "passive": {
+  "name": "Mana milenario",
+  "description": "ATAQUE +8% y VIDA MAX +6%. Empieza el combate con 2 SP extra."
+ },
+ "obtain": {
+  "banner": true,
+  "event": true
+ },
+ "rules": [
+  {
+   "id": "base",
+   "name": "Baculo",
+   "trigger": "static",
+   "effects": [
+    {
+     "type": "stat_mod",
+     "target": "self",
+     "stat": "atk",
+     "kind": "mult",
+     "value": 0.08,
+     "turns": 0
+    },
+    {
+     "type": "stat_mod",
+     "target": "self",
+     "stat": "max_hp",
+     "kind": "mult",
+     "value": 0.06,
+     "turns": 0
+    }
+   ]
+  },
+  {
+   "id": "mana",
+   "name": "Mana milenario",
+   "trigger": "battle_start",
+   "chance": 1.0,
+   "effects": [
+    {
+     "type": "sp_gain",
+     "target": "self",
+     "amount": 2
+    }
+   ]
+  }
+ ]
+}

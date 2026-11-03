@@ -1,0 +1,57 @@
+{
+ "id": "sandevistan",
+ "name": "Sandevistan",
+ "anime": "Cyberpunk: Edgerunners",
+ "rarity": "UR",
+ "description": "El implante que ralentiza el mundo, a cambio de lo que le cueste al cuerpo.",
+ "icon": "res://art/equipment/sandevistan.png",
+ "passive": {
+  "name": "Tiempo ralentizado",
+  "description": "VELOCIDAD +20% y ESQUIVA +8%. Al empezar su turno, 20% de probabilidad de DAÑO HECHO +20% ese turno."
+ },
+ "obtain": {
+  "banner": true,
+  "event": true
+ },
+ "rules": [
+  {
+   "id": "base",
+   "name": "Implante",
+   "trigger": "static",
+   "effects": [
+    {
+     "type": "stat_mod",
+     "target": "self",
+     "stat": "speed",
+     "kind": "mult",
+     "value": 0.2,
+     "turns": 0
+    },
+    {
+     "type": "stat_mod",
+     "target": "self",
+     "stat": "dodge_rate",
+     "kind": "flat",
+     "value": 0.08,
+     "turns": 0
+    }
+   ]
+  },
+  {
+   "id": "lento",
+   "name": "Tiempo ralentizado",
+   "trigger": "turn_start",
+   "chance": 0.2,
+   "effects": [
+    {
+     "type": "stat_mod",
+     "target": "self",
+     "stat": "dmg_dealt",
+     "kind": "flat",
+     "value": 0.2,
+     "turns": 1
+    }
+   ]
+  }
+ ]
+}

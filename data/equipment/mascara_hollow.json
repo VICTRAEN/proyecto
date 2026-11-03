@@ -1,0 +1,59 @@
+{
+ "id": "mascara_hollow",
+ "name": "Mascara Hollow",
+ "anime": "Bleach",
+ "rarity": "SR",
+ "description": "La mascara de un Hollow interior que no pide permiso.",
+ "icon": "res://art/equipment/mascara_hollow.png",
+ "passive": {
+  "name": "Hollowficacion",
+  "description": "ATAQUE +8% y CRITICO +5%. Una vez por combate, al bajar de un 35% de vida, ATAQUE +20% durante 3 turnos."
+ },
+ "obtain": {
+  "banner": true,
+  "event": true
+ },
+ "rules": [
+  {
+   "id": "base",
+   "name": "Mascara",
+   "trigger": "static",
+   "effects": [
+    {
+     "type": "stat_mod",
+     "target": "self",
+     "stat": "atk",
+     "kind": "mult",
+     "value": 0.08,
+     "turns": 0
+    },
+    {
+     "type": "stat_mod",
+     "target": "self",
+     "stat": "crit_rate",
+     "kind": "flat",
+     "value": 0.05,
+     "turns": 0
+    }
+   ]
+  },
+  {
+   "id": "hollow",
+   "name": "Hollowficacion",
+   "trigger": "low_hp",
+   "chance": 1.0,
+   "effects": [
+    {
+     "type": "stat_mod",
+     "target": "self",
+     "stat": "atk",
+     "kind": "mult",
+     "value": 0.2,
+     "turns": 3
+    }
+   ],
+   "once": true,
+   "threshold": 0.35
+  }
+ ]
+}

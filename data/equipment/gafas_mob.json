@@ -1,0 +1,51 @@
+{
+ "id": "gafas_mob",
+ "name": "Gafas de Mob",
+ "anime": "Mob Psycho 100",
+ "rarity": "N",
+ "description": "Las gafas de un chico corriente con un poder que no deberia contenerse.",
+ "icon": "res://art/equipment/gafas_mob.png",
+ "passive": {
+  "name": "Ira al 100%",
+  "description": "ESQUIVA +4%. Una vez por combate, al bajar de un 30% de vida, ATAQUE +20% durante 3 turnos."
+ },
+ "obtain": {
+  "banner": true,
+  "event": true
+ },
+ "rules": [
+  {
+   "id": "base",
+   "name": "Mente en calma",
+   "trigger": "static",
+   "effects": [
+    {
+     "type": "stat_mod",
+     "target": "self",
+     "stat": "dodge_rate",
+     "kind": "flat",
+     "value": 0.04,
+     "turns": 0
+    }
+   ]
+  },
+  {
+   "id": "ira",
+   "name": "Ira al 100%",
+   "trigger": "low_hp",
+   "chance": 1.0,
+   "effects": [
+    {
+     "type": "stat_mod",
+     "target": "self",
+     "stat": "atk",
+     "kind": "mult",
+     "value": 0.2,
+     "turns": 3
+    }
+   ],
+   "once": true,
+   "threshold": 0.3
+  }
+ ]
+}

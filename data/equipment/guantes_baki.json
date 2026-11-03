@@ -1,0 +1,41 @@
+{
+ "id": "guantes_baki",
+ "name": "Guantes de combate de Baki",
+ "anime": "Baki",
+ "rarity": "R",
+ "description": "Guantes de un luchador que solo vive para pelear.",
+ "icon": "res://art/equipment/guantes_baki.png",
+ "passive": {
+  "name": "Puños de acero",
+  "description": "ATAQUE +6% y PERFORACION +5% (ignora parte de la defensa)."
+ },
+ "obtain": {
+  "banner": true,
+  "event": true
+ },
+ "rules": [
+  {
+   "id": "base",
+   "name": "Puños",
+   "trigger": "static",
+   "effects": [
+    {
+     "type": "stat_mod",
+     "target": "self",
+     "stat": "atk",
+     "kind": "mult",
+     "value": 0.06,
+     "turns": 0
+    },
+    {
+     "type": "stat_mod",
+     "target": "self",
+     "stat": "pierce",
+     "kind": "flat",
+     "value": 0.05,
+     "turns": 0
+    }
+   ]
+  }
+ ]
+}

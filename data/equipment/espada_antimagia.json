@@ -1,0 +1,49 @@
+{
+ "id": "espada_antimagia",
+ "name": "Espada de Antimagia (Demon-Slayer Sword)",
+ "anime": "Black Clover",
+ "rarity": "SSR",
+ "description": "La espada de Asta que anula la magia con la que se encuentra.",
+ "icon": "res://art/equipment/espada_antimagia.png",
+ "passive": {
+  "name": "Antimagia",
+  "description": "ATAQUE +10%. Al atacar, 20% de probabilidad de reducir un 15% la DEFENSA del objetivo durante 2 turnos."
+ },
+ "obtain": {
+  "banner": true,
+  "event": true
+ },
+ "rules": [
+  {
+   "id": "base",
+   "name": "Espada",
+   "trigger": "static",
+   "effects": [
+    {
+     "type": "stat_mod",
+     "target": "self",
+     "stat": "atk",
+     "kind": "mult",
+     "value": 0.1,
+     "turns": 0
+    }
+   ]
+  },
+  {
+   "id": "antimagia",
+   "name": "Antimagia",
+   "trigger": "on_attack",
+   "chance": 0.2,
+   "effects": [
+    {
+     "type": "stat_mod",
+     "target": "trigger_target",
+     "stat": "def",
+     "kind": "mult",
+     "value": -0.15,
+     "turns": 2
+    }
+   ]
+  }
+ ]
+}

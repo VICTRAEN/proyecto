@@ -1,0 +1,64 @@
+{
+ "id": "rueda_adaptabilidad",
+ "name": "Rueda de la Adaptabilidad",
+ "anime": "Jujutsu Kaisen",
+ "rarity": "LR",
+ "description": "La rueda de Mahoraga: lo que ya le ha golpeado una vez, ya no le hace tanto.",
+ "icon": "res://art/equipment/rueda_adaptabilidad.png",
+ "passive": {
+  "name": "Adaptacion absoluta",
+  "description": "Cada golpe recibido da un 10% adicional de reduccion de daño, hasta 4 golpes (maximo 40%). Se suma a la reduccion base. CRITICO +30%. Al empezar su turno, 5% de probabilidad de recuperar un 40% de su VIDA MAX."
+ },
+ "obtain": {
+  "banner": true,
+  "event": true
+ },
+ "rules": [
+  {
+   "id": "critico",
+   "name": "Critico adaptado",
+   "trigger": "static",
+   "effects": [
+    {
+     "type": "stat_mod",
+     "target": "self",
+     "stat": "crit_rate",
+     "kind": "flat",
+     "value": 0.3,
+     "turns": 0
+    }
+   ]
+  },
+  {
+   "id": "adaptacion",
+   "name": "Adaptacion",
+   "trigger": "on_hit",
+   "chance": 1.0,
+   "effects": [
+    {
+     "type": "stat_mod",
+     "target": "self",
+     "stat": "dmg_reduction",
+     "kind": "flat",
+     "value": 0.1,
+     "turns": 0,
+     "stacks_max": 4
+    }
+   ]
+  },
+  {
+   "id": "regeneracion",
+   "name": "Regeneracion",
+   "trigger": "turn_start",
+   "chance": 0.05,
+   "effects": [
+    {
+     "type": "heal",
+     "target": "self",
+     "of": "max_hp",
+     "amount": 0.4
+    }
+   ]
+  }
+ ]
+}

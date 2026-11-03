@@ -1,0 +1,56 @@
+{
+ "id": "automail_edward",
+ "name": "Automail de Edward Elric",
+ "anime": "Fullmetal Alchemist",
+ "rarity": "SSR",
+ "description": "El brazo de acero de un alquimista que pago el precio.",
+ "icon": "res://art/equipment/automail_edward.png",
+ "passive": {
+  "name": "Equivalencia",
+  "description": "DEFENSA +12% y ATAQUE +6%. Al recibir un golpe, 30% de probabilidad de ganar un escudo del 8% de su VIDA MAX (2 turnos)."
+ },
+ "obtain": {
+  "banner": true,
+  "event": true
+ },
+ "rules": [
+  {
+   "id": "base",
+   "name": "Automail",
+   "trigger": "static",
+   "effects": [
+    {
+     "type": "stat_mod",
+     "target": "self",
+     "stat": "def",
+     "kind": "mult",
+     "value": 0.12,
+     "turns": 0
+    },
+    {
+     "type": "stat_mod",
+     "target": "self",
+     "stat": "atk",
+     "kind": "mult",
+     "value": 0.06,
+     "turns": 0
+    }
+   ]
+  },
+  {
+   "id": "equivalencia",
+   "name": "Equivalencia",
+   "trigger": "on_hit",
+   "chance": 0.3,
+   "effects": [
+    {
+     "type": "shield",
+     "target": "self",
+     "of": "max_hp",
+     "amount": 0.08,
+     "turns": 2
+    }
+   ]
+  }
+ ]
+}

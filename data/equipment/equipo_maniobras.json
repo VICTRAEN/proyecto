@@ -1,0 +1,41 @@
+{
+ "id": "equipo_maniobras",
+ "name": "Equipo de Maniobras Tridimensionales",
+ "anime": "Shingeki no Kyojin",
+ "rarity": "SR",
+ "description": "El equipo que permite a la Legion de Reconocimiento volar entre gigantes.",
+ "icon": "res://art/equipment/equipo_maniobras.png",
+ "passive": {
+  "name": "Vuelo entre edificios",
+  "description": "VELOCIDAD +10% y ESQUIVA +5%."
+ },
+ "obtain": {
+  "banner": true,
+  "event": true
+ },
+ "rules": [
+  {
+   "id": "base",
+   "name": "Maniobras",
+   "trigger": "static",
+   "effects": [
+    {
+     "type": "stat_mod",
+     "target": "self",
+     "stat": "speed",
+     "kind": "mult",
+     "value": 0.1,
+     "turns": 0
+    },
+    {
+     "type": "stat_mod",
+     "target": "self",
+     "stat": "dodge_rate",
+     "kind": "flat",
+     "value": 0.05,
+     "turns": 0
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,21 @@
+{
+ "id": "banner_objetos",
+ "name": "Armeria de Anime Battle",
+ "description": "Objetos equipables de todos los animes. Cada tirada es independiente. Los objetos no evolucionan: conservan siempre su rareza.",
+ "enabled": true,
+ "cost": {
+  "single": 20,
+  "multi": 180
+ },
+ "multi_pulls": 10,
+ "rates": {
+  "N": 0.34,
+  "R": 0.3,
+  "SR": 0.2,
+  "SSR": 0.11,
+  "UR": 0.04,
+  "LR": 0.01
+ },
+ "featured": [],
+ "featured_rates": {}
+}

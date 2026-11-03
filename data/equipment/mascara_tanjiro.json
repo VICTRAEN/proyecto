@@ -1,0 +1,47 @@
+{
+ "id": "mascara_tanjiro",
+ "name": "Mascara de Tanjiro",
+ "anime": "Kimetsu no Yaiba",
+ "rarity": "R",
+ "description": "La mascara de zorro que Urokodaki le dio a Tanjiro.",
+ "icon": "res://art/equipment/mascara_tanjiro.png",
+ "passive": {
+  "name": "Respiracion constante",
+  "description": "DEFENSA +6%. Al recibir un golpe, 15% de probabilidad de curar un 5% de su VIDA MAX."
+ },
+ "obtain": {
+  "banner": true,
+  "event": true
+ },
+ "rules": [
+  {
+   "id": "base",
+   "name": "Mascara",
+   "trigger": "static",
+   "effects": [
+    {
+     "type": "stat_mod",
+     "target": "self",
+     "stat": "def",
+     "kind": "mult",
+     "value": 0.06,
+     "turns": 0
+    }
+   ]
+  },
+  {
+   "id": "respiracion",
+   "name": "Respiracion constante",
+   "trigger": "on_hit",
+   "chance": 0.15,
+   "effects": [
+    {
+     "type": "heal",
+     "target": "self",
+     "of": "max_hp",
+     "amount": 0.05
+    }
+   ]
+  }
+ ]
+}

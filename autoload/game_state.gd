@@ -998,6 +998,8 @@ func _item_drop_texts(drops: Variant) -> Array:
 		if not (entry is Dictionary):
 			continue
 		var item_id := String((entry as Dictionary).get("item", ""))
+		if item_id.is_empty():
+			continue
 		var amount := int((entry as Dictionary).get("amount", 0))
 		out.append("%s x%d" % [item_display_name(item_id), amount])
 	return out
@@ -1597,6 +1599,9 @@ var account = Account.new(self)
 ## v16: perfil, vitrina y personalizacion del menu (core/player_profile.gd).
 const PlayerProfile := preload("res://core/player_profile.gd")
 var profile = PlayerProfile.new(self)
+## X.2: objetos equipables (core/equipment.gd).
+const Equipment := preload("res://core/equipment.gd")
+var equipment = Equipment.new(self)
 var collections = CollectionsSystem.new(self)
 
 
@@ -3282,6 +3287,13 @@ func _roll_drops(drops: Variant) -> Array:
 	for drop in drops:
 		if not (drop is Dictionary):
 			continue
+		# X.2: un drop puede ser un OBJETO EQUIPABLE poco frecuente: { "equipment": id, "chance": 0.05 }.
+		var equip_id := String((drop as Dictionary).get("equipment", ""))
+		if not equip_id.is_empty():
+			if randf() < float((drop as Dictionary).get("chance", 0.05)) and equipment.add(equip_id, 1):
+				add_counter("objetos_equipables_obtenidos", 1)
+				out.append({ "item": equip_id, "name": equipment.name_of(equip_id), "amount": 1, "count": equipment.count_of(equip_id), "equipment": true })
+			continue
 		var item_id := String((drop as Dictionary).get("item", ""))
 		if item_id.is_empty():
 			continue
@@ -4966,6 +4978,7 @@ func build_save_payload() -> Dictionary:
 		"meta_progress": meta.to_dict(),
 		"account": account.to_dict(),
 		"profile": profile.to_dict(),
+		"equipment": equipment.to_dict(),
 		"collections": collections.to_dict(),
 	}
 	return payload
@@ -5161,6 +5174,7 @@ func load_game() -> bool:
 	# (el progreso se lee del roster, asi que lo que ya cumplia sale listo para cobrar).
 	account.from_dict(data.get("account", {}))
 	profile.from_dict(data.get("profile", {}))
+	equipment.from_dict(data.get("equipment", {}))
 	collections.from_dict(data.get("collections", {}))
 	account.bootstrap_if_needed()
 	account.regrant_claimed_cosmetics()

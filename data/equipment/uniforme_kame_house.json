@@ -1,0 +1,41 @@
+{
+ "id": "uniforme_kame_house",
+ "name": "Uniforme Kame House",
+ "anime": "Dragon Ball",
+ "rarity": "N",
+ "description": "El uniforme de entrenamiento de la Kame House: caparazon a la espalda y mucha disciplina.",
+ "icon": "res://art/equipment/uniforme_kame_house.png",
+ "passive": {
+  "name": "Entrenamiento de la tortuga",
+  "description": "ATAQUE +5% y VIDA MAX +5% durante todo el combate."
+ },
+ "obtain": {
+  "banner": true,
+  "event": true
+ },
+ "rules": [
+  {
+   "id": "base",
+   "name": "Entrenamiento",
+   "trigger": "static",
+   "effects": [
+    {
+     "type": "stat_mod",
+     "target": "self",
+     "stat": "atk",
+     "kind": "mult",
+     "value": 0.05,
+     "turns": 0
+    },
+    {
+     "type": "stat_mod",
+     "target": "self",
+     "stat": "max_hp",
+     "kind": "mult",
+     "value": 0.05,
+     "turns": 0
+    }
+   ]
+  }
+ ]
+}

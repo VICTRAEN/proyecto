@@ -1,0 +1,55 @@
+{
+ "id": "traje_conejita",
+ "name": "Traje de conejita",
+ "anime": "Bunny Girl Senpai",
+ "rarity": "SR",
+ "description": "El traje de la senpai que nadie parece ver.",
+ "icon": "res://art/equipment/traje_conejita.png",
+ "passive": {
+  "name": "Fenomeno de la pubertad",
+  "description": "VIDA MAX +6% y ESQUIVA +6%. Al esquivar un golpe, cura un 5% de su VIDA MAX."
+ },
+ "obtain": {
+  "banner": true,
+  "event": true
+ },
+ "rules": [
+  {
+   "id": "base",
+   "name": "Traje",
+   "trigger": "static",
+   "effects": [
+    {
+     "type": "stat_mod",
+     "target": "self",
+     "stat": "max_hp",
+     "kind": "mult",
+     "value": 0.06,
+     "turns": 0
+    },
+    {
+     "type": "stat_mod",
+     "target": "self",
+     "stat": "dodge_rate",
+     "kind": "flat",
+     "value": 0.06,
+     "turns": 0
+    }
+   ]
+  },
+  {
+   "id": "pubertad",
+   "name": "Fenomeno de la pubertad",
+   "trigger": "on_dodge",
+   "chance": 1.0,
+   "effects": [
+    {
+     "type": "heal",
+     "target": "self",
+     "of": "max_hp",
+     "amount": 0.05
+    }
+   ]
+  }
+ ]
+}

@@ -18,6 +18,9 @@ func run(app: Node) -> void:
 	GameState.account.equip_background("bg_equipo")
 	GameState.account.claim_level(2)
 	GameState.account.claim_level(3)
+	for it in ["rueda_adaptabilidad", "dedo_sukuna", "armadura_saiyan", "semilla_senzu", "sombrero_paja"]:
+		GameState.equipment.add(it, 1)
+	GameState.equipment.equip(String(GameState.party[0]), "rueda_adaptabilidad")
 	for c in ["frame_oro", "theme_violeta", "deco_estrellas", "theme_cian"]:
 		GameState.account.grant_cosmetic(c)
 	GameState.profile.equip("frame", "frame_oro")
@@ -27,7 +30,7 @@ func run(app: Node) -> void:
 		var r := String(GameState.profile.selectable_roots()[i])
 		GameState.profile.set_showcase_slot(i, r, String((GameState.profile.available_forms(r)[0] as Dictionary)["form"]))
 	GameState.profile.set_avatar(String(GameState.profile.selectable_roots()[0]), "ssr" if GameState.profile.is_valid_choice({"root": String(GameState.profile.selectable_roots()[0]), "form": "ssr"}) else String((GameState.profile.available_forms(String(GameState.profile.selectable_roots()[0]))[0] as Dictionary)["form"]))
-	for name in ["main_menu", "summon", "profile", "menu_customize", "collection_rewards", "compare", "collection", "missions", "evolution", "shop", "events", "inventory", "settings", "team"]:
+	for name in ["main_menu", "equipment", "summon", "profile", "menu_customize", "collection_rewards", "compare", "collection", "missions", "evolution", "shop", "events", "inventory", "settings", "team"]:
 		_app.call("open_screen", name)
 		await _frames(25)
 		_save("screen_" + name)

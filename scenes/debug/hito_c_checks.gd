@@ -368,7 +368,7 @@ func _check_main_menu() -> void:
 	var menu := _screen("main_menu")
 	menu.call("refresh")
 	var buttons: Array = menu.find_children("*", "Button", true, false)
-	_check("el menu tiene los 14 botones (JUGAR, HISTORIA, los grupos, TORRE, TIENDA y, desde la v15, PERFIL)", buttons.size() == 14)
+	_check("el menu tiene los 15 botones (JUGAR, HISTORIA, los grupos, TORRE, TIENDA, PERFIL y, desde la X.2, OBJETOS EQUIPABLES)", buttons.size() == 15)
 	for raw_button in buttons:
 		var button: Button = raw_button
 		button.pressed.emit()

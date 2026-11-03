@@ -1,0 +1,34 @@
+{
+ "id": "semilla_senzu",
+ "name": "Semilla Senzu",
+ "anime": "Dragon Ball",
+ "rarity": "N",
+ "description": "Una semilla que devuelve todas las fuerzas con un solo bocado.",
+ "icon": "res://art/equipment/semilla_senzu.png",
+ "passive": {
+  "name": "Una semilla de la ermitaño",
+  "description": "Una vez por combate, al bajar de un 30% de vida, recupera un 30% de su VIDA MAX."
+ },
+ "obtain": {
+  "banner": true,
+  "event": true
+ },
+ "rules": [
+  {
+   "id": "senzu",
+   "name": "Senzu",
+   "trigger": "low_hp",
+   "chance": 1.0,
+   "effects": [
+    {
+     "type": "heal",
+     "target": "self",
+     "of": "max_hp",
+     "amount": 0.3
+    }
+   ],
+   "once": true,
+   "threshold": 0.3
+  }
+ ]
+}

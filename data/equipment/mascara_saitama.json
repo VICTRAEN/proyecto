@@ -1,0 +1,46 @@
+{
+ "id": "mascara_saitama",
+ "name": "Mascara de Saitama",
+ "anime": "One Punch Man",
+ "rarity": "R",
+ "description": "La capucha y la mascara de un heroe por diversion.",
+ "icon": "res://art/equipment/mascara_saitama.png",
+ "passive": {
+  "name": "Puñetazo serio",
+  "description": "VIDA MAX +8%. Al atacar, 10% de probabilidad de un puñetazo extra (poder 120)."
+ },
+ "obtain": {
+  "banner": true,
+  "event": true
+ },
+ "rules": [
+  {
+   "id": "base",
+   "name": "Entrenamiento",
+   "trigger": "static",
+   "effects": [
+    {
+     "type": "stat_mod",
+     "target": "self",
+     "stat": "max_hp",
+     "kind": "mult",
+     "value": 0.08,
+     "turns": 0
+    }
+   ]
+  },
+  {
+   "id": "puñetazo",
+   "name": "Puñetazo serio",
+   "trigger": "on_attack",
+   "chance": 0.1,
+   "effects": [
+    {
+     "type": "damage",
+     "target": "trigger_target",
+     "power": 120
+    }
+   ]
+  }
+ ]
+}

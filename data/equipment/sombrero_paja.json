@@ -1,0 +1,49 @@
+{
+ "id": "sombrero_paja",
+ "name": "Sombrero de Paja",
+ "anime": "One Piece",
+ "rarity": "SSR",
+ "description": "El sombrero que Shanks dejo a Luffy con una promesa.",
+ "icon": "res://art/equipment/sombrero_paja.png",
+ "passive": {
+  "name": "Voluntad del capitan",
+  "description": "VIDA MAX +10%. Al empezar el combate, todo el equipo gana ATAQUE +5%."
+ },
+ "obtain": {
+  "banner": true,
+  "event": true
+ },
+ "rules": [
+  {
+   "id": "base",
+   "name": "Sombrero",
+   "trigger": "static",
+   "effects": [
+    {
+     "type": "stat_mod",
+     "target": "self",
+     "stat": "max_hp",
+     "kind": "mult",
+     "value": 0.1,
+     "turns": 0
+    }
+   ]
+  },
+  {
+   "id": "capitan",
+   "name": "Voluntad del capitan",
+   "trigger": "battle_start",
+   "chance": 1.0,
+   "effects": [
+    {
+     "type": "stat_mod",
+     "target": "ally_all",
+     "stat": "atk",
+     "kind": "mult",
+     "value": 0.05,
+     "turns": 0
+    }
+   ]
+  }
+ ]
+}

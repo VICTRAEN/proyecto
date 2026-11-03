@@ -1,0 +1,34 @@
+{
+ "id": "guantes_mustang",
+ "name": "Guantes de alquimia de Roy Mustang",
+ "anime": "Fullmetal Alchemist",
+ "rarity": "SR",
+ "description": "Guantes con el circulo de transmutacion de la llama.",
+ "icon": "res://art/equipment/guantes_mustang.png",
+ "passive": {
+  "name": "Chasquido de llama",
+  "description": "Al atacar, 25% de probabilidad de quemar al objetivo (30% del ATAQUE por turno, 2 turnos)."
+ },
+ "obtain": {
+  "banner": true,
+  "event": true
+ },
+ "rules": [
+  {
+   "id": "llama",
+   "name": "Chasquido de llama",
+   "trigger": "on_attack",
+   "chance": 0.25,
+   "effects": [
+    {
+     "type": "periodic",
+     "target": "trigger_target",
+     "kind": "burn",
+     "of": "atk",
+     "amount": 0.3,
+     "turns": 2
+    }
+   ]
+  }
+ ]
+}

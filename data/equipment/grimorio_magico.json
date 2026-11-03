@@ -1,0 +1,46 @@
+{
+ "id": "grimorio_magico",
+ "name": "Grimorio Magico",
+ "anime": "Black Clover",
+ "rarity": "SR",
+ "description": "Un grimorio de cuatro hojas que responde a quien no se rinde.",
+ "icon": "res://art/equipment/grimorio_magico.png",
+ "passive": {
+  "name": "Magia ilimitada",
+  "description": "ATAQUE +8%. Empieza el combate con 1 SP extra."
+ },
+ "obtain": {
+  "banner": true,
+  "event": true
+ },
+ "rules": [
+  {
+   "id": "base",
+   "name": "Grimorio",
+   "trigger": "static",
+   "effects": [
+    {
+     "type": "stat_mod",
+     "target": "self",
+     "stat": "atk",
+     "kind": "mult",
+     "value": 0.08,
+     "turns": 0
+    }
+   ]
+  },
+  {
+   "id": "mana",
+   "name": "Magia ilimitada",
+   "trigger": "battle_start",
+   "chance": 1.0,
+   "effects": [
+    {
+     "type": "sp_gain",
+     "target": "self",
+     "amount": 1
+    }
+   ]
+  }
+ ]
+}

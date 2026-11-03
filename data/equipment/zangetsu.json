@@ -1,0 +1,57 @@
+{
+ "id": "zangetsu",
+ "name": "Zanpakuto Zangetsu",
+ "anime": "Bleach",
+ "rarity": "UR",
+ "description": "La zanpakuto de Ichigo: crece cuanto mas se desafia al enemigo.",
+ "icon": "res://art/equipment/zangetsu.png",
+ "passive": {
+  "name": "Getsuga Tensho",
+  "description": "ATAQUE +16% y DAÑO CRITICO +25%. Al usar una habilidad especial, PERFORACION +20% durante 2 turnos."
+ },
+ "obtain": {
+  "banner": true,
+  "event": true
+ },
+ "rules": [
+  {
+   "id": "base",
+   "name": "Zanpakuto",
+   "trigger": "static",
+   "effects": [
+    {
+     "type": "stat_mod",
+     "target": "self",
+     "stat": "atk",
+     "kind": "mult",
+     "value": 0.16,
+     "turns": 0
+    },
+    {
+     "type": "stat_mod",
+     "target": "self",
+     "stat": "crit_dmg",
+     "kind": "flat",
+     "value": 0.25,
+     "turns": 0
+    }
+   ]
+  },
+  {
+   "id": "getsuga",
+   "name": "Getsuga Tensho",
+   "trigger": "on_special",
+   "chance": 1.0,
+   "effects": [
+    {
+     "type": "stat_mod",
+     "target": "self",
+     "stat": "pierce",
+     "kind": "flat",
+     "value": 0.2,
+     "turns": 2
+    }
+   ]
+  }
+ ]
+}

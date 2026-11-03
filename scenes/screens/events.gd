@@ -478,6 +478,13 @@ func _drops_text(drops: Array) -> String:
 	for drop in drops:
 		if not (drop is Dictionary):
 			continue
+		# X.2: un objeto equipable poco frecuente ("equipment" + "chance").
+		var equip_id := String((drop as Dictionary).get("equipment", ""))
+		if not equip_id.is_empty():
+			var equip_label := "%s (raro, %d%%)" % [GameState.equipment.name_of(equip_id), int(round(float((drop as Dictionary).get("chance", 0.05)) * 100.0))]
+			if not parts.has(equip_label):
+				parts.append(equip_label)
+			continue
 		var item_id := String((drop as Dictionary).get("item", ""))
 		if item_id.is_empty():
 			continue

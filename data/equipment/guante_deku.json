@@ -1,0 +1,49 @@
+{
+ "id": "guante_deku",
+ "name": "Guante de Deku",
+ "anime": "Boku no Hero",
+ "rarity": "SR",
+ "description": "El guante que Deku destroza una y otra vez con One For All.",
+ "icon": "res://art/equipment/guante_deku.png",
+ "passive": {
+  "name": "One For All",
+  "description": "ATAQUE +10%. Al usar una habilidad especial, DAÑO HECHO +15% durante 2 turnos."
+ },
+ "obtain": {
+  "banner": true,
+  "event": true
+ },
+ "rules": [
+  {
+   "id": "base",
+   "name": "Guante",
+   "trigger": "static",
+   "effects": [
+    {
+     "type": "stat_mod",
+     "target": "self",
+     "stat": "atk",
+     "kind": "mult",
+     "value": 0.1,
+     "turns": 0
+    }
+   ]
+  },
+  {
+   "id": "ofa",
+   "name": "One For All",
+   "trigger": "on_special",
+   "chance": 1.0,
+   "effects": [
+    {
+     "type": "stat_mod",
+     "target": "self",
+     "stat": "dmg_dealt",
+     "kind": "flat",
+     "value": 0.15,
+     "turns": 2
+    }
+   ]
+  }
+ ]
+}

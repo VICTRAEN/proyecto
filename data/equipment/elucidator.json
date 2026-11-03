@@ -1,0 +1,54 @@
+{
+ "id": "elucidator",
+ "name": "Espada de Kirito (Elucidator)",
+ "anime": "Sword Art Online",
+ "rarity": "SSR",
+ "description": "La espada negra de Kirito, forjada con el drop de un jefe.",
+ "icon": "res://art/equipment/elucidator.png",
+ "passive": {
+  "name": "Starburst Stream",
+  "description": "ATAQUE +9% y CRITICO +8%. Al atacar, 20% de probabilidad de un golpe extra (poder 70)."
+ },
+ "obtain": {
+  "banner": true,
+  "event": true
+ },
+ "rules": [
+  {
+   "id": "base",
+   "name": "Elucidator",
+   "trigger": "static",
+   "effects": [
+    {
+     "type": "stat_mod",
+     "target": "self",
+     "stat": "atk",
+     "kind": "mult",
+     "value": 0.09,
+     "turns": 0
+    },
+    {
+     "type": "stat_mod",
+     "target": "self",
+     "stat": "crit_rate",
+     "kind": "flat",
+     "value": 0.08,
+     "turns": 0
+    }
+   ]
+  },
+  {
+   "id": "starburst",
+   "name": "Starburst Stream",
+   "trigger": "on_attack",
+   "chance": 0.2,
+   "effects": [
+    {
+     "type": "damage",
+     "target": "trigger_target",
+     "power": 70
+    }
+   ]
+  }
+ ]
+}

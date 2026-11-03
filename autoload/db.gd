@@ -26,6 +26,9 @@ const TOWERS_DIR := "res://data/towers"
 ## v15: colecciones con recompensas, cosmeticos y nivel de cuenta.
 const COLLECTIONS_DIR := "res://data/collections"
 const COSMETICS_DIR := "res://data/cosmetics"
+## X.2: objetos equipables y sus banners (un JSON por objeto / banner).
+const EQUIPMENT_DIR := "res://data/equipment"
+const EQUIPMENT_BANNERS_DIR := "res://data/equipment_banners"
 const ACCOUNT_FILE := "res://data/account/levels.json"
 ## v16: calendario de la rotacion diaria de banners (un unico archivo de configuracion).
 const ROTATION_FILE := "res://data/rotation.json"
@@ -80,6 +83,8 @@ var dupe_rules: Dictionary = {}
 ## tramos, catalogo de cosmeticos (fondos e ilustraciones) y tabla del nivel de cuenta.
 var collections: Dictionary = {}
 var cosmetics: Dictionary = {}
+var equipment: Dictionary = {}
+var equipment_banners: Dictionary = {}
 var account_levels: Dictionary = {}
 var rotation: Dictionary = {}
 var load_errors: Array = []
@@ -107,6 +112,8 @@ func load_all() -> void:
 	towers = _load_dir(TOWERS_DIR)
 	collections = _load_dir(COLLECTIONS_DIR)
 	cosmetics = _load_dir(COSMETICS_DIR)
+	equipment = _load_dir(EQUIPMENT_DIR)
+	equipment_banners = _load_dir(EQUIPMENT_BANNERS_DIR)
 	account_levels = _load_account_levels()
 	rotation = _load_rotation()
 	mutations_config = _load_mutations()
@@ -318,6 +325,27 @@ func get_collection(id: String) -> Dictionary:
 ## Colecciones ordenadas por id (la pantalla las agrupa por "kind").
 func all_collections() -> Array:
 	return _all_sorted(collections)
+
+
+func get_equipment(id: String) -> Dictionary:
+	return equipment.get(String(id), {})
+
+
+## Todos los objetos equipables, ordenados por id.
+func all_equipment() -> Array:
+	return _all_sorted(equipment)
+
+
+func get_equipment_banner(id: String) -> Dictionary:
+	return equipment_banners.get(String(id), {})
+
+
+func all_equipment_banners() -> Array:
+	var out: Array = []
+	for b in _all_sorted(equipment_banners):
+		if bool((b as Dictionary).get("enabled", true)):
+			out.append(b)
+	return out
 
 
 func get_cosmetic(id: String) -> Dictionary:

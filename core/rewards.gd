@@ -15,14 +15,14 @@ extends RefCounted
 ## contador de materiales, objetos del inventario, titulos y cosmeticos): no hay tickets
 ## ni monedas nuevas. Los titulos y cosmeticos NO se duplican: darlos dos veces es no-op.
 
-const KEYS := ["coins", "gems", "materials", "items", "title", "cosmetics"]
+const KEYS := ["coins", "gems", "materials", "items", "title", "cosmetics", "equipment"]
 
 
 ## Paga `reward` al jugador (gs = GameState). NO guarda: lo hace quien llama, una vez,
 ## despues de marcar la recompensa como reclamada.
 ## Devuelve lo realmente entregado: { coins, gems, materials, items, titles, cosmetics }.
 static func pay(gs, reward: Dictionary) -> Dictionary:
-	var out := { "coins": 0, "gems": 0, "materials": 0, "items": {}, "titles": [], "cosmetics": [] }
+	var out := { "coins": 0, "gems": 0, "materials": 0, "items": {}, "titles": [], "cosmetics": [], "equipment": {} }
 	if gs == null or reward.is_empty():
 		return out
 	var coins_amount := maxi(0, int(reward.get("coins", 0)))
@@ -44,6 +44,13 @@ static func pay(gs, reward: Dictionary) -> Dictionary:
 			if amount > 0 and DB.items.has(String(item_id)):
 				gs.add_item(String(item_id), amount)
 				out["items"][String(item_id)] = amount
+	# X.2: objetos equipables { "equipment": { "id": cantidad } }.
+	var equip = reward.get("equipment", {})
+	if equip is Dictionary:
+		for eid in equip:
+			var n := maxi(0, int((equip as Dictionary)[eid]))
+			if n > 0 and gs.equipment.add(String(eid), n):
+				out["equipment"][String(eid)] = n
 	var title = reward.get("title", {})
 	if title is Dictionary and not String((title as Dictionary).get("id", "")).is_empty():
 		var title_id := String((title as Dictionary)["id"])
@@ -73,6 +80,10 @@ static func describe(reward: Dictionary) -> String:
 		for item_id in items:
 			var item_name := String((DB.items.get(String(item_id), {}) as Dictionary).get("name", item_id))
 			parts.append("%d x %s" % [int((items as Dictionary)[item_id]), item_name])
+	var equip_r = reward.get("equipment", {})
+	if equip_r is Dictionary:
+		for eid in equip_r:
+			parts.append("%d x %s" % [int((equip_r as Dictionary)[eid]), String((DB.equipment.get(String(eid), {}) as Dictionary).get("name", eid))])
 	var title = reward.get("title", {})
 	if title is Dictionary and not String((title as Dictionary).get("id", "")).is_empty():
 		parts.append("Titulo: %s" % String((title as Dictionary).get("name", title["id"])))
@@ -107,6 +118,11 @@ static func problems(reward: Variant, label: String) -> Array:
 				out.append("%s: el objeto '%s' no existe" % [label, item_id])
 			elif int((items as Dictionary)[item_id]) <= 0:
 				out.append("%s: cantidad no positiva de '%s'" % [label, item_id])
+	var equip_p = r.get("equipment", {})
+	if equip_p is Dictionary:
+		for eid in equip_p:
+			if not DB.equipment.has(String(eid)):
+				out.append("%s: el objeto equipable '%s' no existe" % [label, eid])
 	var title = r.get("title", {})
 	if r.has("title"):
 		if not (title is Dictionary) or String((title as Dictionary).get("id", "")).is_empty() or String((title as Dictionary).get("name", "")).is_empty():
