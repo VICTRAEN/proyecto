@@ -1,0 +1,129 @@
+{
+ "id": "dng_evolution",
+ "name": "Camara del Despertar",
+ "description": "Mazmorra de MATERIALES DE EVOLUCION: Brasa del despertar desde Normal y Nucleo del despertar desde Dificil. Son materiales genericos de evolucion (no sustituyen a los objetos exclusivos de evento).",
+ "order": 3,
+ "focus": "evolution",
+ "background": "battle",
+ "difficulties": [
+  {
+   "id": "easy",
+   "name": "Facil",
+   "order": 1,
+   "enemies": [
+    "vigia_alfa",
+    "vigia_beta"
+   ],
+   "scale": {
+    "hp": 1.0,
+    "atk": 1.0,
+    "def": 1.0
+   },
+   "reward": {
+    "coins": 50,
+    "materials": 1
+   },
+   "requires_previous": false,
+   "drops": [
+    {
+     "type": "item",
+     "id": "evo_ember",
+     "chance": 0.5,
+     "min": 1,
+     "max": 1
+    }
+   ]
+  },
+  {
+   "id": "normal",
+   "name": "Normal",
+   "order": 2,
+   "enemies": [
+    "torre_guardian",
+    "vigia_alfa"
+   ],
+   "scale": {
+    "hp": 1.5,
+    "atk": 1.3,
+    "def": 1.2
+   },
+   "reward": {
+    "coins": 110,
+    "items": {
+     "evo_ember": 1
+    }
+   },
+   "requires_previous": true,
+   "drops": [
+    {
+     "type": "item",
+     "id": "evo_ember",
+     "chance": 0.5,
+     "min": 1,
+     "max": 2
+    }
+   ]
+  },
+  {
+   "id": "hard",
+   "name": "Dificil",
+   "order": 3,
+   "enemies": [
+    "torre_guardian",
+    "torre_verdugo"
+   ],
+   "scale": {
+    "hp": 2.4,
+    "atk": 1.7,
+    "def": 1.5
+   },
+   "reward": {
+    "coins": 220,
+    "items": {
+     "evo_ember": 2
+    }
+   },
+   "requires_previous": true,
+   "drops": [
+    {
+     "type": "item",
+     "id": "evo_core",
+     "chance": 0.35,
+     "min": 1,
+     "max": 1
+    }
+   ]
+  },
+  {
+   "id": "extreme",
+   "name": "Extremo",
+   "order": 4,
+   "enemies": [
+    "torre_verdugo",
+    "torre_avatar"
+   ],
+   "scale": {
+    "hp": 3.6,
+    "atk": 2.2,
+    "def": 2.0
+   },
+   "reward": {
+    "coins": 400,
+    "items": {
+     "evo_ember": 3,
+     "evo_core": 1
+    }
+   },
+   "requires_previous": true,
+   "drops": [
+    {
+     "type": "item",
+     "id": "evo_core",
+     "chance": 0.6,
+     "min": 1,
+     "max": 2
+    }
+   ]
+  }
+ ]
+}

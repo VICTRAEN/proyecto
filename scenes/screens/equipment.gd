@@ -122,6 +122,17 @@ func _build_summon_card() -> void:
 		VI.tint_button(b, def[3])
 		b.pressed.connect(_on_summon.bind(int(def[1])))
 		row.add_child(b)
+	var shard_cost := int(banner.get("shard_cost", 0))
+	if shard_cost > 0:
+		var sb := Button.new()
+		sb.name = "SummonShards"
+		sb.text = "x1  -  %d fragmentos de armeria  (tienes %d)" % [shard_cost, GameState.item_count("equipment_shard")]
+		sb.custom_minimum_size = Vector2(0, 84)
+		sb.add_theme_font_size_override("font_size", VI.FONT_BODY)
+		VI.tint_button(sb, VI.GREEN)
+		sb.disabled = not GameState.has_item("equipment_shard", shard_cost)
+		sb.pressed.connect(_on_summon_shards)
+		col.add_child(sb)
 	_list.add_child(card)
 
 
@@ -267,6 +278,16 @@ func _on_summon(count: int) -> void:
 		names.append("%s (%s)%s" % [GameState.equipment.name_of(String(id)), GameState.equipment.rarity_of(String(id)), " NUEVO" if (report["new"] as Array).has(id) else ""])
 	refresh()
 	_feedback.text = "Obtenido: " + ", ".join(names)
+
+
+func _on_summon_shards() -> void:
+	var report: Dictionary = GameState.equipment.summon_with_shards(banner_id)
+	if not bool(report["ok"]):
+		_feedback.text = String(report["reason"])
+		return
+	var id := String(report["results"][0])
+	refresh()
+	_feedback.text = "Obtenido: %s (%s)%s" % [GameState.equipment.name_of(id), GameState.equipment.rarity_of(id), " NUEVO" if (report["new"] as Array).has(id) else ""]
 
 
 func _back() -> void:

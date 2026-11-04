@@ -183,6 +183,9 @@ func check_missing_resources() -> void:
 	for bid in DB.equipment_banners.keys():
 		for problem in GameState.Equipment.banner_problems(String(bid)):
 			_add("error", "recursos", "banner de objetos '%s': %s" % [bid, problem])
+	# X.3: datos de los modos de juego (incursiones, mazmorras, Boss Rush, roguelike).
+	for problem in GameState.modes.data_problems():
+		_add("error", "modos", String(problem))
 	# Cosmeticos: el fondo o la ilustracion tienen que existir de verdad.
 	for id in DB.cosmetics.keys():
 		var c: Dictionary = DB.cosmetics[id]

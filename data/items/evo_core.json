@@ -1,0 +1,11 @@
+{
+ "id": "evo_core",
+ "name": "Nucleo del despertar",
+ "description": "Material generico de evolucion de gran pureza. Solo cae en dificultades altas de la Camara del Despertar.",
+ "type": "evolution_material",
+ "kind": "evolutive",
+ "icon": "res://art/items/evo_core.png",
+ "rarity": "SSR",
+ "usable": false,
+ "obtained_from": "Mazmorras de materiales (Camara del Despertar, dificil o superior)"
+}

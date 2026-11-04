@@ -360,6 +360,36 @@ func summon(banner_id: String, count: int) -> Dictionary:
 	return report
 
 
+## X.3: UNA tirada pagando Fragmentos de armeria (material de la mazmorra "Forja de la Armeria").
+## Mismas tasas y mismo pool que la invocacion normal; solo cambia el pago. { ok, reason, results, new, cost }.
+func summon_with_shards(banner_id: String) -> Dictionary:
+	var report := { "ok": false, "reason": "", "results": [], "new": [], "cost": 0 }
+	var banner := DB.get_equipment_banner(banner_id)
+	var cost := int(banner.get("shard_cost", 0))
+	if banner.is_empty() or cost <= 0 or not banner_problems(banner_id).is_empty():
+		report["reason"] = "Ese banner no admite fragmentos."
+		return report
+	if not gs.has_item("equipment_shard", cost):
+		report["reason"] = "Necesitas %d fragmentos de armeria." % cost
+		return report
+	var rng := RandomNumberGenerator.new()
+	rng.randomize()
+	var id := roll(banner_id, rng)
+	if id.is_empty():
+		report["reason"] = "No ha salido ningun objeto."
+		return report
+	gs.remove_item("equipment_shard", cost)
+	if count_of(id) == 0:
+		(report["new"] as Array).append(id)
+	add(id, 1)
+	(report["results"] as Array).append(id)
+	report["ok"] = true
+	report["cost"] = cost
+	gs.add_counter("objetos_equipables_obtenidos", 1)
+	gs.save_game()
+	return report
+
+
 ## --- Validacion de datos (diagnostico y pruebas) --------------------------------------------
 
 const TRIGGERS := ["static", "battle_start", "turn_start", "on_hit", "on_attack", "on_crit", "on_special", "on_dodge", "on_kill", "on_ally_down", "low_hp"]

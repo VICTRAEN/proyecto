@@ -1,0 +1,11 @@
+{
+ "id": "evo_ember",
+ "name": "Brasa del despertar",
+ "description": "Material generico de evolucion. Se consigue en la Camara del Despertar.",
+ "type": "evolution_material",
+ "kind": "evolutive",
+ "icon": "res://art/items/evo_ember.png",
+ "rarity": "SR",
+ "usable": false,
+ "obtained_from": "Mazmorras de materiales (Camara del Despertar)"
+}

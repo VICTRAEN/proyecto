@@ -1,0 +1,12 @@
+{
+ "id": "training",
+ "name": "Campo de entrenamiento",
+ "description": "Prueba personajes, equipos, links, pasivas y objetos sin gastar nada. No da recompensas, no avanza misiones y no modifica tus personajes ni tu partida.",
+ "background": "battle",
+ "team_size": 4,
+ "enemy_size": 3,
+ "enemy_mult": { "min": 0.25, "max": 5.0, "step": 0.25 },
+ "start_hp": { "min": 0.1, "max": 1.0, "step": 0.1 },
+ "start_sp": { "min": 0, "max": 6 },
+ "rounds": [0, 3, 5, 10, 20]
+}

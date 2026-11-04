@@ -833,6 +833,8 @@ func _grant_rewards(victory: bool) -> Dictionary:
 				alive_now += 1
 		var fallen := manager.participant_ids().size() - alive_now
 		GameState.last_battle_info = { "rounds": manager.round_number, "fallen": fallen }
+	if GameState.battle_source == GameState.BATTLE_MODE and manager != null and not _rewards_claimed:
+		GameState.modes.summarize(manager)
 	if _rewards_claimed:
 		return { "xp": 0, "coins": 0, "characters": [], "granted": false, "unlocked": [] }
 	_rewards_claimed = true

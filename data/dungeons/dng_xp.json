@@ -1,0 +1,88 @@
+{
+ "id": "dng_xp",
+ "name": "Dojo de la experiencia",
+ "description": "Mazmorra de EXPERIENCIA: cada personaje que combate recibe la XP indicada. A mayor dificultad, mas XP.",
+ "order": 1,
+ "focus": "xp",
+ "background": "battle",
+ "difficulties": [
+  {
+   "id": "easy",
+   "name": "Facil",
+   "order": 1,
+   "enemies": [
+    "vigia_alfa",
+    "vigia_beta"
+   ],
+   "scale": {
+    "hp": 1.0,
+    "atk": 1.0,
+    "def": 1.0
+   },
+   "reward": {
+    "xp": 250,
+    "coins": 40
+   },
+   "requires_previous": false
+  },
+  {
+   "id": "normal",
+   "name": "Normal",
+   "order": 2,
+   "enemies": [
+    "torre_guardian",
+    "vigia_alfa"
+   ],
+   "scale": {
+    "hp": 1.5,
+    "atk": 1.3,
+    "def": 1.2
+   },
+   "reward": {
+    "xp": 600,
+    "coins": 90
+   },
+   "requires_previous": true
+  },
+  {
+   "id": "hard",
+   "name": "Dificil",
+   "order": 3,
+   "enemies": [
+    "torre_guardian",
+    "torre_verdugo"
+   ],
+   "scale": {
+    "hp": 2.4,
+    "atk": 1.7,
+    "def": 1.5
+   },
+   "reward": {
+    "xp": 1200,
+    "coins": 180,
+    "materials": 2
+   },
+   "requires_previous": true
+  },
+  {
+   "id": "extreme",
+   "name": "Extremo",
+   "order": 4,
+   "enemies": [
+    "torre_verdugo",
+    "torre_avatar"
+   ],
+   "scale": {
+    "hp": 3.6,
+    "atk": 2.2,
+    "def": 2.0
+   },
+   "reward": {
+    "xp": 2400,
+    "coins": 320,
+    "materials": 4
+   },
+   "requires_previous": true
+  }
+ ]
+}

@@ -190,6 +190,8 @@ func setup(ally_data: Array, enemy_data: Array, reserve_data: Array = []) -> voi
 	_apply_mutations()
 	_attach_link_rules()
 	_apply_equipment()
+	# X.3: estado de modo (desgaste de carrera, mejoras del roguelike, condiciones del entrenamiento).
+	GameState.modes.apply_battle_state(self)
 	# Las reservas esperan ya "armadas": mismos links, lider y mutacion que los activos.
 	for reserve_unit in reserves:
 		if not _team_link_ids.is_empty():
@@ -557,6 +559,8 @@ func _try_rule(unit: CombatUnit, rule: Dictionary, trigger: String, extra: Dicti
 	var origin_text := "Link %s" % rule_name if String(rule.get("origin", "")) == "link" else rule_name
 	if String(rule.get("origin", "")) == "equipment":
 		origin_text = "Objeto - %s" % rule_name
+	elif String(rule.get("origin", "")) == "boon":
+		origin_text = "Mejora - %s" % rule_name
 	_log("%s activa %s" % [unit.display_name, origin_text], "passive")
 	_record_passive_stats(unit, results)
 	action_resolved.emit({
@@ -621,7 +625,7 @@ func _apply_equipment() -> void:
 		ids.append(u.id)
 	for u in reserves:
 		ids.append(u.id)
-	var assignment: Dictionary = GameState.equipment.assignment_for(ids)
+	var assignment: Dictionary = GameState.modes.equipment_assignment(ids)
 	for u in allies:
 		GameState.equipment.apply_mods(u.stats, u.id, assignment)
 		u.equipment_rules = GameState.equipment.rules_for(u.id, assignment)

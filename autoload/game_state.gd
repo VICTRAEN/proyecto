@@ -514,6 +514,8 @@ func assign_party_slot(index: int, id: String) -> void:
 ## equipo vale. Los huecos NO son un problema por si mismos: lo que decide si
 ## hacen falta mas unidades es el stage, no esta funcion.
 func team_problem() -> String:
+	if battle_source == BATTLE_MODE and not battle_party.is_empty():
+		return ""
 	if battle_source == BATTLE_TOWER and not _tower_lead.is_empty():
 		if tower_active_ids().is_empty():
 			return "El equipo de torre no tiene activos: pon al menos 1 personaje en los 3 puestos de arriba."
@@ -580,6 +582,8 @@ func locked_character_ids() -> Array:
 
 
 func enemy_data() -> Array:
+	if battle_source == BATTLE_MODE:
+		return modes.enemy_data()
 	var data_list: Array = []
 	for id in current_stage_enemies:
 		var data := DB.get_enemy(String(id))
@@ -609,6 +613,8 @@ const BATTLE_STAGE := "stage"
 const BATTLE_STORY := "story"
 const BATTLE_EVENT := "event"
 const BATTLE_TOWER := "tower"
+## X.3: incursiones, mazmorras, roguelike, entrenamiento y Boss Rush (core/game_modes.gd).
+const BATTLE_MODE := "mode"
 
 var battle_source := BATTLE_STAGE
 ## Plantilla de la batalla en curso. Vacia = equipo normal (party). Un stage de
@@ -660,6 +666,8 @@ func current_stage() -> Dictionary:
 			return _event_battle_info()
 		BATTLE_TOWER:
 			return _tower_battle_info()
+		BATTLE_MODE:
+			return modes.battle_info()
 		_:
 			return DB.get_stage(stage_id)
 
@@ -801,6 +809,8 @@ func battle_source_label() -> String:
 			return "EVENTO"
 		BATTLE_TOWER:
 			return "TORRE"
+		BATTLE_MODE:
+			return "MODO"
 		_:
 			return "BATALLA"
 
@@ -818,6 +828,10 @@ func grant_battle_rewards(token: int, ally_ids: Array, victory: bool) -> Diction
 	if token != battle_token or _rewarded_token == token:
 		return _empty_report()
 	_rewarded_token = token
+	# X.3: el campo de entrenamiento es un SANDBOX: ni contadores, ni misiones, ni XP, ni guardado.
+	if battle_source == BATTLE_MODE and modes.is_sandbox():
+		last_battle_info = {}
+		return modes.sandbox_report()
 	# Contadores globales: una batalla jugada, y ganada o perdida. Cuentan
 	# tambien al abandonar (el abandono cierra la batalla sin premios). Se
 	# cuentan AQUI y una sola vez para todos los origenes, asi que historia,
@@ -863,6 +877,8 @@ func _record_battle_meta(ally_ids: Array, victory: bool) -> void:
 ## sitio propio, pero todos devuelven el mismo informe, asi que la pantalla de
 ## resultado no cambia segun de donde venga la batalla.
 func _pay_battle_by_source(ally_ids: Array, victory: bool) -> Dictionary:
+	if battle_source == BATTLE_MODE:
+		return modes.pay(ally_ids, victory)
 	if not victory:
 		if battle_source == BATTLE_TOWER:
 			tower_register_defeat(String(battle_source_ref.get("tower", "")))
@@ -1601,7 +1617,9 @@ const PlayerProfile := preload("res://core/player_profile.gd")
 var profile = PlayerProfile.new(self)
 ## X.2: objetos equipables (core/equipment.gd).
 const Equipment := preload("res://core/equipment.gd")
+const GameModes := preload("res://core/game_modes.gd")
 var equipment = Equipment.new(self)
+var modes = GameModes.new(self)
 var collections = CollectionsSystem.new(self)
 
 
@@ -4135,6 +4153,17 @@ func prepare_tower_battle(tower_id: String, floor_number: int) -> bool:
 	return true
 
 
+## X.3: prepara un combate de modo. `team` vacio = el equipo normal; si trae ids, el combate (y los
+## links y el lider) leen ESE equipo, como en la torre.
+func prepare_mode_battle(ref: Dictionary, team: Array) -> bool:
+	if not prepare_battle(BATTLE_MODE, ref):
+		return false
+	if not team.is_empty():
+		battle_party = team.duplicate()
+		_tower_lead = team.duplicate()
+	return true
+
+
 func battle_reserve_data() -> Array:
 	var data_list: Array = []
 	for id in battle_reserve:
@@ -4148,9 +4177,10 @@ func battle_reserve_data() -> Array:
 func reset_battle_context() -> void:
 	_tower_lead = []
 	battle_reserve = []
-	if battle_source == BATTLE_TOWER:
+	if battle_source == BATTLE_TOWER or battle_source == BATTLE_MODE:
 		battle_party = []
 		battle_source = BATTLE_STAGE
+		modes.end_context()
 
 
 func _lead_party() -> Array:
@@ -4980,6 +5010,7 @@ func build_save_payload() -> Dictionary:
 		"account": account.to_dict(),
 		"profile": profile.to_dict(),
 		"equipment": equipment.to_dict(),
+		"modes": modes.to_dict(),
 		"collections": collections.to_dict(),
 	}
 	return payload
@@ -5176,6 +5207,7 @@ func load_game() -> bool:
 	account.from_dict(data.get("account", {}))
 	profile.from_dict(data.get("profile", {}))
 	equipment.from_dict(data.get("equipment", {}))
+	modes.from_dict(data.get("modes", {}))
 	collections.from_dict(data.get("collections", {}))
 	account.bootstrap_if_needed()
 	account.regrant_claimed_cosmetics()

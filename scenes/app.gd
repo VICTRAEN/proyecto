@@ -57,6 +57,13 @@ const SCREENS := {
 	# X.2: objetos equipables (inventario de objetos, equipar e invocar).
 	"equipment": preload("res://scenes/screens/equipment.tscn"),
 	"compare": preload("res://scenes/screens/compare.tscn"),
+	# X.3: modos de juego (hub + cada modo).
+	"modes": preload("res://scenes/screens/modes.tscn"),
+	"mode_raid": preload("res://scenes/screens/mode_raid.tscn"),
+	"mode_dungeon": preload("res://scenes/screens/mode_dungeon.tscn"),
+	"mode_rush": preload("res://scenes/screens/mode_rush.tscn"),
+	"mode_rogue": preload("res://scenes/screens/mode_rogue.tscn"),
+	"mode_training": preload("res://scenes/screens/mode_training.tscn"),
 }
 
 var nav: NAV = null
@@ -127,6 +134,13 @@ func _ready() -> void:
 	elif dbg_args.has("--diag"):
 		# v15: diagnostico de datos y guardado (solo desarrollo; dev/diagnostics.gd).
 		_run_diagnostics()
+	elif dbg_args.has("--dbg30"):
+		var hito_p: GDScript = load("res://scenes/debug/hito_p_checks.gd")
+		var hito_p_node := Node.new()
+		hito_p_node.set_script(hito_p)
+		hito_p_node.name = "HitoPChecks"
+		add_child(hito_p_node)
+		hito_p_node.call_deferred("run", self)
 	elif dbg_args.has("--dbg29"):
 		var hito_o: GDScript = load("res://scenes/debug/hito_o_checks.gd")
 		var hito_o_node := Node.new()
@@ -547,6 +561,11 @@ func open_battle() -> void:
 
 ## Otra batalla con las mismas reglas, sin salir del combate.
 func restart_battle() -> void:
+	# X.3: un combate de modo no se reintenta desde el resultado: el estado (carrera, semana, entrenamiento)
+	# vive en la pantalla del modo, asi que se vuelve a ella.
+	if GameState.battle_source == GameState.BATTLE_MODE:
+		close_battle()
+		return
 	close_battle()
 	open_battle()
 

@@ -174,6 +174,15 @@ func _rebuild_layout() -> void:
 	equipment_button.pressed.connect(_goto.bind("equipment"))
 	main.add_child(equipment_button)
 
+	var modes_button := Button.new()
+	modes_button.name = "ModesButton"
+	modes_button.text = "MODOS DE JUEGO"
+	modes_button.custom_minimum_size = Vector2(0, 72)
+	modes_button.add_theme_font_size_override("font_size", VI.FONT_BODY)
+	VI.tint_button(modes_button, VI.RED)
+	modes_button.pressed.connect(_goto.bind("modes"))
+	main.add_child(modes_button)
+
 	# --- Escaparate del lider ---
 	_hero = Control.new()
 	_hero.name = "Hero"

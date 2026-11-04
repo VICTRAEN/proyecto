@@ -1,0 +1,122 @@
+{
+ "id": "dng_equipment",
+ "name": "Forja de la Armeria",
+ "description": "Mazmorra de RECURSOS PARA EQUIPABLES: Fragmentos de armeria (50 = una tirada de objetos) y posibilidad de que caiga un objeto equipable directamente.",
+ "order": 5,
+ "focus": "equipment",
+ "background": "battle",
+ "difficulties": [
+  {
+   "id": "easy",
+   "name": "Facil",
+   "order": 1,
+   "enemies": [
+    "vigia_alfa",
+    "vigia_beta"
+   ],
+   "scale": {
+    "hp": 1.0,
+    "atk": 1.0,
+    "def": 1.0
+   },
+   "reward": {
+    "coins": 50,
+    "items": {
+     "equipment_shard": 3
+    }
+   },
+   "requires_previous": false,
+   "drops": [
+    {
+     "type": "equipment",
+     "id": "bata_laboratorio",
+     "chance": 0.15
+    }
+   ]
+  },
+  {
+   "id": "normal",
+   "name": "Normal",
+   "order": 2,
+   "enemies": [
+    "torre_guardian",
+    "vigia_alfa"
+   ],
+   "scale": {
+    "hp": 1.5,
+    "atk": 1.3,
+    "def": 1.2
+   },
+   "reward": {
+    "coins": 110,
+    "items": {
+     "equipment_shard": 6
+    }
+   },
+   "requires_previous": true,
+   "drops": [
+    {
+     "type": "equipment",
+     "id": "gafas_mob",
+     "chance": 0.2
+    }
+   ]
+  },
+  {
+   "id": "hard",
+   "name": "Dificil",
+   "order": 3,
+   "enemies": [
+    "torre_guardian",
+    "torre_verdugo"
+   ],
+   "scale": {
+    "hp": 2.4,
+    "atk": 1.7,
+    "def": 1.5
+   },
+   "reward": {
+    "coins": 220,
+    "items": {
+     "equipment_shard": 12
+    }
+   },
+   "requires_previous": true,
+   "drops": [
+    {
+     "type": "equipment",
+     "id": "escudo_legendario",
+     "chance": 0.15
+    }
+   ]
+  },
+  {
+   "id": "extreme",
+   "name": "Extremo",
+   "order": 4,
+   "enemies": [
+    "torre_verdugo",
+    "torre_avatar"
+   ],
+   "scale": {
+    "hp": 3.6,
+    "atk": 2.2,
+    "def": 2.0
+   },
+   "reward": {
+    "coins": 400,
+    "items": {
+     "equipment_shard": 25
+    }
+   },
+   "requires_previous": true,
+   "drops": [
+    {
+     "type": "equipment",
+     "id": "armadura_saiyan",
+     "chance": 0.2
+    }
+   ]
+  }
+ ]
+}

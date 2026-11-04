@@ -1,0 +1,180 @@
+{
+ "id": "raid_geto",
+ "based_on": "geto",
+ "name": "Geto, el Manipulador",
+ "title": "Incursion semanal",
+ "boss": true,
+ "_note": "Jefe de incursion (X.3): identidad del personaje base, vida enorme y 4 fases (75/50/25%) que anaden habilidades nuevas.",
+ "stats": {
+  "max_hp": 38000,
+  "atk": 255,
+  "def": 135,
+  "speed": 150,
+  "crit_rate": 0.1,
+  "dodge_rate": 0.04
+ },
+ "passive": {
+  "id": "pas_raid_geto",
+  "name": "Presencia de jefe de incursion",
+  "description": "Se vuelve mas fuerte cuando el combate se alarga: desde la ronda 6 sube un 20% su ataque.",
+  "trigger": "turn_start",
+  "condition": {
+   "type": "round_at_least",
+   "value": 6
+  },
+  "effects": [
+   {
+    "type": "stat_mod",
+    "target": "self",
+    "stat": "atk",
+    "kind": "mult",
+    "value": 0.2,
+    "turns": 1
+   }
+  ]
+ },
+ "intro": {
+  "title": "Geto, el Manipulador",
+  "subtitle": "Incursion semanal",
+  "tagline": "Una incursion no se gana de un golpe.",
+  "color": "#3b6fe0"
+ },
+ "phases": [
+  {
+   "id": "raid_geto_p2",
+   "name": "Primera ira",
+   "when": {
+    "type": "hp_below",
+    "value": 0.75
+   },
+   "banner": "PRIMERA IRA",
+   "color": "#3b6fe0",
+   "effects": [
+    {
+     "type": "stat_mod",
+     "target": "self",
+     "stat": "atk",
+     "kind": "mult",
+     "value": 0.1,
+     "turns": 0
+    }
+   ],
+   "pattern": [
+    "basic",
+    "special",
+    "basic"
+   ],
+   "unlock_skills": [
+    {
+     "id": "sk_raid_geto_01",
+     "name": "Desfile de mil espiritus",
+     "kind": "special",
+     "power": 145,
+     "cost": 3,
+     "target": "enemy_all",
+     "description": "Su horda embiste a todos y baja su velocidad un 15% (2 turnos).",
+     "effects": [
+      {
+       "type": "stat_mod",
+       "target": "enemy_all",
+       "stat": "speed",
+       "kind": "mult",
+       "value": -0.15,
+       "turns": 2
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "raid_geto_p3",
+   "name": "Segunda ira",
+   "when": {
+    "type": "hp_below",
+    "value": 0.5
+   },
+   "banner": "SEGUNDA IRA",
+   "color": "#3b6fe0",
+   "effects": [
+    {
+     "type": "stat_mod",
+     "target": "self",
+     "stat": "atk",
+     "kind": "mult",
+     "value": 0.15,
+     "turns": 0
+    },
+    {
+     "type": "shield",
+     "target": "self",
+     "amount": 900,
+     "turns": 3
+    }
+   ],
+   "pattern": [
+    "special",
+    "basic",
+    "special"
+   ],
+   "unlock_skills": [
+    {
+     "id": "sk_raid_geto_02",
+     "name": "Maldicion absorbida",
+     "kind": "special",
+     "power": 170,
+     "cost": 3,
+     "target": "enemy",
+     "description": "Golpe devastador sobre un rival; le baja la defensa un 25% (2 turnos).",
+     "effects": [
+      {
+       "type": "stat_mod",
+       "target": "enemy",
+       "stat": "def",
+       "kind": "mult",
+       "value": -0.25,
+       "turns": 2
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "raid_geto_p4",
+   "name": "Furia final",
+   "when": {
+    "type": "hp_below",
+    "value": 0.25
+   },
+   "banner": "FURIA FINAL",
+   "color": "#ff4d6d",
+   "effects": [
+    {
+     "type": "stat_mod",
+     "target": "self",
+     "stat": "atk",
+     "kind": "mult",
+     "value": 0.25,
+     "turns": 0
+    }
+   ],
+   "pattern": [
+    "special",
+    "special",
+    "basic"
+   ],
+   "unlock_skills": [
+    {
+     "id": "sk_raid_geto_03",
+     "name": "Uzumaki",
+     "kind": "special",
+     "power": 205,
+     "cost": 3,
+     "target": "enemy_all",
+     "description": "Una espiral de maldiciones sobre todo el equipo.",
+     "effects": []
+    }
+   ],
+   "heal_ratio": 0.03
+  }
+ ]
+}

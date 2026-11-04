@@ -1,0 +1,84 @@
+{
+ "id": "dng_coins",
+ "name": "Camara del tesoro",
+ "description": "Mazmorra de MONEDAS: la mejor fuente de monedas del juego.",
+ "order": 2,
+ "focus": "coins",
+ "background": "battle",
+ "difficulties": [
+  {
+   "id": "easy",
+   "name": "Facil",
+   "order": 1,
+   "enemies": [
+    "vigia_alfa",
+    "vigia_beta"
+   ],
+   "scale": {
+    "hp": 1.0,
+    "atk": 1.0,
+    "def": 1.0
+   },
+   "reward": {
+    "coins": 400
+   },
+   "requires_previous": false
+  },
+  {
+   "id": "normal",
+   "name": "Normal",
+   "order": 2,
+   "enemies": [
+    "torre_guardian",
+    "vigia_alfa"
+   ],
+   "scale": {
+    "hp": 1.5,
+    "atk": 1.3,
+    "def": 1.2
+   },
+   "reward": {
+    "coins": 1000
+   },
+   "requires_previous": true
+  },
+  {
+   "id": "hard",
+   "name": "Dificil",
+   "order": 3,
+   "enemies": [
+    "torre_guardian",
+    "torre_verdugo"
+   ],
+   "scale": {
+    "hp": 2.4,
+    "atk": 1.7,
+    "def": 1.5
+   },
+   "reward": {
+    "coins": 2200,
+    "materials": 2
+   },
+   "requires_previous": true
+  },
+  {
+   "id": "extreme",
+   "name": "Extremo",
+   "order": 4,
+   "enemies": [
+    "torre_verdugo",
+    "torre_avatar"
+   ],
+   "scale": {
+    "hp": 3.6,
+    "atk": 2.2,
+    "def": 2.0
+   },
+   "reward": {
+    "coins": 4500,
+    "materials": 4
+   },
+   "requires_previous": true
+  }
+ ]
+}

@@ -1,0 +1,103 @@
+{
+ "id": "raid_sukuna",
+ "name": "Incursion: Sukuna",
+ "description": "El Rey de las Maldiciones vuelve a levantarse. 4 fases, mas habilidades en cada una. Cuenta el dano que le hagas en 10 rondas.",
+ "order": 1,
+ "enemy": "raid_sukuna",
+ "rounds": 10,
+ "background": "battle",
+ "tiers": [
+  {
+   "damage": 2500,
+   "reward": {
+    "coins": 400
+   }
+  },
+  {
+   "damage": 6000,
+   "reward": {
+    "coins": 800,
+    "materials": 3
+   }
+  },
+  {
+   "damage": 12000,
+   "reward": {
+    "coins": 1200,
+    "items": {
+     "evo_ember": 1
+    }
+   }
+  },
+  {
+   "damage": 20000,
+   "reward": {
+    "coins": 1600,
+    "gems": 15,
+    "items": {
+     "equipment_shard": 10
+    }
+   }
+  },
+  {
+   "damage": 30000,
+   "reward": {
+    "coins": 2400,
+    "gems": 40
+   }
+  }
+ ],
+ "objectives": [
+  {
+   "id": "phase2",
+   "type": "phase_at_least",
+   "value": 2,
+   "text": "Llega a la fase 2 del jefe",
+   "reward": {
+    "coins": 500
+   }
+  },
+  {
+   "id": "phase4",
+   "type": "phase_at_least",
+   "value": 4,
+   "text": "Llega a la fase final del jefe",
+   "reward": {
+    "coins": 1500,
+    "gems": 10
+   }
+  },
+  {
+   "id": "nofall",
+   "type": "no_fallen",
+   "value": 0,
+   "text": "Termina sin ninguna baja",
+   "reward": {
+    "coins": 800,
+    "materials": 5
+   }
+  },
+  {
+   "id": "crits",
+   "type": "crits_at_least",
+   "value": 8,
+   "text": "Consigue 8 golpes criticos",
+   "reward": {
+    "coins": 600
+   }
+  },
+  {
+   "id": "kill",
+   "type": "boss_defeated",
+   "value": 1,
+   "text": "Derrota al jefe",
+   "reward": {
+    "coins": 5000,
+    "gems": 60,
+    "items": {
+     "evo_core": 1
+    }
+   }
+  }
+ ]
+}

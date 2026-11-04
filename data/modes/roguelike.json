@@ -1,0 +1,714 @@
+{
+ "id": "roguelike",
+ "name": "Modo roguelike",
+ "description": "Elige un equipo y lucha combates seguidos. Tras cada victoria eliges 1 de 3 mejoras aleatorias que duran SOLO esa partida.",
+ "team_size": 4,
+ "choices": 3,
+ "rarity_weights": {
+  "common": 60,
+  "rare": 30,
+  "epic": 10
+ },
+ "boss_every": 5,
+ "max_depth": 30,
+ "base_rest_heal": 0.15,
+ "scaling": {
+  "hp_per_depth": 0.12,
+  "atk_per_depth": 0.08,
+  "def_per_depth": 0.06
+ },
+ "enemy_count": {
+  "base": 1,
+  "per_depths": 3,
+  "max": 3
+ },
+ "enemy_pool": [
+  "vigia_alfa",
+  "vigia_beta",
+  "torre_guardian",
+  "torre_verdugo",
+  "torre_avatar"
+ ],
+ "boss_pool": [
+  "void_warden",
+  "sdp_todo",
+  "sdp_mahito",
+  "sdp_akaza",
+  "boss_sakuta"
+ ],
+ "background": "battle",
+ "rewards": {
+  "per_depth": {
+   "coins": 45
+  },
+  "milestones": [
+   {
+    "depth": 5,
+    "reward": {
+     "coins": 400,
+     "materials": 3
+    }
+   },
+   {
+    "depth": 10,
+    "reward": {
+     "coins": 900,
+     "gems": 20,
+     "items": {
+      "evo_ember": 1
+     }
+    }
+   },
+   {
+    "depth": 15,
+    "reward": {
+     "coins": 1600,
+     "gems": 30,
+     "items": {
+      "equipment_shard": 15
+     }
+    }
+   },
+   {
+    "depth": 20,
+    "reward": {
+     "coins": 2600,
+     "gems": 50,
+     "items": {
+      "evo_core": 1
+     }
+    }
+   },
+   {
+    "depth": 30,
+    "reward": {
+     "coins": 6000,
+     "gems": 120
+    }
+   }
+  ]
+ },
+ "boons": [
+  {
+   "id": "vigor",
+   "name": "Vigor",
+   "description": "VIDA MAX +12% a todo el equipo (acumulable).",
+   "category": "stats",
+   "rarity": "common",
+   "max_stacks": 5,
+   "rules": [
+    {
+     "id": "base",
+     "name": "Mejora",
+     "trigger": "static",
+     "effects": [
+      {
+       "type": "stat_mod",
+       "target": "self",
+       "stat": "max_hp",
+       "kind": "mult",
+       "value": 0.12,
+       "turns": 0
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "filo",
+   "name": "Filo afilado",
+   "description": "ATAQUE +10% a todo el equipo (acumulable).",
+   "category": "stats",
+   "rarity": "common",
+   "max_stacks": 5,
+   "rules": [
+    {
+     "id": "base",
+     "name": "Mejora",
+     "trigger": "static",
+     "effects": [
+      {
+       "type": "stat_mod",
+       "target": "self",
+       "stat": "atk",
+       "kind": "mult",
+       "value": 0.1,
+       "turns": 0
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "coraza",
+   "name": "Coraza",
+   "description": "DEFENSA +12% a todo el equipo (acumulable).",
+   "category": "stats",
+   "rarity": "common",
+   "max_stacks": 5,
+   "rules": [
+    {
+     "id": "base",
+     "name": "Mejora",
+     "trigger": "static",
+     "effects": [
+      {
+       "type": "stat_mod",
+       "target": "self",
+       "stat": "def",
+       "kind": "mult",
+       "value": 0.12,
+       "turns": 0
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "celeridad",
+   "name": "Celeridad",
+   "description": "VELOCIDAD +8% a todo el equipo.",
+   "category": "stats",
+   "rarity": "common",
+   "max_stacks": 4,
+   "rules": [
+    {
+     "id": "base",
+     "name": "Mejora",
+     "trigger": "static",
+     "effects": [
+      {
+       "type": "stat_mod",
+       "target": "self",
+       "stat": "speed",
+       "kind": "mult",
+       "value": 0.08,
+       "turns": 0
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "reflejos",
+   "name": "Reflejos",
+   "description": "Esquiva +4% a todo el equipo.",
+   "category": "stats",
+   "rarity": "rare",
+   "max_stacks": 4,
+   "rules": [
+    {
+     "id": "base",
+     "name": "Mejora",
+     "trigger": "static",
+     "effects": [
+      {
+       "type": "stat_mod",
+       "target": "self",
+       "stat": "dodge_rate",
+       "kind": "flat",
+       "value": 0.04,
+       "turns": 0
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "ojo_halcon",
+   "name": "Ojo de halcon",
+   "description": "Probabilidad critica +6%.",
+   "category": "crit",
+   "rarity": "common",
+   "max_stacks": 5,
+   "rules": [
+    {
+     "id": "base",
+     "name": "Mejora",
+     "trigger": "static",
+     "effects": [
+      {
+       "type": "stat_mod",
+       "target": "self",
+       "stat": "crit_rate",
+       "kind": "flat",
+       "value": 0.06,
+       "turns": 0
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "golpe_devastador",
+   "name": "Golpe devastador",
+   "description": "Dano critico +20%.",
+   "category": "crit",
+   "rarity": "rare",
+   "max_stacks": 4,
+   "rules": [
+    {
+     "id": "base",
+     "name": "Mejora",
+     "trigger": "static",
+     "effects": [
+      {
+       "type": "stat_mod",
+       "target": "self",
+       "stat": "crit_dmg",
+       "kind": "flat",
+       "value": 0.2,
+       "turns": 0
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "sed_sangre",
+   "name": "Sed de sangre",
+   "description": "Al asestar un critico gana 1 SP.",
+   "category": "crit",
+   "rarity": "rare",
+   "max_stacks": 3,
+   "rules": [
+    {
+     "id": "sed",
+     "name": "Sed de sangre",
+     "trigger": "on_crit",
+     "chance": 1.0,
+     "effects": [
+      {
+       "type": "sp_gain",
+       "target": "self",
+       "amount": 1
+      }
+     ]
+    }
+   ],
+   "scale_keys": [
+    "amount"
+   ]
+  },
+  {
+   "id": "regeneracion",
+   "name": "Regeneracion",
+   "description": "Al empezar su turno recupera un 3% de su vida maxima.",
+   "category": "heal",
+   "rarity": "common",
+   "max_stacks": 4,
+   "rules": [
+    {
+     "id": "regen",
+     "name": "Regeneracion",
+     "trigger": "turn_start",
+     "chance": 1.0,
+     "effects": [
+      {
+       "type": "heal",
+       "target": "self",
+       "of": "max_hp",
+       "amount": 0.03
+      }
+     ]
+    }
+   ],
+   "scale_keys": [
+    "amount"
+   ]
+  },
+  {
+   "id": "vampirismo",
+   "name": "Vampirismo",
+   "description": "Robo de vida +5%.",
+   "category": "heal",
+   "rarity": "rare",
+   "max_stacks": 4,
+   "rules": [
+    {
+     "id": "base",
+     "name": "Mejora",
+     "trigger": "static",
+     "effects": [
+      {
+       "type": "stat_mod",
+       "target": "self",
+       "stat": "lifesteal",
+       "kind": "flat",
+       "value": 0.05,
+       "turns": 0
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "botiquin",
+   "name": "Botiquin",
+   "description": "Tras cada victoria el equipo recupera un 10% extra de vida.",
+   "category": "heal",
+   "rarity": "common",
+   "max_stacks": 5,
+   "rules": [],
+   "rest_heal": 0.1
+  },
+  {
+   "id": "orgullo_heroes",
+   "name": "Orgullo de heroes",
+   "description": "ATAQUE +18% a los personajes de la categoria Heroes.",
+   "category": "category",
+   "rarity": "rare",
+   "max_stacks": 4,
+   "rules": [
+    {
+     "id": "base",
+     "name": "Mejora",
+     "trigger": "static",
+     "effects": [
+      {
+       "type": "stat_mod",
+       "target": "self",
+       "stat": "atk",
+       "kind": "mult",
+       "value": 0.18,
+       "turns": 0
+      }
+     ]
+    }
+   ],
+   "requires_category": "heroes"
+  },
+  {
+   "id": "sangre_villano",
+   "name": "Sangre de villano",
+   "description": "ATAQUE +18% a los personajes de la categoria Villanos.",
+   "category": "category",
+   "rarity": "rare",
+   "max_stacks": 4,
+   "rules": [
+    {
+     "id": "base",
+     "name": "Mejora",
+     "trigger": "static",
+     "effects": [
+      {
+       "type": "stat_mod",
+       "target": "self",
+       "stat": "atk",
+       "kind": "mult",
+       "value": 0.18,
+       "turns": 0
+      }
+     ]
+    }
+   ],
+   "requires_category": "villains"
+  },
+  {
+   "id": "espiritu_shonen",
+   "name": "Espiritu shonen",
+   "description": "VIDA MAX +15% y ATAQUE +8% a los personajes Shonen.",
+   "category": "category",
+   "rarity": "rare",
+   "max_stacks": 3,
+   "rules": [
+    {
+     "id": "base",
+     "name": "Mejora",
+     "trigger": "static",
+     "effects": [
+      {
+       "type": "stat_mod",
+       "target": "self",
+       "stat": "max_hp",
+       "kind": "mult",
+       "value": 0.15,
+       "turns": 0
+      },
+      {
+       "type": "stat_mod",
+       "target": "self",
+       "stat": "atk",
+       "kind": "mult",
+       "value": 0.08,
+       "turns": 0
+      }
+     ]
+    }
+   ],
+   "requires_category": "shonen"
+  },
+  {
+   "id": "rivalidad",
+   "name": "Rivalidad",
+   "description": "VELOCIDAD +12% a los personajes de la categoria Rivales.",
+   "category": "category",
+   "rarity": "common",
+   "max_stacks": 3,
+   "rules": [
+    {
+     "id": "base",
+     "name": "Mejora",
+     "trigger": "static",
+     "effects": [
+      {
+       "type": "stat_mod",
+       "target": "self",
+       "stat": "speed",
+       "kind": "mult",
+       "value": 0.12,
+       "turns": 0
+      }
+     ]
+    }
+   ],
+   "requires_category": "rivals"
+  },
+  {
+   "id": "fuerza_sobrenatural",
+   "name": "Fuerza sobrenatural",
+   "description": "DEFENSA +15% a los personajes Sobrenaturales.",
+   "category": "category",
+   "rarity": "common",
+   "max_stacks": 3,
+   "rules": [
+    {
+     "id": "base",
+     "name": "Mejora",
+     "trigger": "static",
+     "effects": [
+      {
+       "type": "stat_mod",
+       "target": "self",
+       "stat": "def",
+       "kind": "mult",
+       "value": 0.15,
+       "turns": 0
+      }
+     ]
+    }
+   ],
+   "requires_category": "supernatural"
+  },
+  {
+   "id": "lazo_fuerte",
+   "name": "Lazo fuerte",
+   "description": "ATAQUE +7% por cada link activo del equipo.",
+   "category": "link",
+   "rarity": "rare",
+   "max_stacks": 4,
+   "rules": [
+    {
+     "id": "base",
+     "name": "Mejora",
+     "trigger": "static",
+     "effects": [
+      {
+       "type": "stat_mod",
+       "target": "self",
+       "stat": "atk",
+       "kind": "mult",
+       "value": 0.07,
+       "turns": 0
+      }
+     ]
+    }
+   ],
+   "requires_links": true,
+   "per_link": true
+  },
+  {
+   "id": "coro_de_lazos",
+   "name": "Coro de lazos",
+   "description": "VIDA MAX +9% por cada link activo del equipo.",
+   "category": "link",
+   "rarity": "rare",
+   "max_stacks": 4,
+   "rules": [
+    {
+     "id": "base",
+     "name": "Mejora",
+     "trigger": "static",
+     "effects": [
+      {
+       "type": "stat_mod",
+       "target": "self",
+       "stat": "max_hp",
+       "kind": "mult",
+       "value": 0.09,
+       "turns": 0
+      }
+     ]
+    }
+   ],
+   "requires_links": true,
+   "per_link": true
+  },
+  {
+   "id": "furia",
+   "name": "Furia",
+   "description": "Al bajar del 35% de vida: ATAQUE +30% durante 3 turnos (una vez por combate).",
+   "category": "special",
+   "rarity": "epic",
+   "max_stacks": 3,
+   "rules": [
+    {
+     "id": "furia",
+     "name": "Furia",
+     "trigger": "low_hp",
+     "chance": 1.0,
+     "once": true,
+     "threshold": 0.35,
+     "effects": [
+      {
+       "type": "stat_mod",
+       "target": "self",
+       "stat": "atk",
+       "kind": "mult",
+       "value": 0.3,
+       "turns": 3
+      }
+     ]
+    }
+   ],
+   "scale_keys": [
+    "value"
+   ]
+  },
+  {
+   "id": "ultimo_aliento",
+   "name": "Ultimo aliento",
+   "description": "Sobrevive a un golpe mortal con el 15% de vida (una vez por combate).",
+   "category": "special",
+   "rarity": "epic",
+   "max_stacks": 2,
+   "rules": [
+    {
+     "id": "aliento",
+     "name": "Ultimo aliento",
+     "trigger": "battle_start",
+     "chance": 1.0,
+     "effects": [
+      {
+       "type": "undying",
+       "target": "self",
+       "charges": 1,
+       "heal": 0.15
+      }
+     ]
+    }
+   ],
+   "scale_keys": [
+    "charges"
+   ]
+  },
+  {
+   "id": "venganza",
+   "name": "Venganza",
+   "description": "Cuando cae un aliado: ATAQUE +25% durante 3 turnos.",
+   "category": "special",
+   "rarity": "epic",
+   "max_stacks": 3,
+   "rules": [
+    {
+     "id": "venganza",
+     "name": "Venganza",
+     "trigger": "on_ally_down",
+     "chance": 1.0,
+     "effects": [
+      {
+       "type": "stat_mod",
+       "target": "self",
+       "stat": "atk",
+       "kind": "mult",
+       "value": 0.25,
+       "turns": 3
+      }
+     ]
+    }
+   ],
+   "scale_keys": [
+    "value"
+   ]
+  },
+  {
+   "id": "escudo_inicial",
+   "name": "Escudo inicial",
+   "description": "Empieza cada combate con un escudo del 15% de su vida maxima.",
+   "category": "special",
+   "rarity": "rare",
+   "max_stacks": 4,
+   "rules": [
+    {
+     "id": "escudo",
+     "name": "Escudo inicial",
+     "trigger": "battle_start",
+     "chance": 1.0,
+     "effects": [
+      {
+       "type": "shield",
+       "target": "self",
+       "of": "max_hp",
+       "amount": 0.15,
+       "turns": 3
+      }
+     ]
+    }
+   ],
+   "scale_keys": [
+    "amount"
+   ]
+  },
+  {
+   "id": "carga_inicial",
+   "name": "Carga inicial",
+   "description": "Empieza cada combate con 2 SP extra.",
+   "category": "special",
+   "rarity": "rare",
+   "max_stacks": 3,
+   "rules": [
+    {
+     "id": "carga",
+     "name": "Carga inicial",
+     "trigger": "battle_start",
+     "chance": 1.0,
+     "effects": [
+      {
+       "type": "sp_gain",
+       "target": "self",
+       "amount": 2
+      }
+     ]
+    }
+   ],
+   "scale_keys": [
+    "amount"
+   ]
+  },
+  {
+   "id": "perforacion",
+   "name": "Perforacion",
+   "description": "Ignora un 8% de la defensa rival.",
+   "category": "stats",
+   "rarity": "rare",
+   "max_stacks": 4,
+   "rules": [
+    {
+     "id": "base",
+     "name": "Mejora",
+     "trigger": "static",
+     "effects": [
+      {
+       "type": "stat_mod",
+       "target": "self",
+       "stat": "pierce",
+       "kind": "flat",
+       "value": 0.08,
+       "turns": 0
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,11 @@
+{
+ "id": "equipment_shard",
+ "name": "Fragmento de armeria",
+ "description": "Esquirlas de objetos equipables. Se consiguen en las mazmorras de equipo; 50 fragmentos pagan una tirada en la Armeria.",
+ "type": "material",
+ "kind": "resource",
+ "icon": "res://art/items/equipment_shard.png",
+ "rarity": "R",
+ "usable": false,
+ "obtained_from": "Mazmorras de materiales (Forja de la Armeria)"
+}

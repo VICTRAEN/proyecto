@@ -29,6 +29,10 @@ const COSMETICS_DIR := "res://data/cosmetics"
 ## X.2: objetos equipables y sus banners (un JSON por objeto / banner).
 const EQUIPMENT_DIR := "res://data/equipment"
 const EQUIPMENT_BANNERS_DIR := "res://data/equipment_banners"
+## X.3: modos de juego (incursiones, mazmorras y configuracion de Boss Rush / roguelike / entrenamiento).
+const RAIDS_DIR := "res://data/raids"
+const DUNGEONS_DIR := "res://data/dungeons"
+const MODES_DIR := "res://data/modes"
 const ACCOUNT_FILE := "res://data/account/levels.json"
 ## v16: calendario de la rotacion diaria de banners (un unico archivo de configuracion).
 const ROTATION_FILE := "res://data/rotation.json"
@@ -85,6 +89,9 @@ var collections: Dictionary = {}
 var cosmetics: Dictionary = {}
 var equipment: Dictionary = {}
 var equipment_banners: Dictionary = {}
+var raids: Dictionary = {}
+var dungeons: Dictionary = {}
+var modes_config: Dictionary = {}
 var account_levels: Dictionary = {}
 var rotation: Dictionary = {}
 var load_errors: Array = []
@@ -114,6 +121,9 @@ func load_all() -> void:
 	cosmetics = _load_dir(COSMETICS_DIR)
 	equipment = _load_dir(EQUIPMENT_DIR)
 	equipment_banners = _load_dir(EQUIPMENT_BANNERS_DIR)
+	raids = _load_dir(RAIDS_DIR)
+	dungeons = _load_dir(DUNGEONS_DIR)
+	modes_config = _load_dir(MODES_DIR)
 	account_levels = _load_account_levels()
 	rotation = _load_rotation()
 	mutations_config = _load_mutations()
@@ -334,6 +344,31 @@ func get_equipment(id: String) -> Dictionary:
 ## Todos los objetos equipables, ordenados por id.
 func all_equipment() -> Array:
 	return _all_sorted(equipment)
+
+
+## X.3: contenido de los modos. Anadir una incursion o una mazmorra es soltar un JSON.
+func all_raids() -> Array:
+	var out: Array = _all_sorted(raids)
+	out.sort_custom(func(a, b): return [int(a.get("order", 99)), String(a["id"])] < [int(b.get("order", 99)), String(b["id"])])
+	return out
+
+
+func get_raid(id: String) -> Dictionary:
+	return raids.get(String(id), {})
+
+
+func all_dungeons() -> Array:
+	var out: Array = _all_sorted(dungeons)
+	out.sort_custom(func(a, b): return [int(a.get("order", 99)), String(a["id"])] < [int(b.get("order", 99)), String(b["id"])])
+	return out
+
+
+func get_dungeon(id: String) -> Dictionary:
+	return dungeons.get(String(id), {})
+
+
+func mode_config(id: String) -> Dictionary:
+	return modes_config.get(String(id), {})
 
 
 func get_equipment_banner(id: String) -> Dictionary:

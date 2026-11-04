@@ -17,5 +17,6 @@
   "LR": 0.01
  },
  "featured": [],
- "featured_rates": {}
+ "featured_rates": {},
+ "shard_cost": 50
 }

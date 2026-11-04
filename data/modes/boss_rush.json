@@ -1,0 +1,144 @@
+{
+ "id": "boss_rush",
+ "name": "Boss Rush",
+ "description": "Una cadena de jefes seguidos. Tu equipo NO se cura del todo entre combates y los caidos no vuelven. Cuantos mas jefes derrotes, mas recompensa.",
+ "background": "battle",
+ "bosses": [
+  "void_warden",
+  "torre_verdugo",
+  "sdp_todo",
+  "sdp_mahito",
+  "sdp_akaza",
+  "torre_avatar",
+  "boss_sakuta"
+ ],
+ "boss_scale_per_index": {
+  "hp": 0.1,
+  "atk": 0.06,
+  "def": 0.05
+ },
+ "difficulties": [
+  {
+   "id": "normal",
+   "name": "Normal",
+   "order": 1,
+   "scale": {
+    "hp": 1.0,
+    "atk": 1.0,
+    "def": 1.0
+   },
+   "recovery": 0.15,
+   "per_boss": {
+    "coins": 250
+   },
+   "milestones": [
+    {
+     "bosses": 3,
+     "reward": {
+      "coins": 800,
+      "materials": 3
+     }
+    },
+    {
+     "bosses": 5,
+     "reward": {
+      "coins": 1500,
+      "gems": 15
+     }
+    },
+    {
+     "bosses": 7,
+     "reward": {
+      "coins": 3000,
+      "gems": 40,
+      "items": {
+       "evo_ember": 2
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "hard",
+   "name": "Dificil",
+   "order": 2,
+   "scale": {
+    "hp": 1.6,
+    "atk": 1.3,
+    "def": 1.25
+   },
+   "recovery": 0.08,
+   "requires_clear": "normal",
+   "per_boss": {
+    "coins": 450
+   },
+   "milestones": [
+    {
+     "bosses": 3,
+     "reward": {
+      "coins": 1400,
+      "materials": 5
+     }
+    },
+    {
+     "bosses": 5,
+     "reward": {
+      "coins": 2600,
+      "gems": 30
+     }
+    },
+    {
+     "bosses": 7,
+     "reward": {
+      "coins": 5500,
+      "gems": 80,
+      "items": {
+       "evo_core": 1
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "extreme",
+   "name": "Extremo",
+   "order": 3,
+   "scale": {
+    "hp": 2.4,
+    "atk": 1.7,
+    "def": 1.6
+   },
+   "recovery": 0.0,
+   "requires_clear": "hard",
+   "per_boss": {
+    "coins": 800
+   },
+   "milestones": [
+    {
+     "bosses": 3,
+     "reward": {
+      "coins": 2600,
+      "gems": 15
+     }
+    },
+    {
+     "bosses": 5,
+     "reward": {
+      "coins": 5000,
+      "gems": 60
+     }
+    },
+    {
+     "bosses": 7,
+     "reward": {
+      "coins": 10000,
+      "gems": 160,
+      "items": {
+       "evo_core": 2
+      }
+     }
+    }
+   ]
+  }
+ ]
+}
