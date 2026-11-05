@@ -1,0 +1,187 @@
+{
+ "id": "world_005",
+ "name": "LAS QUINTILLIZAS",
+ "genre": "Romance",
+ "description": "Cinco hermanas, un tutor y un examen que no perdona. Miku, Nino e Itsuki cruzan el umbral con los libros bajo el brazo.",
+ "background": "stages",
+ "position": {
+  "x": 0.3,
+  "y": 0.8
+ },
+ "unlock": {
+  "requires_world": "world_004",
+  "requires_levels_completed": 4
+ },
+ "levels": [
+  {
+   "id": "world_005_01",
+   "name": "Un tutor para cinco",
+   "position": {
+    "x": 0.2,
+    "y": 0.16
+   },
+   "next": "world_005_02",
+   "background": "battle_plain",
+   "dialogue": "dlg_world_005_001",
+   "difficulties": {
+    "normal": {
+     "order": 0,
+     "name": "NORMAL",
+     "enemies": [
+      "vigia_alfa"
+     ],
+     "xp_reward": 440,
+     "coin_reward": 175
+    },
+    "hard": {
+     "order": 1,
+     "name": "DIFICIL",
+     "enemies": [
+      "vigia_alfa",
+      "vigia_beta"
+     ],
+     "xp_reward": 660,
+     "coin_reward": 270
+    },
+    "extreme": {
+     "order": 2,
+     "name": "EXTREMO",
+     "enemies": [
+      "vigia_beta",
+      "torre_guardian"
+     ],
+     "xp_reward": 1020,
+     "coin_reward": 430
+    }
+   }
+  },
+  {
+   "id": "world_005_02",
+   "name": "El examen sorpresa",
+   "position": {
+    "x": 0.5,
+    "y": 0.3
+   },
+   "next": "world_005_03",
+   "background": "battle_plain",
+   "dialogue": "",
+   "difficulties": {
+    "normal": {
+     "order": 0,
+     "name": "NORMAL",
+     "enemies": [
+      "story_miku"
+     ],
+     "xp_reward": 490,
+     "coin_reward": 195
+    },
+    "hard": {
+     "order": 1,
+     "name": "DIFICIL",
+     "enemies": [
+      "story_miku",
+      "vigia_alfa"
+     ],
+     "xp_reward": 720,
+     "coin_reward": 300
+    },
+    "extreme": {
+     "order": 2,
+     "name": "EXTREMO",
+     "enemies": [
+      "story_miku",
+      "torre_guardian"
+     ],
+     "xp_reward": 1100,
+     "coin_reward": 470
+    }
+   }
+  },
+  {
+   "id": "world_005_03",
+   "name": "Rivalidad en la cocina",
+   "position": {
+    "x": 0.74,
+    "y": 0.46
+   },
+   "next": "world_005_04",
+   "background": "battle_plain",
+   "dialogue": "",
+   "difficulties": {
+    "normal": {
+     "order": 0,
+     "name": "NORMAL",
+     "enemies": [
+      "story_nino"
+     ],
+     "xp_reward": 550,
+     "coin_reward": 215
+    },
+    "hard": {
+     "order": 1,
+     "name": "DIFICIL",
+     "enemies": [
+      "story_nino",
+      "story_miku"
+     ],
+     "xp_reward": 800,
+     "coin_reward": 330
+    },
+    "extreme": {
+     "order": 2,
+     "name": "EXTREMO",
+     "enemies": [
+      "story_nino",
+      "story_miku",
+      "vigia_alfa"
+     ],
+     "xp_reward": 1200,
+     "coin_reward": 510
+    }
+   }
+  },
+  {
+   "id": "world_005_04",
+   "name": "El apetito de Itsuki",
+   "position": {
+    "x": 0.4,
+    "y": 0.66
+   },
+   "next": "",
+   "background": "battle_plain",
+   "dialogue": "",
+   "difficulties": {
+    "normal": {
+     "order": 0,
+     "name": "NORMAL",
+     "enemies": [
+      "story_itsuki"
+     ],
+     "xp_reward": 660,
+     "coin_reward": 265
+    },
+    "hard": {
+     "order": 1,
+     "name": "DIFICIL",
+     "enemies": [
+      "story_itsuki",
+      "story_nino"
+     ],
+     "xp_reward": 960,
+     "coin_reward": 400
+    },
+    "extreme": {
+     "order": 2,
+     "name": "EXTREMO",
+     "enemies": [
+      "story_itsuki",
+      "story_nino",
+      "story_miku"
+     ],
+     "xp_reward": 1480,
+     "coin_reward": 640
+    }
+   }
+  }
+ ]
+}

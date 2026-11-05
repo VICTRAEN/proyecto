@@ -1,0 +1,26 @@
+{
+ "id": "dlg_world_005_001",
+ "name": "Un tutor para cinco",
+ "skippable": true,
+ "skip_label": "SALTAR",
+ "lines": [
+  {
+   "speaker": "Itsuki",
+   "portrait": "itsuki",
+   "text": "Si aprobamos el examen, hay cena. Esa es mi unica motivacion y es suficiente.",
+   "background": "battle_plain"
+  },
+  {
+   "speaker": "Nino",
+   "portrait": "nino",
+   "text": "No me mires asi, tutor: yo solo cocino para los que se lo merecen.",
+   "background": "battle_plain"
+  },
+  {
+   "speaker": "Miku",
+   "portrait": "miku",
+   "text": "Yo... lo intentare. Prometo no esconderme detras del libro esta vez.",
+   "background": "battle_plain"
+  }
+ ]
+}

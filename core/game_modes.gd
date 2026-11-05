@@ -684,7 +684,7 @@ func rogue_start_run(team: Array) -> Dictionary:
 	var hp := {}
 	for id in ids:
 		hp[id] = 1.0
-	rogue_run = { "team": ids, "hp": hp, "dead": [], "depth": 0, "boons": {}, "seed": rng.randi(), "phase": "fight", "choices": [], "rounds": 0 }
+	rogue_run = { "team": ids, "hp": hp, "dead": [], "depth": 0, "boons": {}, "items": {}, "seed": rng.randi(), "phase": "fight", "choices": [], "rounds": 0 }
 	var rec := rogue_record()
 	rec["runs"] = int(rec["runs"]) + 1
 	rogue_best = rec
@@ -769,20 +769,54 @@ func rogue_generate_choices(depth: int) -> Array:
 	var r := _rogue_rng(depth, 53)
 	var picks: Array = []
 	var want := int(cfg.get("choices", 3))
-	while picks.size() < want and not pool.is_empty():
-		var total := 0.0
-		for b in pool:
-			total += float(weights.get(String(b.get("rarity", "common")), 10))
-		var x := r.randf() * total
-		var chosen := 0
-		for i in pool.size():
-			x -= float(weights.get(String((pool[i] as Dictionary).get("rarity", "common")), 10))
-			if x <= 0.0:
-				chosen = i
+	var item_cfg: Dictionary = cfg.get("item_choices", {})
+	var item_chance := float(item_cfg.get("chance", 0.0))
+	var item_pool := _rogue_item_pool()
+	while picks.size() < want:
+		var made := false
+		# Un objeto equipable (temporal) en lugar de una mejora.
+		if item_chance > 0.0 and not item_pool.is_empty() and r.randf() < item_chance:
+			var iw: Dictionary = item_cfg.get("rarity_weights", {})
+			var total_i := 0.0
+			for id in item_pool:
+				total_i += float(iw.get(String((DB.equipment[id] as Dictionary).get("rarity", "N")), 10))
+			var xi := r.randf() * total_i
+			var ci := 0
+			for k in item_pool.size():
+				xi -= float(iw.get(String((DB.equipment[item_pool[k]] as Dictionary).get("rarity", "N")), 10))
+				if xi <= 0.0:
+					ci = k
+					break
+			picks.append("item:%s" % String(item_pool[ci]))
+			item_pool.remove_at(ci)
+			made = true
+		if not made:
+			if pool.is_empty():
 				break
-		picks.append(String((pool[chosen] as Dictionary)["id"]))
-		pool.remove_at(chosen)
+			var total := 0.0
+			for b in pool:
+				total += float(weights.get(String(b.get("rarity", "common")), 10))
+			var x := r.randf() * total
+			var chosen := 0
+			for i in pool.size():
+				x -= float(weights.get(String((pool[i] as Dictionary).get("rarity", "common")), 10))
+				if x <= 0.0:
+					chosen = i
+					break
+			picks.append(String((pool[chosen] as Dictionary)["id"]))
+			pool.remove_at(chosen)
 	return picks
+
+
+## Objetos equipables que aun pueden ofrecerse (los que la partida ya lleva no se repiten).
+func _rogue_item_pool() -> Array:
+	var held: Array = (rogue_run.get("items", {}) as Dictionary).values()
+	var out: Array = []
+	for item in DB.all_equipment():
+		var id := String(item["id"])
+		if not held.has(id):
+			out.append(id)
+	return out
 
 
 func rogue_fight() -> bool:
@@ -798,13 +832,29 @@ func rogue_fight() -> bool:
 		"background": String(cfg.get("background", "battle")), "rounds": 0, "enemies": rogue_enemies_for(depth) }, alive)
 
 
-func rogue_pick(boon_id: String) -> Dictionary:
+func rogue_pick(choice_id: String, holder: String = "") -> Dictionary:
 	if not rogue_active() or String(rogue_run.get("phase", "")) != "choose":
 		return { "ok": false, "reason": "No hay mejora que elegir." }
-	if not (rogue_run.get("choices", []) as Array).has(boon_id):
+	if not (rogue_run.get("choices", []) as Array).has(choice_id):
 		return { "ok": false, "reason": "Esa mejora no estaba entre las ofrecidas." }
 	var boons: Dictionary = rogue_run["boons"]
-	boons[boon_id] = int(boons.get(boon_id, 0)) + 1
+	if choice_id.begins_with("item:"):
+		var item_id := choice_id.substr(5)
+		var alive := rogue_alive_team()
+		var target := holder
+		if target.is_empty():
+			# Sin portador indicado: el primero vivo que aun no lleva objeto de la partida.
+			for id in alive:
+				if not (rogue_run["items"] as Dictionary).has(String(id)):
+					target = String(id)
+					break
+			if target.is_empty() and not alive.is_empty():
+				target = String(alive[0])
+		if not alive.has(target):
+			return { "ok": false, "reason": "Ese personaje no puede llevarlo." }
+		(rogue_run["items"] as Dictionary)[target] = item_id
+	else:
+		boons[choice_id] = int(boons.get(choice_id, 0)) + 1
 	# Descanso entre combates: cura parcial a los vivos (base + Botiquin).
 	var heal := float(rogue_config().get("base_rest_heal", 0.0))
 	for key in boons:
@@ -826,6 +876,7 @@ func rogue_end_run() -> Dictionary:
 	if not rogue_active():
 		return report
 	var depth := int(rogue_run.get("depth", 0))
+	var held_items: Dictionary = (rogue_run.get("items", {}) as Dictionary).duplicate()
 	var rewards_cfg: Dictionary = rogue_config().get("rewards", {})
 	var lines := _lines(report)
 	var rec := rogue_record()
@@ -847,6 +898,8 @@ func rogue_end_run() -> Dictionary:
 				lines.append("Hito de profundidad %d: %s" % [n, Rewards.describe((m as Dictionary).get("reward", {}))])
 	else:
 		lines.append("Partida abandonada sin ganar ningun combate.")
+	if not held_items.is_empty():
+		lines.append("Los objetos de la partida se pierden al terminar (eran temporales).")
 	rogue_best = rec
 	rogue_run = {}
 	last_report = report.duplicate(true)
@@ -926,6 +979,17 @@ func start_training() -> bool:
 ## del catalogo, sin tocar lo que llevan puesto tus personajes); en el resto, el equipo real.
 func equipment_assignment(unit_ids: Array) -> Dictionary:
 	var assignment: Dictionary = gs.equipment.assignment_for(unit_ids)
+	if active_mode() == MODE_ROGUE:
+		# Objetos de la partida: SOLO en este combate, sustituyen al guardado y no tocan tu inventario.
+		var run_items: Dictionary = rogue_run.get("items", {})
+		for ch in run_items:
+			if not unit_ids.has(String(ch)):
+				continue
+			for other in assignment.keys():
+				if String(assignment[other]) == String(run_items[ch]):
+					assignment.erase(other)
+			assignment[String(ch)] = String(run_items[ch])
+		return assignment
 	if not is_sandbox():
 		return assignment
 	var loadout: Dictionary = training.get("loadout", {})

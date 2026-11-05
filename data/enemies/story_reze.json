@@ -1,0 +1,15 @@
+{
+ "id": "story_reze",
+ "based_on": "reze",
+ "name": "Reze, la chica bomba",
+ "title": "Capitulo Chainsaw Man",
+ "_note": "Enemigo de Historia (X.3b): identidad del personaje base con estadisticas propias.",
+ "stats": {
+  "max_hp": 4300,
+  "atk": 178,
+  "def": 100,
+  "speed": 126,
+  "crit_rate": 0.06,
+  "dodge_rate": 0.04
+ }
+}

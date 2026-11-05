@@ -55,6 +55,8 @@ func run(app: Node) -> void:
 	await _check_rush()
 	await _check_roguelike()
 	await _check_training()
+	await _check_rogue_items()
+	await _check_story_worlds()
 	_check_save_compat()
 	await _check_screens()
 	_app.call("_restore_save")
@@ -828,4 +830,151 @@ func _check_screens() -> void:
 	await _wait(0.1)
 	_check("al volver, el contexto de modo se limpia", GameState.battle_source != GameState.BATTLE_MODE)
 	_app.call("go_back")
+	GameState.reset_battle_context()
+
+
+## --- 8. Roguelike: objetos temporales -------------------------------------------------------------
+func _check_rogue_items() -> void:
+	_out("[DBG30] == ROGUELIKE: OBJETOS ==")
+	_fresh()
+	var m = GameState.modes
+	var ids: Array = GameState.party_ids().slice(0, 3)
+	var a := String(ids[0])
+	GameState.equipment.add("sombrero_paja", 1)
+	GameState.equipment.equip(a, "sombrero_paja")
+	var snap := _chars_snapshot()
+	m.rogue_start_run(ids)
+	var cfg: Dictionary = DB.mode_config("roguelike")
+	cfg["item_choices"]["chance"] = 1.0
+	var ch: Array = m.rogue_generate_choices(1)
+	_check("con probabilidad 1, las 3 opciones son objetos distintos", ch.size() == 3 and ch.all(func(c): return String(c).begins_with("item:")) and ch[0] != ch[1] and ch[1] != ch[2])
+	_check("los objetos ofrecidos existen en el catalogo de equipables", ch.all(func(c): return DB.equipment.has(String(c).substr(5))))
+	_check("las mismas opciones al regenerarlas (semilla fija)", m.rogue_generate_choices(1) == ch)
+	cfg["item_choices"]["chance"] = 0.34
+	# Mezcla con probabilidad normal: a lo largo de muchas profundidades salen objetos Y mejoras
+	var items_seen := 0
+	var boons_seen := 0
+	for d in range(1, 41):
+		for c in m.rogue_generate_choices(d):
+			if String(c).begins_with("item:"):
+				items_seen += 1
+			else:
+				boons_seen += 1
+	_check("con la probabilidad normal salen objetos y mejoras (%d objetos, %d mejoras en 40 ofertas)" % [items_seen, boons_seen], items_seen > 10 and boons_seen > 40)
+	# Elegir un objeto y darselo a un personaje
+	var item_id := String(ch[0]).substr(5)
+	m.rogue_run["choices"] = ch
+	m.rogue_run["phase"] = "choose"
+	_check("no se puede dar a alguien fuera del equipo", not bool(m.rogue_pick(String(ch[0]), "goku")["ok"]))
+	_check("elegir objeto y portador", bool(m.rogue_pick(String(ch[0]), a)["ok"]) and String(m.rogue_run["items"][a]) == item_id and String(m.rogue_run["phase"]) == "fight")
+	_check("el objeto NO entra en tu inventario y lo guardado no cambia", not GameState.equipment.owns(item_id) and GameState.equipment.item_of(a) == "sombrero_paja")
+	_check("un objeto que la partida ya lleva no se vuelve a ofrecer", not m.rogue_generate_choices(1).has("item:%s" % item_id))
+	# En combate lo lleva (sustituyendo al guardado) y fuera no
+	m.rogue_fight()
+	var mgr := BattleManager.new()
+	add_child(mgr)
+	mgr.setup(GameState.battle_party_data(), GameState.enemy_data(), [])
+	mgr.pause_scale = 0.0
+	var ua = mgr.allies[0]
+	var has_item := false
+	var has_saved := false
+	for u_mod in ua.stats.mods:
+		if String(u_mod["source"]).begins_with("equip:%s:" % item_id):
+			has_item = true
+		if String(u_mod["source"]).begins_with("equip:sombrero_paja"):
+			has_saved = true
+	for r in ua.equipment_rules:
+		if String(r.get("id", "")).begins_with("equip_%s_" % item_id):
+			has_item = true
+	_check("EN la partida el objeto temporal esta activo y sustituye al guardado", has_item and not has_saved)
+	mgr.queue_free()
+	GameState.reset_battle_context()
+	var plain := BattleManager.new()
+	add_child(plain)
+	plain.setup(_char_list(ids), [DB.get_enemy("vigia_alfa")], [])
+	var leak := false
+	for u_mod in plain.allies[0].stats.mods:
+		if String(u_mod["source"]).begins_with("equip:%s:" % item_id):
+			leak = true
+	_check("FUERA de la partida no hay rastro del objeto temporal", not leak)
+	plain.queue_free()
+	# Guardar y cargar a mitad de partida
+	GameState.save_game()
+	m.from_dict({})
+	GameState.load_game()
+	_check("al cargar la partida sigue llevando el objeto", m.rogue_active() and String(m.rogue_run["items"].get(a, "")) == item_id)
+	# Terminar: se pierden y todo queda igual
+	m.rogue_run["depth"] = 1
+	m.rogue_end_run()
+	_check("al terminar el objeto desaparece y nada de lo tuyo cambia", not m.rogue_active() and _chars_snapshot() == snap and not GameState.equipment.owns(item_id))
+	GameState.reset_battle_context()
+
+
+## --- 9. Historia: mundos nuevos --------------------------------------------------------------------
+func _check_story_worlds() -> void:
+	_out("[DBG30] == HISTORIA: MUNDOS NUEVOS ==")
+	_fresh()
+	_check("hay 5 mundos", DB.worlds.size() == 5)
+	var cm_owned := 0
+	for c in ["denji", "makima", "reze"]:
+		if GameState.is_owned(c):
+			cm_owned += 1
+	var qt_owned := 0
+	for c in ["miku", "nino", "itsuki"]:
+		if GameState.is_owned(c):
+			qt_owned += 1
+	_check("ya tienes 3 personajes de Chainsaw Man y 3 de Las Quintillizas", cm_owned == 3 and qt_owned == 3)
+	for wid in ["world_004", "world_005"]:
+		var w := DB.get_world(wid)
+		_check("%s (%s): 4 niveles con 3 dificultades, enemigos y recompensas validos" % [wid, w["name"]], DB.story_levels(wid).size() == 4)
+		var bad := 0
+		var last_xp := 0
+		for lv in DB.story_levels(wid):
+			var prev := 0
+			for dk in ["normal", "hard", "extreme"]:
+				var d: Dictionary = lv["difficulties"][dk]
+				if (d["enemies"] as Array).is_empty() or int(d["xp_reward"]) <= prev or int(d["coin_reward"]) <= 0:
+					bad += 1
+				prev = int(d["xp_reward"])
+				for e in d["enemies"]:
+					if DB.get_enemy(String(e)).is_empty():
+						bad += 1
+		_check("%s: todo valido y la dificultad paga mas (%d problemas)" % [wid, bad], bad == 0)
+		var dlg := String(DB.story_levels(wid)[0].get("dialogue", ""))
+		_check("%s: el primer nivel tiene dialogo" % wid, DB.dialogues.has(dlg))
+		var final_level: Dictionary = DB.story_levels(wid)[3]
+		var boss := String(final_level["difficulties"]["normal"]["enemies"][0])
+		_check("%s: el nivel final tiene jefe con fase" % wid, bool(DB.get_enemy(boss).get("boss", false)) and not (DB.get_enemy(boss).get("phases", []) as Array).is_empty())
+	# Desbloqueo en cadena
+	for wid in ["world_001", "world_002", "world_003"]:
+		for lv in DB.story_levels(wid):
+			GameState.story_progress[String(lv["id"])] = []
+	_check("con los mundos 1-3 sin superar, el mundo 4 esta cerrado", not GameState.world_unlocked("world_004") and not GameState.world_unlocked("world_005"))
+	for wid in ["world_001", "world_002", "world_003"]:
+		for lv in DB.story_levels(wid):
+			GameState.story_progress[String(lv["id"])] = ["normal"]
+	_check("superar Black Clover abre Chainsaw Man", GameState.world_unlocked("world_004") and not GameState.world_unlocked("world_005"))
+	# Combate real del primer nivel de Chainsaw Man y progreso
+	var xp0 := int(GameState.progress[String(GameState.party_ids()[0])]["xp"])
+	var coins0 := GameState.coins
+	_check("el primer nivel esta abierto y el segundo no", GameState.story_level_unlocked("world_004_01") and not GameState.story_level_unlocked("world_004_02"))
+	_check("se prepara el combate de historia", GameState.prepare_battle(GameState.BATTLE_STORY, { "level": "world_004_01", "difficulty": "normal" }))
+	var r: Dictionary = await _play()
+	_check("combate real de Chainsaw Man 1: termina", bool(r["finished"]))
+	if bool(r["victory"]):
+		_check("victoria: paga la XP y las monedas del JSON y abre el nivel 2", int(r["report"]["xp"]) == 420 and GameState.coins - coins0 >= 170 and GameState.story_level_unlocked("world_004_02"))
+	else:
+		_check("(derrota: sin premios)", GameState.coins == coins0)
+	# Cada nivel y dificultad se puede preparar con sus enemigos
+	var ok_all := true
+	for wid in ["world_004", "world_005"]:
+		for lv in DB.story_levels(wid):
+			for dk in ["normal", "hard", "extreme"]:
+				if not GameState.prepare_battle(GameState.BATTLE_STORY, { "level": String(lv["id"]), "difficulty": dk }) or GameState.enemy_data().is_empty():
+					ok_all = false
+	_check("los 24 combates de los dos mundos se preparan con enemigos reales", ok_all)
+	# Boss final jugable (combate real contra el jefe de Quintillizas)
+	GameState.prepare_battle(GameState.BATTLE_STORY, { "level": "world_005_04", "difficulty": "normal" })
+	var rb: Dictionary = await _play()
+	_check("combate real contra el jefe final de Las Quintillizas: termina", bool(rb["finished"]))
 	GameState.reset_battle_context()

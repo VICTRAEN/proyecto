@@ -55,12 +55,23 @@ func _run_view() -> void:
 	for bid in boons:
 		var b: Dictionary = m.rogue_boon(String(bid))
 		col.add_child(make_label("%s x%d: %s" % [String(b.get("name", bid)), int(boons[bid]), String(b.get("description", ""))], VI.FONT_TINY, VI.GOLD_LIGHT))
+	var run_items: Dictionary = run.get("items", {})
+	for ch in run_items:
+		col.add_child(make_label("%s lleva %s (solo esta partida)" % [GameState.display_name(String(ch)), GameState.equipment.name_of(String(run_items[ch]))], VI.FONT_TINY, VI.CYAN))
 	if String(run["phase"]) == "choose":
-		var pick := make_card("ChoiceCard", "ELIGE UNA MEJORA", VI.GOLD)
+		var pick := make_card("ChoiceCard", "ELIGE UNA MEJORA U OBJETO", VI.GOLD)
 		for bid in run["choices"]:
-			var b2: Dictionary = m.rogue_boon(String(bid))
-			pick.add_child(make_label("%s (%s): %s" % [String(b2.get("name", bid)), String(b2.get("rarity", "")), String(b2.get("description", ""))], VI.FONT_TINY, VI.INK))
-			pick.add_child(make_button("Boon_" + String(bid), "ELEGIR  " + String(b2.get("name", bid)).to_upper(), VI.GOLD, _pick.bind(String(bid)), 72.0))
+			var cid := String(bid)
+			if cid.begins_with("item:"):
+				var iid := cid.substr(5)
+				var idata: Dictionary = DB.equipment.get(iid, {})
+				pick.add_child(make_label("OBJETO: %s (%s). %s" % [String(idata.get("name", iid)), String(idata.get("rarity", "")), String((idata.get("passive", {}) as Dictionary).get("description", ""))], VI.FONT_TINY, VI.INK))
+				for ch in m.rogue_alive_team():
+					pick.add_child(make_button("Item_%s_%s" % [iid, String(ch)], "DAR A %s" % GameState.display_name(String(ch)).to_upper(), VI.CYAN, _pick.bind(cid, String(ch)), 64.0))
+			else:
+				var b2: Dictionary = m.rogue_boon(cid)
+				pick.add_child(make_label("%s (%s): %s" % [String(b2.get("name", cid)), String(b2.get("rarity", "")), String(b2.get("description", ""))], VI.FONT_TINY, VI.INK))
+				pick.add_child(make_button("Boon_" + cid, "ELEGIR  " + String(b2.get("name", cid)).to_upper(), VI.GOLD, _pick.bind(cid), 72.0))
 	else:
 		col.add_child(make_button("RogueFight", "COMBATIR", VI.VIOLET, _fight, 96.0))
 	col.add_child(make_button("RogueEnd", "TERMINAR Y COBRAR", VI.RED, _end, 72.0))
@@ -93,8 +104,8 @@ func _fight() -> void:
 	open_battle()
 
 
-func _pick(boon_id: String) -> void:
-	var r: Dictionary = GameState.modes.rogue_pick(boon_id)
+func _pick(choice_id: String, holder: String = "") -> void:
+	var r: Dictionary = GameState.modes.rogue_pick(choice_id, holder)
 	if not bool(r["ok"]):
 		say(String(r["reason"]), false)
 		return

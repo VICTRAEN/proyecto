@@ -1,0 +1,57 @@
+{
+ "id": "story_makima",
+ "based_on": "makima",
+ "name": "Makima, el control",
+ "title": "Capitulo Chainsaw Man",
+ "_note": "Enemigo de Historia (X.3b): identidad del personaje base con estadisticas propias.",
+ "stats": {
+  "max_hp": 5900,
+  "atk": 192,
+  "def": 122,
+  "speed": 112,
+  "crit_rate": 0.06,
+  "dodge_rate": 0.04
+ },
+ "boss": true,
+ "intro": {
+  "title": "Makima, el control",
+  "subtitle": "Capitulo Chainsaw Man",
+  "tagline": "Todo sucede como ella lo ha decidido.",
+  "color": "#e03a3a"
+ },
+ "phases": [
+  {
+   "id": "story_makima_p2",
+   "name": "Dominio absoluto",
+   "when": {
+    "type": "hp_below",
+    "value": 0.5
+   },
+   "banner": "DOMINIO ABSOLUTO",
+   "color": "#e03a3a",
+   "effects": [
+    {
+     "type": "stat_mod",
+     "target": "self",
+     "stat": "atk",
+     "kind": "mult",
+     "value": 0.2,
+     "turns": 0
+    },
+    {
+     "type": "stat_mod",
+     "target": "self",
+     "stat": "speed",
+     "kind": "mult",
+     "value": 0.1,
+     "turns": 0
+    }
+   ],
+   "pattern": [
+    "basic",
+    "special",
+    "basic"
+   ]
+  }
+ ]
+}

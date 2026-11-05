@@ -1,0 +1,57 @@
+{
+ "id": "story_itsuki",
+ "based_on": "itsuki",
+ "name": "Itsuki, la glotona imparable",
+ "title": "Capitulo Quintillizas",
+ "_note": "Enemigo de Historia (X.3b): identidad del personaje base con estadisticas propias.",
+ "stats": {
+  "max_hp": 5600,
+  "atk": 186,
+  "def": 118,
+  "speed": 106,
+  "crit_rate": 0.06,
+  "dodge_rate": 0.04
+ },
+ "boss": true,
+ "intro": {
+  "title": "Itsuki, la glotona imparable",
+  "subtitle": "Capitulo Quintillizas",
+  "tagline": "El examen final no se aprueba con la barriga vacia.",
+  "color": "#ffb347"
+ },
+ "phases": [
+  {
+   "id": "story_itsuki_p2",
+   "name": "Apetito desatado",
+   "when": {
+    "type": "hp_below",
+    "value": 0.5
+   },
+   "banner": "APETITO DESATADO",
+   "color": "#ffb347",
+   "effects": [
+    {
+     "type": "stat_mod",
+     "target": "self",
+     "stat": "atk",
+     "kind": "mult",
+     "value": 0.2,
+     "turns": 0
+    },
+    {
+     "type": "stat_mod",
+     "target": "self",
+     "stat": "speed",
+     "kind": "mult",
+     "value": 0.1,
+     "turns": 0
+    }
+   ],
+   "pattern": [
+    "basic",
+    "special",
+    "basic"
+   ]
+  }
+ ]
+}

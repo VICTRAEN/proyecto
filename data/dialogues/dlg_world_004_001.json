@@ -1,0 +1,26 @@
+{
+ "id": "dlg_world_004_001",
+ "name": "Seguridad Publica",
+ "skippable": true,
+ "skip_label": "SALTAR",
+ "lines": [
+  {
+   "speaker": "Makima",
+   "portrait": "makima",
+   "text": "Bienvenidos a Seguridad Publica. Los demonios no esperan, y yo tampoco.",
+   "background": "battle_plain"
+  },
+  {
+   "speaker": "Denji",
+   "portrait": "denji",
+   "text": "Yo solo quiero comer algo caliente y que alguien me abrace... pero vale, a luchar.",
+   "background": "battle_plain"
+  },
+  {
+   "speaker": "Reze",
+   "portrait": "reze",
+   "text": "Un cafe y una pelea. Los lunes son asi.",
+   "background": "battle_plain"
+  }
+ ]
+}

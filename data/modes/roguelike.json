@@ -710,5 +710,17 @@
     }
    ]
   }
- ]
+ ],
+ "item_choices": {
+  "chance": 0.34,
+  "rarity_weights": {
+   "N": 30,
+   "R": 30,
+   "SR": 22,
+   "SSR": 12,
+   "UR": 5,
+   "LR": 1
+  },
+  "description": "Algunas opciones son objetos equipables: se asignan a un personaje y valen solo para esta partida (no tocan tu inventario)."
+ }
 }

@@ -1,0 +1,187 @@
+{
+ "id": "world_004",
+ "name": "CHAINSAW MAN",
+ "genre": "Accion",
+ "description": "Demonios, contratos y la Seguridad Publica. Denji, Makima y Reze en el mundo que el umbral ha vuelto a abrir.",
+ "background": "stages",
+ "position": {
+  "x": 0.7,
+  "y": 0.62
+ },
+ "unlock": {
+  "requires_world": "world_003",
+  "requires_levels_completed": 3
+ },
+ "levels": [
+  {
+   "id": "world_004_01",
+   "name": "Seguridad Publica",
+   "position": {
+    "x": 0.15,
+    "y": 0.14
+   },
+   "next": "world_004_02",
+   "background": "battle_plain",
+   "dialogue": "dlg_world_004_001",
+   "difficulties": {
+    "normal": {
+     "order": 0,
+     "name": "NORMAL",
+     "enemies": [
+      "vigia_alfa"
+     ],
+     "xp_reward": 420,
+     "coin_reward": 170
+    },
+    "hard": {
+     "order": 1,
+     "name": "DIFICIL",
+     "enemies": [
+      "vigia_alfa",
+      "vigia_beta"
+     ],
+     "xp_reward": 640,
+     "coin_reward": 260
+    },
+    "extreme": {
+     "order": 2,
+     "name": "EXTREMO",
+     "enemies": [
+      "vigia_beta",
+      "torre_guardian"
+     ],
+     "xp_reward": 1000,
+     "coin_reward": 420
+    }
+   }
+  },
+  {
+   "id": "world_004_02",
+   "name": "Cazadores de demonios",
+   "position": {
+    "x": 0.42,
+    "y": 0.28
+   },
+   "next": "world_004_03",
+   "background": "battle_plain",
+   "dialogue": "",
+   "difficulties": {
+    "normal": {
+     "order": 0,
+     "name": "NORMAL",
+     "enemies": [
+      "vigia_beta",
+      "vigia_alfa"
+     ],
+     "xp_reward": 470,
+     "coin_reward": 190
+    },
+    "hard": {
+     "order": 1,
+     "name": "DIFICIL",
+     "enemies": [
+      "vigia_alfa",
+      "story_reze"
+     ],
+     "xp_reward": 700,
+     "coin_reward": 290
+    },
+    "extreme": {
+     "order": 2,
+     "name": "EXTREMO",
+     "enemies": [
+      "story_reze",
+      "torre_guardian"
+     ],
+     "xp_reward": 1080,
+     "coin_reward": 460
+    }
+   }
+  },
+  {
+   "id": "world_004_03",
+   "name": "La bomba de Reze",
+   "position": {
+    "x": 0.7,
+    "y": 0.42
+   },
+   "next": "world_004_04",
+   "background": "battle_plain",
+   "dialogue": "",
+   "difficulties": {
+    "normal": {
+     "order": 0,
+     "name": "NORMAL",
+     "enemies": [
+      "story_reze"
+     ],
+     "xp_reward": 530,
+     "coin_reward": 210
+    },
+    "hard": {
+     "order": 1,
+     "name": "DIFICIL",
+     "enemies": [
+      "story_reze",
+      "vigia_alfa"
+     ],
+     "xp_reward": 780,
+     "coin_reward": 320
+    },
+    "extreme": {
+     "order": 2,
+     "name": "EXTREMO",
+     "enemies": [
+      "story_reze",
+      "torre_guardian",
+      "vigia_beta"
+     ],
+     "xp_reward": 1180,
+     "coin_reward": 500
+    }
+   }
+  },
+  {
+   "id": "world_004_04",
+   "name": "Makima",
+   "position": {
+    "x": 0.45,
+    "y": 0.62
+   },
+   "next": "",
+   "background": "battle_plain",
+   "dialogue": "",
+   "difficulties": {
+    "normal": {
+     "order": 0,
+     "name": "NORMAL",
+     "enemies": [
+      "story_makima"
+     ],
+     "xp_reward": 640,
+     "coin_reward": 260
+    },
+    "hard": {
+     "order": 1,
+     "name": "DIFICIL",
+     "enemies": [
+      "story_makima",
+      "vigia_alfa"
+     ],
+     "xp_reward": 940,
+     "coin_reward": 390
+    },
+    "extreme": {
+     "order": 2,
+     "name": "EXTREMO",
+     "enemies": [
+      "story_makima",
+      "story_reze"
+     ],
+     "xp_reward": 1450,
+     "coin_reward": 620
+    }
+   }
+  }
+ ]
+}
