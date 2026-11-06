@@ -41,6 +41,8 @@ signal boss_intro(unit, intro: Dictionary)
 signal intro_closed
 ## Un jefe entra en una fase nueva (index = numero de fase, 1 = la primera).
 signal phase_changed(unit, index: int, phase: Dictionary)
+## X.5: un aliado se transforma. Se emite DESPUES de aplicar la transformacion y ANTES de su ataque.
+signal transformed(unit, definition: Dictionary)
 
 const ENEMY_THINK_TIME := 0.7
 const TURN_PAUSE := 0.15
@@ -98,6 +100,8 @@ func set_auto(enabled: bool) -> void:
 
 
 func _pick_auto_kind(unit: CombatUnit) -> String:
+	if can_transform(unit):
+		return "transform"
 	if can_use(unit, "ultimate"):
 		return "ultimate"
 	if can_use(unit, "special"):
@@ -126,6 +130,10 @@ var lines: Array = []
 
 var _rng := RandomNumberGenerator.new()
 var _finished := false
+## X.5: solo UN personaje por equipo puede transformarse por combate. Se marca al transformar y no se
+## libera aunque el transformado caiga.
+var _team_transform_used := false
+var transformed_unit: CombatUnit = null
 ## Links del equipo que han quedado ACTIVOS en esta batalla. Se resuelve una vez
 ## al construir la formacion y la pantalla de combate lo lee para su aviso.
 var _team_link_ids: Array = []
@@ -135,6 +143,8 @@ var _last_action_kind := ""
 const ULTIMATE_PAUSE := 0.9
 ## Pausa tras una ULTIMATE de forma: lo que dura su presentacion en pantalla.
 const ULTIMATE_CINEMATIC_PAUSE := 3.0
+## Pausa tras una TRANSFORMACION: lo que dura su presentacion (flash, cambio de sprite, ataque).
+const TRANSFORM_PAUSE := 2.2
 
 
 func setup(ally_data: Array, enemy_data: Array, reserve_data: Array = []) -> void:
@@ -147,6 +157,8 @@ func setup(ally_data: Array, enemy_data: Array, reserve_data: Array = []) -> voi
 	lines = []
 	round_number = 0
 	_finished = false
+	_team_transform_used = false
+	transformed_unit = null
 	_rng.randomize()
 	# El ajuste de velocidad de combate se lee UNA vez por batalla: si el jugador
 	# lo cambia en AJUSTES, la siguiente batalla ya va distinto.
@@ -215,7 +227,15 @@ func submit_action(payload: Dictionary) -> void:
 	action_chosen.emit(payload)
 
 
+## Puede este aliado transformarse AHORA? (ademas de tener transformacion: el equipo no la ha usado
+## ya en este combate, el combate sigue y la unidad esta viva y sin transformar).
+func can_transform(unit: CombatUnit) -> bool:
+	return unit != null and unit.can_transform() and not _team_transform_used and not _finished
+
+
 func can_use(unit: CombatUnit, kind: String) -> bool:
+	if kind == "transform":
+		return can_transform(unit)
 	var skill := unit.skill_by_kind(kind)
 	if skill.is_empty():
 		return false
@@ -332,7 +352,9 @@ func _take_turn(unit: CombatUnit) -> void:
 	unit.tick_statuses()
 	if _finished:
 		return
-	if _last_action_kind == "ultimate":
+	if _last_action_kind == "transform":
+		await get_tree().create_timer(TRANSFORM_PAUSE * pause_scale).timeout
+	elif _last_action_kind == "ultimate":
 		await get_tree().create_timer(ULTIMATE_CINEMATIC_PAUSE * pause_scale).timeout
 	elif _last_action_kind == "special":
 		await get_tree().create_timer(ULTIMATE_PAUSE * pause_scale).timeout
@@ -348,11 +370,24 @@ func _perform(actor: CombatUnit, kind: String, target_key: String = "") -> void:
 	# degrada a ataque basico, igual que un especial sin SP: la accion nunca se pierde.
 	if kind == "ultimate" and not can_use(actor, "ultimate"):
 		kind = "basic"
+	# X.5: TRANSFORMAR es la accion del turno: el personaje cambia y hace su ataque especial ya con
+	# la forma nueva. Si no se puede (equipo ya uso la suya, sin transformacion), se degrada a basico.
+	var is_transform := false
+	if kind == "transform":
+		if can_transform(actor):
+			is_transform = true
+		else:
+			kind = "basic"
 	_last_action_kind = kind
 	var skill := actor.skill_by_kind(kind)
+	if is_transform:
+		_do_transform(actor)
+		skill = actor.transform_attack()
+		kind = "special"
+		_last_action_kind = "transform"
 	if skill.is_empty():
 		return
-	var cost := _skill_cost(actor, skill)
+	var cost := 0 if is_transform else _skill_cost(actor, skill)
 	if cost > actor.sp:
 		skill = actor.skill_by_kind("basic")
 		cost = 0
@@ -415,7 +450,7 @@ func _perform(actor: CombatUnit, kind: String, target_key: String = "") -> void:
 		hits.append({ "kind": "recoil", "target_key": actor.source_key, "target_name": actor.display_name, "value": lost })
 
 	# Atacar con el ataque basico genera SP; tambien lo genera recibir un golpe.
-	if cost == 0 and kind != "ultimate":
+	if cost == 0 and kind != "ultimate" and not is_transform:
 		actor.gain_sp(1)
 	for hit in hits:
 		if String(hit.get("kind", "")) == "damage" and not bool(hit.get("dodged", true)):
@@ -1007,10 +1042,30 @@ func participant_ids() -> Array:
 	return _participants.duplicate()
 
 
+## Aplica la transformacion a la unidad y la anuncia. UNICO sitio donde se transforma un aliado.
+func _do_transform(actor: CombatUnit) -> void:
+	_team_transform_used = true
+	transformed_unit = actor
+	var old_name := actor.display_name
+	actor.apply_transformation()
+	_log("%s se transforma: %s" % [old_name, actor.display_name], "buff")
+	# Las pasivas de la forma nueva con "battle_start" se encienden ahora (las de antes ya no existen).
+	_apply_passives("battle_start", [actor])
+	transformed.emit(actor, actor.transformation)
+
+
+## Fin del combate: todo vuelve a como era (la unidad de combate se descarta igualmente al cerrar).
+func _revert_transformations() -> void:
+	for unit in allies + reserves:
+		if unit.transformed:
+			unit.revert_transformation()
+
+
 func _finish(victory: bool) -> void:
 	if _finished:
 		return
 	_finished = true
+	_revert_transformations()
 	if victory:
 		_log("Victoria en la ronda %d." % round_number, "result")
 	else:

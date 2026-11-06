@@ -21,7 +21,7 @@ archivo en `data/characters/` y meter su arte.
 | links | array | Lista de IDS de `data/links/`. Con dos personajes del EQUIPO que compartan un link, el link se activa y da su bonus. |
 | passive | objeto | trigger, condition, effects. La pasiva del personaje sin evolucionar. |
 | skills | array | La primera con kind "basic", la segunda con kind "special". |
-| transformations | array | Reservado. Puede estar vacio. |
+| transformations | array | Transformacion en combate (estilo Mega Evolucion). Vacio = el personaje no se transforma (el estado de TODOS hoy). Se usa la PRIMERA entrada. Ver "Bloque de transformacion". |
 | evolution | objeto | La RECETA de su forma evolucionada: passive (la pasiva mejorada), passive_extra (la segunda pasiva que gana), links y categories nuevos. Ver "Bloque de evolucion". |
 
 El nivel y la XP del personaje NO viven en su JSON: son estado del jugador
@@ -854,3 +854,28 @@ guardado antiguo desbloquea lo que ya cumplia. `title` da un titulo equipable.
 - `completion_reward`: `{ coins, gems, items }`, se paga la PRIMERA vez que se completa.
 - Stage: `survive_rounds` (gana quien aguante N rondas), `first_clear_items`
   {id: n} (solo la primera victoria), y el jefe se detecta solo por sus enemigos.
+
+## Bloque de transformacion (`transformations[0]`)
+
+Solo los personajes con una entrada valida (con `id`) ven el boton circular TRANSFORMAR en su
+turno. Un solo personaje por equipo y combate (aunque varios puedan). Dura hasta que muere o
+termina el combate; al terminar todo vuelve a su estado original (nada se guarda en el save).
+Pulsarlo gasta el turno: ataque especial de la transformacion y la forma nueva actua ya cambiada.
+
+| Campo | Tipo | Notas |
+|---|---|---|
+| id | texto | Obligatorio. Sin id la entrada se ignora. |
+| name | texto | Nombre mostrado de la forma (opcional). |
+| form | texto | Subcarpeta de arte `art/characters/<id>/<form>/{front,back,icon}.png` (por defecto `transform`). |
+| art | objeto | Rutas explicitas front/back/icon (opcional). |
+| stat_multiplier | numero | Multiplica vida, ataque, defensa y velocidad (1.5 = +50%). |
+| stat_mods | array | `{stat, kind, value}` extra (p. ej. critico). |
+| heal_ratio | numero | Cura extra al transformarse (0..1). |
+| attack | objeto | Ataque especial al transformarse: `{id,name,power,target,effects}`. Por defecto potencia 150 a todos los rivales, sin coste. |
+| skills | array | Habilidades nuevas (`kind` basic/special...) que sustituyen a las del mismo tipo. |
+| passives / passive | array / objeto | Pasivas de la forma (sustituyen a las originales; `battle_start` se dispara al transformarse). |
+| ultimate | objeto | Ultimate nueva (opcional; se puede volver a usar). |
+| type, portrait_style, roles, categories, pattern | | Sustituyen a los originales (opcional). |
+| icon | ruta | PNG para el icono del boton circular (opcional; si falta, dibuja una estrella evolutiva). |
+| color, color2 | `#rrggbb` | Colores del boton y del destello. |
+

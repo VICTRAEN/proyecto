@@ -49,6 +49,13 @@ var source_key := ""
 var slot := 0
 ## Contadores dinamicos de esta batalla (core/battle_stats.gd).
 var battle: BattleStats = null
+## --- TRANSFORMACION (X.5) -----------------------------------------------------------------------
+## Definicion de la transformacion del personaje (primera entrada valida de "transformations" de
+## su JSON). Vacia = el personaje no puede transformarse. Solo los ALIADOS la reciben.
+var transformation: Dictionary = {}
+var transformed := false
+## Copia del estado original para volver a el al terminar el combate (o en las pruebas).
+var _form_backup: Dictionary = {}
 ## --- Estado de combate v12 -------------------------------------------------
 ## Escudos: absorben dano ANTES que la vida. [{ amount, turns, source }]
 var shields: Array = []
@@ -149,6 +156,15 @@ func setup(data: Dictionary, ally_flag: bool, slot_index: int) -> void:
 				stats.add_mod(String(mod["stat"]), String(mod["kind"]), float(mod["value"]), String(mod.get("source", "dupe")))
 	battle = BattleStats.new()
 	hp = max_hp()
+	transformation = {}
+	transformed = false
+	_form_backup = {}
+	var raw_forms = data.get("transformations", [])
+	if ally_flag and raw_forms is Array:
+		for entry in raw_forms:
+			if entry is Dictionary and not String((entry as Dictionary).get("id", "")).is_empty():
+				transformation = (entry as Dictionary).duplicate(true)
+				break
 
 
 ## Ruta de arte explicita para una ranura ("front", "back", "icon"), o "" si el
@@ -553,3 +569,161 @@ func status_text() -> String:
 	for status in statuses:
 		parts.append(String(status["name"]))
 	return ", ".join(parts)
+
+
+## --- TRANSFORMACION (X.5) ---------------------------------------------------------------------
+## Todo lo que cambia sale del JSON de la transformacion (data/SCHEMA.md, "Transformaciones"):
+## estadisticas (stat_multiplier + stat_mods), habilidades (por tipo), pasivas, arte, nombre, tipo y
+## demas. Se aplica sobre ESTA unidad de combate y nunca sobre el personaje guardado.
+const TRANSFORM_CORE_STATS := ["max_hp", "atk", "def", "speed"]
+const TRANSFORM_SOURCE_MULT := "transform:mult"
+const TRANSFORM_SOURCE_EXTRA := "transform:extra"
+const TRANSFORM_DEFAULT_FORM := "transform"
+
+
+func has_transformation() -> bool:
+	return not transformation.is_empty()
+
+
+func can_transform() -> bool:
+	return alive and is_ally and has_transformation() and not transformed
+
+
+## Ataque especial que se hace al transformarse (el del JSON, o uno por defecto).
+func transform_attack() -> Dictionary:
+	var attack = transformation.get("attack", {})
+	var out: Dictionary = (attack as Dictionary).duplicate(true) if attack is Dictionary and not (attack as Dictionary).is_empty() else {
+		"id": "sk_%s_attack" % String(transformation.get("id", "transform")),
+		"name": String(transformation.get("name", "Transformacion")),
+		"power": 150, "target": "enemy_all", "effects": [],
+		"description": "Un ataque especial al transformarse.",
+	}
+	out["kind"] = "special"
+	out["cost"] = 0
+	return out
+
+
+func transform_form_key() -> String:
+	return String(transformation.get("form", TRANSFORM_DEFAULT_FORM))
+
+
+## Forma visual para el retrato: la de la transformacion mientras dura, o "" (la del personaje).
+func visual_form() -> String:
+	return transform_form_key() if transformed else ""
+
+
+func apply_transformation() -> bool:
+	if not can_transform():
+		return false
+	var d := transformation
+	_form_backup = {
+		"display_name": display_name, "type": type, "portrait_style": portrait_style, "art": art.duplicate(true),
+		"roles": roles, "categories": categories, "skills": skills.duplicate(true), "passives": passives.duplicate(true),
+		"passive": passive, "ultimate": ultimate.duplicate(true), "ultimate_used": ultimate_used,
+		"pattern": pattern.duplicate(), "rule_state": rule_state.duplicate(true),
+	}
+	var old_max := max_hp()
+	var multiplier := float(d.get("stat_multiplier", 1.0))
+	if multiplier != 1.0:
+		for stat_name in TRANSFORM_CORE_STATS:
+			stats.add_mod(stat_name, "mult", multiplier - 1.0, TRANSFORM_SOURCE_MULT)
+	var extra = d.get("stat_mods", [])
+	if extra is Array:
+		for mod in extra:
+			if mod is Dictionary and not String((mod as Dictionary).get("stat", "")).is_empty():
+				stats.add_mod(String(mod["stat"]), String(mod.get("kind", "mult")), float(mod.get("value", 0.0)), "%s:%s" % [TRANSFORM_SOURCE_EXTRA, String(mod["stat"])])
+	# La vida actual sube lo que sube la maxima (como cualquier mejora de vida maxima).
+	var new_max := max_hp()
+	if new_max > old_max:
+		hp = minf(new_max, hp + (new_max - old_max))
+	var heal_ratio := float(d.get("heal_ratio", 0.0))
+	if heal_ratio > 0.0:
+		hp = minf(new_max, hp + roundf(new_max * heal_ratio))
+	if not String(d.get("name", "")).is_empty():
+		display_name = String(d["name"])
+	if not String(d.get("type", "")).is_empty():
+		type = String(d["type"])
+	if not String(d.get("portrait_style", "")).is_empty():
+		portrait_style = String(d["portrait_style"])
+	var new_art = d.get("art", {})
+	if new_art is Dictionary:
+		for slot_name in (new_art as Dictionary):
+			art[String(slot_name)] = String(new_art[slot_name])
+	if d.get("roles", null) is Array:
+		roles = d["roles"]
+	if d.get("categories", null) is Array:
+		categories = d["categories"]
+	# Habilidades: las que declara sustituyen a las del mismo tipo (basic / special) y se anaden si no hay.
+	var new_skills = d.get("skills", [])
+	if new_skills is Array:
+		for skill in new_skills:
+			if skill is Dictionary:
+				unlock_skill(skill)
+	var new_passives: Array = []
+	if d.get("passives", null) is Array:
+		for entry in d["passives"]:
+			if entry is Dictionary and not (entry as Dictionary).is_empty():
+				new_passives.append((entry as Dictionary).duplicate(true))
+	elif d.get("passive", null) is Dictionary and not (d["passive"] as Dictionary).is_empty():
+		new_passives.append((d["passive"] as Dictionary).duplicate(true))
+	if not new_passives.is_empty():
+		passives = new_passives
+		passive = new_passives[0]
+	if d.get("ultimate", null) is Dictionary and not (d["ultimate"] as Dictionary).is_empty():
+		ultimate = (d["ultimate"] as Dictionary).duplicate(true)
+		ultimate_used = false
+	if d.get("pattern", null) is Array:
+		pattern = (d["pattern"] as Array).duplicate()
+		pattern_step = 0
+	transformed = true
+	return true
+
+
+## Vuelve al estado original (fin del combate). Conserva la proporcion de vida y si esta vivo.
+func revert_transformation() -> void:
+	if not transformed:
+		return
+	var ratio := hp_ratio()
+	stats.remove_source(TRANSFORM_SOURCE_MULT)
+	var extra = transformation.get("stat_mods", [])
+	if extra is Array:
+		for mod in extra:
+			if mod is Dictionary:
+				stats.remove_source("%s:%s" % [TRANSFORM_SOURCE_EXTRA, String((mod as Dictionary).get("stat", ""))])
+	# Efectos que dejaron las pasivas de la forma (p. ej. un buff de ataque): salen con ella.
+	var form_rule_ids: Array = []
+	for rule in passives:
+		if rule is Dictionary and not String((rule as Dictionary).get("id", "")).is_empty():
+			form_rule_ids.append(String(rule["id"]))
+	if not form_rule_ids.is_empty():
+		var original_ids: Array = []
+		for rule in (_form_backup["passives"] as Array):
+			if rule is Dictionary:
+				original_ids.append(String((rule as Dictionary).get("id", "")))
+		var kept_mods: Array = []
+		for mod in stats.mods:
+			var src := String(mod["source"])
+			var from_form := false
+			for rid in form_rule_ids:
+				if not original_ids.has(rid) and src.begins_with("passive:") and src.find(String(rid)) != -1:
+					from_form = true
+			if not from_form:
+				kept_mods.append(mod)
+		stats.mods = kept_mods
+	display_name = String(_form_backup["display_name"])
+	type = String(_form_backup["type"])
+	portrait_style = String(_form_backup["portrait_style"])
+	art = (_form_backup["art"] as Dictionary).duplicate(true)
+	roles = _form_backup["roles"]
+	categories = _form_backup["categories"]
+	skills = (_form_backup["skills"] as Array).duplicate(true)
+	passives = (_form_backup["passives"] as Array).duplicate(true)
+	passive = _form_backup["passive"]
+	ultimate = (_form_backup["ultimate"] as Dictionary).duplicate(true)
+	ultimate_used = bool(_form_backup["ultimate_used"])
+	pattern = (_form_backup["pattern"] as Array).duplicate()
+	pattern_step = 0
+	if alive:
+		hp = maxf(1.0, roundf(max_hp() * ratio))
+	transformed = false
+	_form_backup = {}

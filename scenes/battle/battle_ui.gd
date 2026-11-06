@@ -163,9 +163,11 @@ func _ready() -> void:
 	manager.log_added.connect(_on_log_added)
 	manager.battle_finished.connect(_on_battle_finished)
 	manager.ultimate_started.connect(_on_ultimate_started)
+	manager.transformed.connect(_on_transformed)
 	manager.boss_intro.connect(_on_boss_intro)
 	manager.phase_changed.connect(_on_phase_changed)
 	_build_ultimate_button()
+	_build_transform_button()
 	_build_speed_auto_buttons()
 
 	attack_button.pressed.connect(_on_attack_pressed)
@@ -433,6 +435,7 @@ func _on_action_requested(unit: CombatUnit) -> void:
 		special_button.text = "%s\nSP %d" % [String(special.get("name", "ESPECIAL")).to_upper(), cost]
 		special_button.disabled = not manager.can_use(unit, "special")
 	_refresh_ultimate_button(unit)
+	_refresh_transform_button(unit)
 	_pulse(action_row)
 
 
@@ -629,6 +632,7 @@ func _refresh_tool_buttons() -> void:
 ## Boton de la ULTIMATE de forma (LR). Se construye por codigo junto al ESPECIAL y
 ## solo es visible para una unidad que la tiene en su forma actual.
 var ultimate_button: Button = null
+var transform_button: Control = null
 ## Presentacion de la ultimate en curso (bloquea el cierre del resultado hasta que acaba).
 var _ult_fx_active := false
 ## Cuantas ultimates de forma se han presentado en esta batalla (lo usan las pruebas).
@@ -671,6 +675,69 @@ func _refresh_ultimate_button(unit: CombatUnit) -> void:
 ## cancion si ya suena, asi que ni los efectos ni otra ultimate la reinician.
 func _on_ultimate_started(_unit) -> void:
 	GameAudio.override_start("david_lucy_theme", "battle")
+
+
+## --- Transformacion (X.5) ---------------------------------------------------
+## Boton circular junto a las acciones. Solo aparece cuando el aliado que actua PUEDE
+## transformarse (tiene definicion, no esta transformado y su equipo no ha usado ya la
+## transformacion de este combate). No pide objetivo: el ataque especial es de area.
+func _build_transform_button() -> void:
+	var script: Script = load("res://ui/transform_button.gd")
+	transform_button = Control.new()
+	transform_button.set_script(script)
+	transform_button.name = "TransformButton"
+	transform_button.visible = false
+	transform_button.custom_minimum_size = Vector2(130, 130)
+	action_row.add_child(transform_button)
+	transform_button.pressed.connect(_on_transform_pressed)
+
+
+func _refresh_transform_button(unit: CombatUnit) -> void:
+	if transform_button == null:
+		return
+	if unit == null or not unit.is_ally or not manager.can_transform(unit):
+		transform_button.visible = false
+		return
+	var d: Dictionary = unit.transformation
+	var col_a := Color.html(String(d.get("color", "#ffcc55")))
+	var col_b := Color.html(String(d.get("color2", "#ff4dbd")))
+	var tex: Texture2D = null
+	var icon_path := String(d.get("icon", ""))
+	if icon_path != "" and ResourceLoader.exists(icon_path):
+		tex = load(icon_path) as Texture2D
+	transform_button.configure(col_a, col_b, tex, "TRANSFORMAR")
+	transform_button.disabled = false
+	transform_button.visible = true
+
+
+func _on_transform_pressed() -> void:
+	if current_actor == null or not manager.can_transform(current_actor):
+		return
+	transform_button.visible = false
+	_finish_submit("transform", "")
+
+
+func _on_transformed(unit: CombatUnit, definition: Dictionary) -> void:
+	if transform_button != null:
+		transform_button.visible = false
+	var col := Color.html(String(definition.get("color", "#ffcc55")))
+	# Destello a pantalla completa y nombre de la forma.
+	var flash := ColorRect.new()
+	flash.color = Color(1, 1, 1, 0.9)
+	flash.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	flash.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	flash.z_index = 17
+	add_child(flash)
+	var tw := create_tween()
+	tw.tween_property(flash, "color:a", 0.0, 0.7)
+	tw.finished.connect(flash.queue_free)
+	_spawn_banner(String(definition.get("name", unit.display_name)).to_upper(), col)
+	# Sprite, nombre y tipo nuevos en la casilla y en la barra inferior.
+	for card in cards.values():
+		if is_instance_valid(card) and card.unit == unit and card.has_method("refresh_art"):
+			card.refresh_art()
+	if current_actor == unit:
+		_set_active_unit(unit)
 
 
 func _on_restart_pressed() -> void:
@@ -938,6 +1005,7 @@ func _cancel_targeting() -> void:
 	attack_button.visible = true
 	special_button.visible = true
 	_refresh_ultimate_button(current_actor)
+	_refresh_transform_button(current_actor)
 
 
 func _clear_targeting() -> void:
@@ -1034,7 +1102,8 @@ func _set_active_unit(unit: CombatUnit) -> void:
 	# La forma (SSR/UR/LR) viaja hasta el retrato: un personaje evolucionado
 	# ensena el arte de su forma nueva, y si esa forma no tiene PNG se cae al
 	# arte base sin romperse.
-	active_portrait.setup(unit.id, tint, unit.portrait_style, unit.art_for(art_slot), art_slot, GameState.form_of(unit.id))
+	var portrait_form := unit.visual_form() if unit.transformed else GameState.form_of(unit.id)
+	active_portrait.setup(unit.id, tint, unit.portrait_style, unit.art_for(art_slot), art_slot, portrait_form)
 	active_name.text = unit.display_name
 
 	var max_value := maxf(1.0, unit.max_hp())

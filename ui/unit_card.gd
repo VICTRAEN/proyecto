@@ -97,6 +97,13 @@ func bind(new_unit: CombatUnit, make_prominent: bool = false, make_compact: bool
 		_apply_text_sizes(25, 18, 22)
 	if minimal:
 		_apply_minimal_layout()
+	refresh_art()
+	_apply_identity()
+	refresh()
+
+
+## Arte, nombre y tipo de la unidad. Se repite al TRANSFORMARSE (X.5): el sprite cambia en vivo.
+func refresh_art() -> void:
 	var tint: Color = TypeColors.color_for(unit.type)
 	# El rival se muestra de frente; las unidades del jugador, de espaldas.
 	# FRONT en las casillas: la fila entera se ve de FRENTE porque es la
@@ -104,12 +111,10 @@ func bind(new_unit: CombatUnit, make_prominent: bool = false, make_compact: bool
 	# grande de la barra inferior, que va de ESPALDAS (BACK). Asi el mismo
 	# personaje no parece salir dos veces igual durante el combate.
 	var art_slot := "front"
-	portrait.setup(unit.id, tint, unit.portrait_style, unit.art_for(art_slot), art_slot, GameState.form_of(unit.id))
+	portrait.setup(unit.id, tint, unit.portrait_style, unit.art_for(art_slot), art_slot, unit.visual_form() if unit.transformed else GameState.form_of(unit.id))
 	name_label.text = unit.display_name
 	type_chip.text = unit.type
 	type_chip.add_theme_color_override("font_color", tint)
-	_apply_identity()
-	refresh()
 
 
 ## Tarjeta de combate despejada: el sprite manda. La informacion sigue ahi (los
