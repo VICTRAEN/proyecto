@@ -22,6 +22,7 @@ archivo en `data/characters/` y meter su arte.
 | passive | objeto | trigger, condition, effects. La pasiva del personaje sin evolucionar. |
 | skills | array | La primera con kind "basic", la segunda con kind "special". |
 | transformations | array | Transformacion en combate (estilo Mega Evolucion). Vacio = el personaje no se transforma (el estado de TODOS hoy). Se usa la PRIMERA entrada. Ver "Bloque de transformacion". |
+| domain | objeto | Dominio en combate (opcional; hoy NINGUN personaje lo tiene). Ver "Bloque de dominio". |
 | evolution | objeto | La RECETA de su forma evolucionada: passive (la pasiva mejorada), passive_extra (la segunda pasiva que gana), links y categories nuevos. Ver "Bloque de evolucion". |
 
 El nivel y la XP del personaje NO viven en su JSON: son estado del jugador
@@ -878,4 +879,45 @@ Pulsarlo gasta el turno: ataque especial de la transformacion y la forma nueva a
 | type, portrait_style, roles, categories, pattern | | Sustituyen a los originales (opcional). |
 | icon | ruta | PNG para el icono del boton circular (opcional; si falta, dibuja una estrella evolutiva). |
 | color, color2 | `#rrggbb` | Colores del boton y del destello. |
+
+## Bloque de dominio (`domain`)
+
+Mecanica rara: solo los personajes con un objeto `domain` valido (con `id`) ven el boton circular DOMINIO
+en su turno. Abrirlo gasta el turno, cambia el FONDO del combate y reparte bonus y penalizaciones por
+categoria a aliados y rivales. Un solo dominio activo a la vez y una expansion por equipo y combate.
+Dura hasta que cae quien lo abrio (o `duration_rounds`). Al terminar, fondo y estadisticas vuelven a lo normal.
+No se guarda nada en el save.
+
+| Campo | Tipo | Notas |
+|---|---|---|
+| id | texto | Obligatorio. |
+| name | texto | Nombre que se lee arriba del combate. |
+| background | ruta o nombre | PNG de fondo. Si falta: `art/backgrounds/domain_<id>.png`; sin PNG, fondo provisional rojo. Admite `res://...` completa. |
+| cost | entero | SP que cuesta abrirlo (por defecto 0). |
+| duration_rounds | entero | 0 = hasta que cae el lanzador (por defecto). N = termina al acabar N rondas. |
+| effects | array | Grupos de efecto (abajo). |
+| attack | objeto | Ataque opcional tras la expansion (`power`, `target`, `effects`...). Sin el, el turno se gasta solo en abrirlo. |
+| icon, color, color2 | | Boton circular (opcionales). |
+
+Cada grupo de `effects`:
+
+| Campo | Notas |
+|---|---|
+| side | `allies`, `foes` o `both` (por defecto). |
+| categories / ids / types | Filtros (basta cumplir uno). Sin filtros o con `"all": true`, afecta a todos del lado indicado. |
+| stat_multiplier + stats | 1.3 = +30%, 0.8 = -20%. `stats` por defecto `["atk","def"]`. |
+| mods | Lista `{stat, kind, value}` como en las pasivas. |
+
+Ejemplo (Gojo): fondo propio, +30% ataque/defensa a las categorias `protagonists` y `supernatural` aliadas, +20% a ciertos personajes por id (la serie "Jujutsu Kaisen" no es una categoria: se indica con `ids`, o se crea una categoria nueva en `data/categories/`) y -20% de ataque a todos los rivales (ids de ejemplo):
+
+```json
+"domain": {
+  "id": "vacio_infinito", "name": "Vacio Infinito", "cost": 0,
+  "effects": [
+    { "side": "allies", "categories": ["protagonists", "supernatural"], "stat_multiplier": 1.3, "stats": ["atk", "def"] },
+    { "side": "allies", "ids": ["gojo", "itadori"], "stat_multiplier": 1.2, "stats": ["atk"] },
+    { "side": "foes", "all": true, "stat_multiplier": 0.8, "stats": ["atk"] }
+  ]
+}
+```
 

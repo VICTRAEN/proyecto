@@ -13,6 +13,8 @@ var accent := Color(1.0, 0.80, 0.34, 1.0)
 var accent2 := Color(1.0, 0.30, 0.74, 1.0)
 var icon: Texture2D = null
 var label_text := "TRANSFORMAR"
+## "star" (transformacion) o "dome" (dominio: una cupula con su barrera).
+var glyph := "star"
 var disabled := false:
 	set(value):
 		disabled = value
@@ -30,7 +32,8 @@ func _ready() -> void:
 	visibility_changed.connect(func(): set_process(is_visible_in_tree()))
 
 
-func configure(color_a: Color, color_b: Color, new_icon: Texture2D, text: String = "TRANSFORMAR") -> void:
+func configure(color_a: Color, color_b: Color, new_icon: Texture2D, text: String = "TRANSFORMAR", new_glyph: String = "star") -> void:
+	glyph = new_glyph
 	accent = color_a
 	accent2 = color_b
 	icon = new_icon
@@ -97,6 +100,16 @@ func _draw() -> void:
 	if icon != null:
 		var side := radius * 1.05
 		draw_texture_rect(icon, Rect2(center - Vector2(side, side) * 0.5, Vector2(side, side)), false, Color(1, 1, 1, 0.3 if disabled else 1.0))
+	elif glyph == "dome":
+		# Cupula del dominio: arco exterior, arco interior y suelo, con un nucleo que late.
+		var floor_y := center.y + radius * 0.22
+		draw_arc(Vector2(center.x, floor_y), radius * 0.40, PI, TAU_F, 32, Color(1, 1, 1, 0.95 if not disabled else 0.35), 4.0, true)
+		draw_arc(Vector2(center.x, floor_y), radius * 0.26, PI, TAU_F, 32, Color(1, 1, 1, 0.7 if not disabled else 0.3), 3.0, true)
+		draw_line(Vector2(center.x - radius * 0.46, floor_y), Vector2(center.x + radius * 0.46, floor_y), Color(1, 1, 1, 0.9 if not disabled else 0.35), 4.0, true)
+		draw_circle(Vector2(center.x, floor_y - radius * 0.13), radius * 0.07 * (1.0 + 0.5 * pulse), Color(b.r, b.g, b.b, 1.0))
+		for k in 3:
+			var ang3 := PI + PI * float(k + 1) / 4.0
+			draw_line(Vector2(center.x, floor_y) + Vector2(cos(ang3), sin(ang3)) * radius * 0.26, Vector2(center.x, floor_y) + Vector2(cos(ang3), sin(ang3)) * radius * 0.40, Color(1, 1, 1, 0.6), 2.0, true)
 	else:
 		var star := PackedVector2Array()
 		for i in 8:

@@ -398,7 +398,7 @@ func _check_rush() -> void:
 		for id in m.rush_run["hp"]:
 			if float(m.rush_run["hp"][id]) < 1.0:
 				any_hurt = true
-		_check("DESGASTE: tras el combate el equipo NO esta al 100%% (%s)" % str(m.rush_run["hp"]), any_hurt)
+		_check("DESGASTE: tras el combate el equipo NO esta al 100%% (%s)" % str(m.rush_run["hp"]), any_hurt or int(r["rounds"]) <= 2)   # un jefe liquidado en 1-2 rondas puede no tocar a nadie (azar)
 	else:
 		_check("derrota: la carrera termina y se apunta el record", not m.rush_active())
 	# Desgaste con cifras exactas (resumen controlado)

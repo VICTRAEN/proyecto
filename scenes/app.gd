@@ -134,6 +134,13 @@ func _ready() -> void:
 	elif dbg_args.has("--diag"):
 		# v15: diagnostico de datos y guardado (solo desarrollo; dev/diagnostics.gd).
 		_run_diagnostics()
+	elif dbg_args.has("--dbg32"):
+		var hito_r: GDScript = load("res://scenes/debug/hito_r_checks.gd")
+		var hito_r_node := Node.new()
+		hito_r_node.set_script(hito_r)
+		hito_r_node.name = "HitoRChecks"
+		add_child(hito_r_node)
+		hito_r_node.call_deferred("run", self)
 	elif dbg_args.has("--dbg31"):
 		var hito_q: GDScript = load("res://scenes/debug/hito_q_checks.gd")
 		var hito_q_node := Node.new()

@@ -111,6 +111,11 @@ const PALETTES := {
 }
 ## Paletas de respaldo de las pantallas nuevas (si falta su imagen de fondo).
 const EXTRA_PALETTES := {
+	"domain": {
+		"top": Color(0.03, 0.0, 0.06), "mid": Color(0.28, 0.02, 0.18),
+		"low": Color(0.62, 0.06, 0.20), "glow": Color(1.0, 0.45, 0.55),
+		"hill_a": Color(0.05, 0.0, 0.08), "hill_b": Color(0.02, 0.0, 0.04),
+	},
 	"summon": {
 		"top": Color(0.08, 0.04, 0.22), "mid": Color(0.36, 0.14, 0.52),
 		"low": Color(0.80, 0.34, 0.74), "glow": Color(1.0, 0.76, 0.95),
@@ -220,6 +225,13 @@ func _update_ambient() -> void:
 static func load_texture(slot_name: String) -> Texture2D:
 	if slot_name.is_empty():
 		return null
+	# Ruta completa (res:// o user://): un dominio puede apuntar a cualquier PNG.
+	if slot_name.begins_with("res://") or slot_name.begins_with("user://"):
+		if ResourceLoader.exists(slot_name):
+			var direct = load(slot_name)
+			if direct is Texture2D:
+				return direct
+		return null
 	for ext in EXTS:
 		var path := "%s/%s%s" % [DIR, slot_name, ext]
 		if ResourceLoader.exists(path):
@@ -277,7 +289,10 @@ func _draw_cover(w: float, h: float) -> void:
 ## siluetas de terreno. Es barato (solo se redibuja al cambiar de tamano) y da
 ## el tono de cada pantalla sin necesitar arte.
 func _draw_placeholder(w: float, h: float) -> void:
-	var pal: Dictionary = PALETTES.get(slot, EXTRA_PALETTES.get(slot, DEFAULT_PALETTE))
+	var pal_key := slot
+	if not PALETTES.has(pal_key) and not EXTRA_PALETTES.has(pal_key) and (slot.begins_with("domain") or slot.contains("/domain")):
+		pal_key = "domain"   # dominio sin PNG todavia: fondo provisional rojo oscuro
+	var pal: Dictionary = PALETTES.get(pal_key, EXTRA_PALETTES.get(pal_key, DEFAULT_PALETTE))
 	var top: Color = pal["top"]
 	var mid: Color = pal["mid"]
 	var low: Color = pal["low"]

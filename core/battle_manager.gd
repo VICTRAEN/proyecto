@@ -43,6 +43,9 @@ signal intro_closed
 signal phase_changed(unit, index: int, phase: Dictionary)
 ## X.5: un aliado se transforma. Se emite DESPUES de aplicar la transformacion y ANTES de su ataque.
 signal transformed(unit, definition: Dictionary)
+## X.6: un aliado abre su DOMINIO / el dominio termina (reason: caster_down, expired, battle_end).
+signal domain_started(unit, definition: Dictionary)
+signal domain_ended(unit, definition: Dictionary, reason: String)
 
 const ENEMY_THINK_TIME := 0.7
 const TURN_PAUSE := 0.15
@@ -102,6 +105,8 @@ func set_auto(enabled: bool) -> void:
 func _pick_auto_kind(unit: CombatUnit) -> String:
 	if can_transform(unit):
 		return "transform"
+	if can_domain(unit):
+		return "domain"
 	if can_use(unit, "ultimate"):
 		return "ultimate"
 	if can_use(unit, "special"):
@@ -134,6 +139,12 @@ var _finished := false
 ## libera aunque el transformado caiga.
 var _team_transform_used := false
 var transformed_unit: CombatUnit = null
+## Dominio (X.6): solo uno a la vez en todo el combate y solo una expansion por equipo.
+var _team_domain_used := false
+var active_domain: Dictionary = {}
+var domain_caster: CombatUnit = null
+var domain_rounds_left := 0
+const DOMAIN_PAUSE := 2.2
 ## Links del equipo que han quedado ACTIVOS en esta batalla. Se resuelve una vez
 ## al construir la formacion y la pantalla de combate lo lee para su aviso.
 var _team_link_ids: Array = []
@@ -159,6 +170,10 @@ func setup(ally_data: Array, enemy_data: Array, reserve_data: Array = []) -> voi
 	_finished = false
 	_team_transform_used = false
 	transformed_unit = null
+	_team_domain_used = false
+	active_domain = {}
+	domain_caster = null
+	domain_rounds_left = 0
 	_rng.randomize()
 	# El ajuste de velocidad de combate se lee UNA vez por batalla: si el jugador
 	# lo cambia en AJUSTES, la siguiente batalla ya va distinto.
@@ -233,7 +248,15 @@ func can_transform(unit: CombatUnit) -> bool:
 	return unit != null and unit.can_transform() and not _team_transform_used and not _finished
 
 
+## Puede este aliado abrir su dominio AHORA? (tiene dominio y SP, su equipo no ha abierto ya uno en
+## este combate y no hay otro dominio activo).
+func can_domain(unit: CombatUnit) -> bool:
+	return unit != null and unit.can_open_domain() and not _team_domain_used and active_domain.is_empty() and not _finished
+
+
 func can_use(unit: CombatUnit, kind: String) -> bool:
+	if kind == "domain":
+		return can_domain(unit)
 	if kind == "transform":
 		return can_transform(unit)
 	var skill := unit.skill_by_kind(kind)
@@ -352,7 +375,7 @@ func _take_turn(unit: CombatUnit) -> void:
 	unit.tick_statuses()
 	if _finished:
 		return
-	if _last_action_kind == "transform":
+	if _last_action_kind == "transform" or _last_action_kind == "domain":
 		await get_tree().create_timer(TRANSFORM_PAUSE * pause_scale).timeout
 	elif _last_action_kind == "ultimate":
 		await get_tree().create_timer(ULTIMATE_CINEMATIC_PAUSE * pause_scale).timeout
@@ -378,15 +401,31 @@ func _perform(actor: CombatUnit, kind: String, target_key: String = "") -> void:
 			is_transform = true
 		else:
 			kind = "basic"
+	# X.6: EXPANDIR DOMINIO tambien es la accion del turno: cambia el campo y, si el dominio trae
+	# ataque, lo lanza a continuacion. Sin ataque, el turno se gasta en la expansion.
+	var is_domain := false
+	if kind == "domain":
+		if can_domain(actor):
+			is_domain = true
+		else:
+			kind = "basic"
 	_last_action_kind = kind
 	var skill := actor.skill_by_kind(kind)
-	if is_transform:
+	if is_domain:
+		_do_domain(actor)
+		skill = actor.domain_attack()
+		_last_action_kind = "domain"
+		if skill.is_empty():
+			return
+		kind = "special"
+	elif is_transform:
 		_do_transform(actor)
 		skill = actor.transform_attack()
 		kind = "special"
 		_last_action_kind = "transform"
 	if skill.is_empty():
 		return
+	is_transform = is_transform or is_domain
 	var cost := 0 if is_transform else _skill_cost(actor, skill)
 	if cost > actor.sp:
 		skill = actor.skill_by_kind("basic")
@@ -993,6 +1032,7 @@ func _emit_order() -> void:
 
 
 func _tick_round_end() -> void:
+	_domain_round_end()
 	if survive_rounds > 0 and round_number >= survive_rounds and not _alive_only(allies).is_empty() and not _finished:
 		_log("Has resistido %d rondas." % survive_rounds, "result")
 		_finish(true)
@@ -1009,6 +1049,7 @@ func _tick_round_end() -> void:
 func _check_end() -> bool:
 	if _finished:
 		return true
+	_domain_check()
 	_rotate_reserves()
 	if _alive_only(enemies).is_empty():
 		_finish(true)
@@ -1035,6 +1076,8 @@ func _rotate_reserves() -> void:
 		_participants.append(incoming.id)
 		_log("%s cae. %s entra desde la reserva." % [fallen.display_name, incoming.display_name], "system")
 		reserve_entered.emit(fallen, incoming, i)
+		if not active_domain.is_empty():
+			_domain_sync()
 
 
 ## Ids de todo el que ha combatido (para repartir XP).
@@ -1065,6 +1108,8 @@ func _finish(victory: bool) -> void:
 	if _finished:
 		return
 	_finished = true
+	if not active_domain.is_empty():
+		_domain_end("battle_end")
 	_revert_transformations()
 	if victory:
 		_log("Victoria en la ronda %d." % round_number, "result")
@@ -1287,3 +1332,119 @@ func _enter_phase(boss: CombatUnit, phase: Dictionary, ctx: Dictionary) -> void:
 	phase_changed.emit(boss, boss.phase_index, phase)
 	if not phase_changed.get_connections().is_empty():
 		_phase_pause = maxf(_phase_pause, PHASE_PAUSE)
+
+
+## --- Dominio (X.6) -------------------------------------------------------------
+## Definicion en el JSON del personaje (data/SCHEMA.md, "Bloque de dominio"). El dominio cambia el
+## FONDO (lo pinta la UI al recibir domain_started) y reparte bonus/penalizaciones por categoria a
+## ALIADOS y RIVALES. Dura hasta que cae quien lo abrio (o `duration_rounds` rondas si se indica).
+
+func domain_groups() -> Array:
+	var out: Array = []
+	var raw = active_domain.get("effects", [])
+	if raw is Array:
+		for entry in raw:
+			if entry is Dictionary:
+				out.append(entry)
+	return out
+
+
+func _domain_source(index: int) -> String:
+	return "domain:%s:%d" % [String(active_domain.get("id", "")), index]
+
+
+## Un grupo afecta a la unidad si cumple el lado (`side`: allies / foes / both, por defecto both) y el filtro
+## (`categories`, `ids`, `types`; con `all: true` o sin ningun filtro, a todos).
+func domain_matches(unit: CombatUnit, group: Dictionary) -> bool:
+	var side := String(group.get("side", "both"))
+	if side == "allies" and not unit.is_ally:
+		return false
+	if side == "foes" and unit.is_ally:
+		return false
+	var has_filter := false
+	if group.get("categories", null) is Array and not (group["categories"] as Array).is_empty():
+		has_filter = true
+		for cat in group["categories"]:
+			if unit.categories.has(String(cat)):
+				return true
+	if group.get("ids", null) is Array and not (group["ids"] as Array).is_empty():
+		has_filter = true
+		if (group["ids"] as Array).has(unit.id):
+			return true
+	if group.get("types", null) is Array and not (group["types"] as Array).is_empty():
+		has_filter = true
+		if (group["types"] as Array).has(unit.type):
+			return true
+	return not has_filter or bool(group.get("all", false))
+
+
+## Repone los modificadores del dominio sobre TODAS las unidades en juego (idempotente: se llama al abrirlo
+## y cuando entra una reserva).
+func _domain_sync() -> void:
+	if active_domain.is_empty():
+		return
+	var groups := domain_groups()
+	for unit in _everyone():
+		for i in groups.size():
+			unit.stats.remove_source(_domain_source(i))
+		if not unit.alive:
+			continue
+		for i in groups.size():
+			var group: Dictionary = groups[i]
+			if not domain_matches(unit, group):
+				continue
+			var source := _domain_source(i)
+			var mult := float(group.get("stat_multiplier", 1.0))
+			if mult != 1.0:
+				var stat_list = group.get("stats", ["atk", "def"])
+				if stat_list is Array:
+					for stat_name in stat_list:
+						unit.stats.add_mod(String(stat_name), "mult", mult - 1.0, source)
+			var extra = group.get("mods", [])
+			if extra is Array:
+				for mod in extra:
+					if mod is Dictionary and not String((mod as Dictionary).get("stat", "")).is_empty():
+						unit.stats.add_mod(String(mod["stat"]), String(mod.get("kind", "mult")), float(mod.get("value", 0.0)), source)
+
+
+func _do_domain(actor: CombatUnit) -> void:
+	_team_domain_used = true
+	actor.sp = maxi(0, actor.sp - actor.domain_cost())
+	active_domain = actor.domain.duplicate(true)
+	domain_caster = actor
+	domain_rounds_left = maxi(0, int(active_domain.get("duration_rounds", 0)))
+	_log("%s expande su dominio: %s" % [actor.display_name, String(active_domain.get("name", "Dominio"))], "buff")
+	_domain_sync()
+	domain_started.emit(actor, active_domain)
+
+
+func _domain_end(reason: String) -> void:
+	if active_domain.is_empty():
+		return
+	var definition := active_domain
+	var caster := domain_caster
+	var count := domain_groups().size()
+	for unit in allies + enemies + reserves:
+		for i in count:
+			unit.stats.remove_source("domain:%s:%d" % [String(definition.get("id", "")), i])
+	active_domain = {}
+	domain_caster = null
+	domain_rounds_left = 0
+	if reason != "battle_end":
+		_log("El dominio %s se desvanece." % String(definition.get("name", "")), "system")
+	domain_ended.emit(caster, definition, reason)
+
+
+## El dominio cae con quien lo abrio.
+func _domain_check() -> void:
+	if not active_domain.is_empty() and (domain_caster == null or not domain_caster.alive):
+		_domain_end("caster_down")
+
+
+func _domain_round_end() -> void:
+	if active_domain.is_empty() or domain_rounds_left <= 0:
+		return
+	domain_rounds_left -= 1
+	if domain_rounds_left <= 0:
+		_domain_end("expired")
+

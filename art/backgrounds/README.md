@@ -98,3 +98,10 @@ aparece solo.
 Si quieres que su fondo provisional tenga buen tono antes de tener arte, anade
 una entrada con ese nombre al diccionario `PALETTES` de `res://ui/background.gd`.
 Es una linea de colores, no hace falta nada mas.
+
+## Fondos de DOMINIO (X.6)
+
+Un personaje con `domain` cambia el fondo del combate mientras el dominio esta activo.
+Mete el PNG como `res://art/backgrounds/domain_<id del dominio>.png` (o indica otra ruta en
+`"background"` del dominio, por ejemplo `"res://art/backgrounds/mi_fondo.png"`). Sin PNG se ve un fondo
+rojo oscuro provisional. Formato vertical (1080x1920 recomendado); se recorta sin deformarse.

@@ -186,6 +186,24 @@ func check_missing_resources() -> void:
 	# X.3: datos de los modos de juego (incursiones, mazmorras, Boss Rush, roguelike).
 	for problem in GameState.modes.data_problems():
 		_add("error", "modos", String(problem))
+	# X.6: dominios de los personajes (categorias que existan; el PNG de fondo falta = aviso, no error).
+	for cid in DB.characters.keys():
+		var dom = (DB.characters[cid] as Dictionary).get("domain", {})
+		if not (dom is Dictionary) or (dom as Dictionary).is_empty():
+			continue
+		if String(dom.get("id", "")).is_empty():
+			_add("error", "dominios", "'%s': el dominio no tiene \"id\" (se ignora)" % cid)
+			continue
+		var bgname := String(dom.get("background", ""))
+		if bgname.is_empty():
+			bgname = "domain_%s" % String(dom["id"])
+		if not bg.has_image(bgname):
+			_add("warning", "dominios", "'%s': falta el PNG de fondo del dominio (%s); se ve un fondo provisional" % [cid, bgname])
+		for group in (dom.get("effects", []) as Array):
+			if group is Dictionary:
+				for cat in ((group as Dictionary).get("categories", []) as Array):
+					if not DB.categories.has(String(cat)):
+						_add("error", "dominios", "'%s': el dominio usa la categoria '%s', que no existe" % [cid, cat])
 	# Cosmeticos: el fondo o la ilustracion tienen que existir de verdad.
 	for id in DB.cosmetics.keys():
 		var c: Dictionary = DB.cosmetics[id]

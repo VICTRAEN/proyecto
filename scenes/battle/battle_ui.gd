@@ -164,10 +164,13 @@ func _ready() -> void:
 	manager.battle_finished.connect(_on_battle_finished)
 	manager.ultimate_started.connect(_on_ultimate_started)
 	manager.transformed.connect(_on_transformed)
+	manager.domain_started.connect(_on_domain_started)
+	manager.domain_ended.connect(_on_domain_ended)
 	manager.boss_intro.connect(_on_boss_intro)
 	manager.phase_changed.connect(_on_phase_changed)
 	_build_ultimate_button()
 	_build_transform_button()
+	_build_domain_button()
 	_build_speed_auto_buttons()
 
 	attack_button.pressed.connect(_on_attack_pressed)
@@ -436,6 +439,7 @@ func _on_action_requested(unit: CombatUnit) -> void:
 		special_button.disabled = not manager.can_use(unit, "special")
 	_refresh_ultimate_button(unit)
 	_refresh_transform_button(unit)
+	_refresh_domain_button(unit)
 	_pulse(action_row)
 
 
@@ -633,6 +637,9 @@ func _refresh_tool_buttons() -> void:
 ## solo es visible para una unidad que la tiene en su forma actual.
 var ultimate_button: Button = null
 var transform_button: Control = null
+var domain_button: Control = null
+var _pre_domain_slot := ""
+var _pre_domain_title := ""
 ## Presentacion de la ultimate en curso (bloquea el cierre del resultado hasta que acaba).
 var _ult_fx_active := false
 ## Cuantas ultimates de forma se han presentado en esta batalla (lo usan las pruebas).
@@ -738,6 +745,84 @@ func _on_transformed(unit: CombatUnit, definition: Dictionary) -> void:
 			card.refresh_art()
 	if current_actor == unit:
 		_set_active_unit(unit)
+
+
+## --- Dominio (X.6) -----------------------------------------------------------------
+## Segundo boton circular, junto al de transformar. Aparece solo si el aliado que actua tiene dominio,
+## le llega el SP y su equipo no ha abierto ya uno. No pide objetivo.
+func _build_domain_button() -> void:
+	var script: Script = load("res://ui/transform_button.gd")
+	domain_button = Control.new()
+	domain_button.set_script(script)
+	domain_button.name = "DomainButton"
+	domain_button.visible = false
+	domain_button.custom_minimum_size = Vector2(130, 130)
+	action_row.add_child(domain_button)
+	domain_button.pressed.connect(_on_domain_pressed)
+
+
+func _refresh_domain_button(unit: CombatUnit) -> void:
+	if domain_button == null:
+		return
+	if unit == null or not unit.is_ally or not manager.can_domain(unit):
+		domain_button.visible = false
+		return
+	var d: Dictionary = unit.domain
+	var tex: Texture2D = null
+	var icon_path := String(d.get("icon", ""))
+	if icon_path != "" and ResourceLoader.exists(icon_path):
+		tex = load(icon_path) as Texture2D
+	domain_button.configure(Color.html(String(d.get("color", "#b0103c"))), Color.html(String(d.get("color2", "#6a1bff"))), tex, "DOMINIO", "dome")
+	domain_button.disabled = false
+	domain_button.visible = true
+
+
+func _on_domain_pressed() -> void:
+	if current_actor == null or not manager.can_domain(current_actor):
+		return
+	domain_button.visible = false
+	_finish_submit("domain", "")
+
+
+func _on_domain_started(unit: CombatUnit, definition: Dictionary) -> void:
+	if domain_button != null:
+		domain_button.visible = false
+	var col := Color.html(String(definition.get("color", "#b0103c")))
+	var flash := ColorRect.new()
+	flash.color = Color(col.r, col.g, col.b, 0.85)
+	flash.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	flash.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	flash.z_index = 17
+	add_child(flash)
+	var tw := create_tween()
+	tw.tween_property(flash, "color:a", 0.0, 0.9)
+	tw.finished.connect(flash.queue_free)
+	_spawn_banner("EXPANSION DE DOMINIO", col)
+	var bg = get_node_or_null("Background")
+	if bg != null and bg.has_method("show_slot"):
+		if _pre_domain_slot.is_empty():
+			_pre_domain_slot = String(bg.get("slot"))
+		var wanted := String(definition.get("background", ""))
+		if wanted.is_empty():
+			wanted = "domain_%s" % String(definition.get("id", ""))
+		bg.call("show_slot", wanted)
+	if _pre_domain_title.is_empty():
+		_pre_domain_title = header_label.text
+	header_label.text = "DOMINIO: %s" % String(definition.get("name", "")).to_upper()
+	_refresh_all()
+
+
+func _on_domain_ended(_unit, _definition: Dictionary, reason: String) -> void:
+	if reason == "battle_end":
+		return
+	var bg = get_node_or_null("Background")
+	if bg != null and bg.has_method("show_slot") and not _pre_domain_slot.is_empty():
+		bg.call("show_slot", _pre_domain_slot)
+	_pre_domain_slot = ""
+	if not _pre_domain_title.is_empty():
+		header_label.text = _pre_domain_title
+	_pre_domain_title = ""
+	_refresh_all()
 
 
 func _on_restart_pressed() -> void:
@@ -1006,6 +1091,7 @@ func _cancel_targeting() -> void:
 	special_button.visible = true
 	_refresh_ultimate_button(current_actor)
 	_refresh_transform_button(current_actor)
+	_refresh_domain_button(current_actor)
 
 
 func _clear_targeting() -> void:

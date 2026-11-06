@@ -54,6 +54,8 @@ var battle: BattleStats = null
 ## su JSON). Vacia = el personaje no puede transformarse. Solo los ALIADOS la reciben.
 var transformation: Dictionary = {}
 var transformed := false
+## Dominio del personaje (clave "domain" de su JSON; X.6). Vacio = no tiene. Solo los ALIADOS lo reciben.
+var domain: Dictionary = {}
 ## Copia del estado original para volver a el al terminar el combate (o en las pruebas).
 var _form_backup: Dictionary = {}
 ## --- Estado de combate v12 -------------------------------------------------
@@ -159,6 +161,10 @@ func setup(data: Dictionary, ally_flag: bool, slot_index: int) -> void:
 	transformation = {}
 	transformed = false
 	_form_backup = {}
+	domain = {}
+	var raw_domain = data.get("domain", {})
+	if ally_flag and raw_domain is Dictionary and not String((raw_domain as Dictionary).get("id", "")).is_empty():
+		domain = (raw_domain as Dictionary).duplicate(true)
 	var raw_forms = data.get("transformations", [])
 	if ally_flag and raw_forms is Array:
 		for entry in raw_forms:
@@ -727,3 +733,42 @@ func revert_transformation() -> void:
 		hp = maxf(1.0, roundf(max_hp() * ratio))
 	transformed = false
 	_form_backup = {}
+
+
+## --- Dominio (X.6) -------------------------------------------------------------
+## La definicion vive en el JSON del personaje (data/SCHEMA.md, "Bloque de dominio"). Lo que
+## cambia (fondo, bonus y penalizaciones por categoria) lo aplica el BattleManager; aqui solo se
+## guarda la definicion y se contesta "puede abrirlo?".
+
+func has_domain() -> bool:
+	return not domain.is_empty()
+
+
+func domain_cost() -> int:
+	return maxi(0, int(domain.get("cost", 0)))
+
+
+func can_open_domain() -> bool:
+	return alive and is_ally and has_domain() and sp >= domain_cost()
+
+
+## Ataque opcional que acompana a la expansion (mismo formato que el de la transformacion). {} = ninguno.
+func domain_attack() -> Dictionary:
+	var raw = domain.get("attack", {})
+	if not (raw is Dictionary) or (raw as Dictionary).is_empty():
+		return {}
+	var out: Dictionary = (raw as Dictionary).duplicate(true)
+	if String(out.get("id", "")).is_empty():
+		out["id"] = "%s_attack" % String(domain.get("id", "domain"))
+	if String(out.get("name", "")).is_empty():
+		out["name"] = String(domain.get("name", "Dominio"))
+	out["kind"] = "special"
+	out["cost"] = 0
+	if not out.has("power"):
+		out["power"] = 120
+	if not out.has("target"):
+		out["target"] = "enemy_all"
+	if not out.has("effects"):
+		out["effects"] = []
+	return out
+
