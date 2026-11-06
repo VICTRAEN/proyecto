@@ -8,5 +8,5 @@
 - Fondo: `art/backgrounds/domain_<id>.png` o `"background"` con ruta completa; sin PNG, fondo rojo provisional.
 - Diagnostico (`--diag`) avisa de dominios mal definidos (categoria inexistente, falta PNG).
 - Documentado en data/SCHEMA.md ("Bloque de dominio") y art/backgrounds/README.md.
-- Pruebas: `--dbg32` (47 comprobaciones, definicion inyectada solo en memoria). dbg17-32 y diag en verde.
+
 - Test dbg30 (Boss Rush, desgaste) era inestable por azar: ya no falla si el jefe cae en 1-2 rondas sin tocar al equipo.

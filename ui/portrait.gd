@@ -133,6 +133,11 @@ func setup(character_id: String, tint: Color, portrait_style: String = "short", 
 			art_path = candidate
 			source_rect = visible_rect_for(candidate, loaded)
 			break
+	# Una TRANSFORMACION sin arte propio todavia (art/characters/<id>/transform/<ranura>.png) enseña el arte
+	# base con un tinte de energia: se nota que ha cambiado sin inventar un dibujo del personaje.
+	self_modulate = Color(1, 1, 1, 1)
+	if form == "transform" and not art_path.is_empty() and not art_path.contains("/transform/"):
+		self_modulate = Color(1.0, 0.58, 0.78, 1.0)
 	provisional = false
 	if texture == null and not character_id.is_empty():
 		var composed := _fallback_composite(character_id, slot)

@@ -1,0 +1,10 @@
+ASTA - FORMA UR (Asta despues del trato con Liebe)
+
+Se usa cuando Asta ha evolucionado a UR (o LR). Mete aqui:
+
+  front.png  ->  de frente   (cuando es el rival / fichas de equipo)
+  back.png   ->  de espaldas (cuando pelea en tu equipo)
+  icon.png   ->  la cara     (coleccion, equipo, orden, ficha)
+
+PNG con fondo transparente. Sin ellos se usa el arte base de res://art/characters/asta/
+(el de la forma SSR); no se rompe nada. Guia completa: res://art/README.md

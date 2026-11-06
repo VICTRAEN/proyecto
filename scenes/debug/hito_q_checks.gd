@@ -115,7 +115,7 @@ func _snap(u) -> Dictionary:
 
 func _check_data() -> void:
 	var dir := DirAccess.open("res://data/characters")
-	var with_t := 0
+	var with_t: Array = []
 	var total := 0
 	for f in dir.get_files():
 		if not f.ends_with(".json"):
@@ -125,14 +125,14 @@ func _check_data() -> void:
 		if parsed is Dictionary:
 			var t = (parsed as Dictionary).get("transformations", [])
 			if t is Array and not (t as Array).is_empty():
-				with_t += 1
-	_check("ningun personaje real tiene transformacion (%d personajes revisados)" % total, with_t == 0 and total > 0)
+				with_t.append(String(parsed.get("id", f)))
+	_check("solo Asta tiene transformacion en los datos reales (%d personajes revisados: %s)" % [total, str(with_t)], with_t == ["asta"] and total > 0)
 	var any_can := false
 	for id in GameState.roster:
 		var u := CombatUnit.new()
 		u.setup(GameState.character_data(String(id)), true, 0)
 		any_can = any_can or u.can_transform()
-	_check("con los datos reales nadie puede transformarse", not any_can)
+	_check("con los datos reales y el equipo inicial (Asta es SSR) nadie puede transformarse", not any_can)
 
 
 func _check_unit_level() -> void:

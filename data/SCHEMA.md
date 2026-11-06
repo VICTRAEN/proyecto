@@ -921,3 +921,8 @@ Ejemplo (Gojo): fondo propio, +30% ataque/defensa a las categorias `protagonists
 }
 ```
 
+
+Campo opcional de la transformacion: `min_rarity` (N/R/SR/SSR/UR/LR). La transformacion solo existe cuando el
+personaje tiene esa forma o una superior (Asta: `"UR"`; siendo SSR no se transforma y no ve el boton).
+Primer personaje con transformacion: `asta` (Union Demoniaca, ver `data/characters/asta.json`). El arte va en
+`art/characters/<id>/transform/` y, si falta, se ve el arte base con un tinte de energia.

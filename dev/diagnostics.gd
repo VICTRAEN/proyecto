@@ -186,6 +186,23 @@ func check_missing_resources() -> void:
 	# X.3: datos de los modos de juego (incursiones, mazmorras, Boss Rush, roguelike).
 	for problem in GameState.modes.data_problems():
 		_add("error", "modos", String(problem))
+	# X.5: transformaciones (id obligatorio, min_rarity valida, arte de la forma = aviso).
+	for cid in DB.characters.keys():
+		var forms = (DB.characters[cid] as Dictionary).get("transformations", [])
+		if not (forms is Array):
+			continue
+		for entry in forms:
+			if not (entry is Dictionary):
+				continue
+			if String(entry.get("id", "")).is_empty():
+				_add("error", "transformaciones", "'%s': una transformacion no tiene \"id\" (se ignora)" % cid)
+				continue
+			var need := String(entry.get("min_rarity", ""))
+			if not need.is_empty() and not ["N", "R", "SR", "SSR", "UR", "LR"].has(need):
+				_add("error", "transformaciones", "'%s': min_rarity '%s' no es una rareza valida" % [cid, need])
+			var form_dir := String(entry.get("form", "transform"))
+			if not ResourceLoader.exists("res://art/characters/%s/%s/front.png" % [cid, form_dir]):
+				_add("warning", "transformaciones", "'%s': falta el arte de la forma transformada (art/characters/%s/%s/front.png); se ve el arte base con tinte" % [cid, cid, form_dir])
 	# X.6: dominios de los personajes (categorias que existan; el PNG de fondo falta = aviso, no error).
 	for cid in DB.characters.keys():
 		var dom = (DB.characters[cid] as Dictionary).get("domain", {})

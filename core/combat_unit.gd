@@ -169,6 +169,11 @@ func setup(data: Dictionary, ally_flag: bool, slot_index: int) -> void:
 	if ally_flag and raw_forms is Array:
 		for entry in raw_forms:
 			if entry is Dictionary and not String((entry as Dictionary).get("id", "")).is_empty():
+				# `min_rarity` (opcional): la transformacion solo existe a partir de esa FORMA. Un SSR que
+				# aun no ha evolucionado a UR no la tiene (la rareza efectiva llega en data["rarity"]).
+				var need := String((entry as Dictionary).get("min_rarity", ""))
+				if not need.is_empty() and TRANSFORM_RARITY_ORDER.find(String(data.get("rarity", rarity))) < TRANSFORM_RARITY_ORDER.find(need):
+					continue
 				transformation = (entry as Dictionary).duplicate(true)
 				break
 
@@ -581,6 +586,7 @@ func status_text() -> String:
 ## Todo lo que cambia sale del JSON de la transformacion (data/SCHEMA.md, "Transformaciones"):
 ## estadisticas (stat_multiplier + stat_mods), habilidades (por tipo), pasivas, arte, nombre, tipo y
 ## demas. Se aplica sobre ESTA unidad de combate y nunca sobre el personaje guardado.
+const TRANSFORM_RARITY_ORDER := ["N", "R", "SR", "SSR", "UR", "LR"]
 const TRANSFORM_CORE_STATS := ["max_hp", "atk", "def", "speed"]
 const TRANSFORM_SOURCE_MULT := "transform:mult"
 const TRANSFORM_SOURCE_EXTRA := "transform:extra"
@@ -626,7 +632,7 @@ func apply_transformation() -> bool:
 		"display_name": display_name, "type": type, "portrait_style": portrait_style, "art": art.duplicate(true),
 		"roles": roles, "categories": categories, "skills": skills.duplicate(true), "passives": passives.duplicate(true),
 		"passive": passive, "ultimate": ultimate.duplicate(true), "ultimate_used": ultimate_used,
-		"pattern": pattern.duplicate(), "rule_state": rule_state.duplicate(true),
+		"pattern": pattern.duplicate(), "rule_state": rule_state.duplicate(true), "undying": undying, "undying_heal": undying_heal,
 	}
 	var old_max := max_hp()
 	var multiplier := float(d.get("stat_multiplier", 1.0))
@@ -729,6 +735,10 @@ func revert_transformation() -> void:
 	ultimate_used = bool(_form_backup["ultimate_used"])
 	pattern = (_form_backup["pattern"] as Array).duplicate()
 	pattern_step = 0
+	# Lo que la forma dejo atras (cargas de 'no morir', cuentas de sus pasivas) se va con ella.
+	undying = int(_form_backup.get("undying", 0))
+	undying_heal = float(_form_backup.get("undying_heal", 0.0))
+	rule_state = (_form_backup.get("rule_state", {}) as Dictionary).duplicate(true)
 	if alive:
 		hp = maxf(1.0, roundf(max_hp() * ratio))
 	transformed = false

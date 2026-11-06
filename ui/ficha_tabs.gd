@@ -278,6 +278,33 @@ static func build_habilidades(unit: CombatUnit) -> Control:
 		if not ult_description.is_empty():
 			box.add_child(body_text(ult_description))
 
+	# TRANSFORMACION (X.5): solo si la forma actual la tiene (Asta la gana al ser UR).
+	if unit.has_transformation():
+		var form: Dictionary = unit.transformation
+		box.add_child(block_title("TRANSFORMACION  -  1 POR EQUIPO Y COMBATE"))
+		var form_name := Label.new()
+		form_name.name = "TransformationName"
+		form_name.text = String(form.get("name", ""))
+		form_name.autowrap_mode = TextServer.AUTOWRAP_WORD
+		form_name.add_theme_font_size_override("font_size", VI.FONT_BODY)
+		form_name.add_theme_color_override("font_color", VI.rarity_color("LR"))
+		box.add_child(form_name)
+		var mult := float(form.get("stat_multiplier", 1.0))
+		if mult != 1.0:
+			box.add_child(key_value_row("ESTADISTICAS", "%+d%%" % int(round((mult - 1.0) * 100.0)), VI.GOLD))
+		var attack_info: Dictionary = unit.transform_attack()
+		box.add_child(key_value_row("AL ACTIVARLA", String(attack_info.get("name", ""))))
+		var attack_text := String(attack_info.get("description", ""))
+		if not attack_text.is_empty():
+			box.add_child(body_text(attack_text))
+		for skill in (form.get("skills", []) as Array):
+			if skill is Dictionary:
+				box.add_child(key_value_row(String((skill as Dictionary).get("kind", "")).to_upper(), String((skill as Dictionary).get("name", ""))))
+		for rule in (form.get("passives", []) as Array):
+			if rule is Dictionary and not String((rule as Dictionary).get("description", "")).is_empty():
+				box.add_child(body_text("%s: %s" % [String(rule.get("name", "")), String(rule["description"])]))
+		box.add_child(note("Dura hasta que el personaje cae. Se pulsa el boton circular en su turno."))
+
 	return box
 
 
