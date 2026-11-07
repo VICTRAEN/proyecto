@@ -1,0 +1,13 @@
+ASTA & LIEBE (unidad especial de banner "Union Demoniaca") - FORMA SSR
+
+Mete en ESTA carpeta (res://art/characters/asta_liebe/) tres archivos:
+
+  front.png  ->  de frente   (se usa cuando es el rival)
+  back.png   ->  de espaldas (se usa cuando es del jugador)
+  icon.png   ->  la cara     (coleccion, equipo, orden, ficha)
+
+PNG con fondo transparente. Subcarpetas:
+  ur/         -> forma UR (cuando evoluciona)
+  transform/  -> forma TRANSFORMADA (Union Demoniaca, solo en combate y solo desde UR)
+
+Mientras no existan, se muestra provisionalmente el arte del Asta normal (art_fallback_ids).

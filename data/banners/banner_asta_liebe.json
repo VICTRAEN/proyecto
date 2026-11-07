@@ -1,0 +1,35 @@
+{
+	"id": "banner_asta_liebe",
+	"name": "Union Demoniaca",
+	"description": "Banner de la unidad especial Asta & Liebe: sale SIEMPRE como SSR (3% por tirada) y despues evoluciona a UR, la forma desde la que se transforma en combate (Union Demoniaca).",
+	"enabled": true,
+	"cost_gems": 10,
+	"multi_pulls": 10,
+	"multi_cost_gems": 90,
+	"rates": {
+		"SR": 0.85,
+		"SSR": 0.15
+	},
+	"pool_categories": [],
+	"exclusive_ids": [
+		"asta_liebe"
+	],
+	"featured_rates": {
+		"asta_liebe": 0.03
+	},
+	"featured": [
+		"asta_liebe"
+	],
+	"featured_bonus": 0.0,
+	"theme": {
+		"accent": "#e0183c",
+		"accent2": "#7a2bd6",
+		"tagline": "UNIDAD ESPECIAL  -  UNION DEMONIACA",
+		"hero": "asta_liebe"
+	},
+	"pity": {
+		"pulls": 0,
+		"rarity": ""
+	},
+	"notes": "Sin pity (ningun personaje del pool puede llegar a LR, que es lo que protege el pity de este juego). Probabilidades POR TIRADA, explicitas y sumando 1: SR 85%, SSR 15%. Dentro del SSR, Asta & Liebe tiene tasa propia del 3% por tirada (featured_rates) y el 12% restante se reparte entre los demas SSR del pool. Solo existe como SSR: la forma UR se consigue evolucionando. No entra en ningun otro banner (banner_only + exclusive_ids). 'enabled': false apaga el banner."
+}

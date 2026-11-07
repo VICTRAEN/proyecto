@@ -138,8 +138,8 @@ func _check_data() -> void:
 				if not KNOWN_TRIGGERS.has(String(rule.get("trigger", ""))) or not _effects_valid(rule.get("effects", [])) or String(rule.get("text", "")).is_empty():
 					link_ok = false
 	_check("los 13 links tienen 3 niveles con reglas validas y texto (%d niveles)" % tiers_total, link_ok and DB.all_links().size() == 13)
-	var ids_ok := DB.character_ids().size() == 65 and DB.has_character("david_lucy_duo") and DB.has_character("sakuta_mai_lr")
-	_check("el roster sigue en 65 personajes con los mismos identificadores", ids_ok)
+	var ids_ok := DB.character_ids().size() == 66 and DB.has_character("asta_liebe") and DB.has_character("david_lucy_duo") and DB.has_character("sakuta_mai_lr")
+	_check("el roster son 66 personajes (los 65 de siempre + Asta & Liebe) con los mismos identificadores", ids_ok)
 	var four := 0
 	for id in DB.character_ids():
 		var sp := {}
@@ -148,7 +148,7 @@ func _check_data() -> void:
 				sp = skill
 		if int(sp.get("cost", 0)) == 3 and float(sp.get("power", 0)) >= 0.0:
 			four += 1
-	_check("los costes de las especiales no han cambiado (SP 3)", four == 65)
+	_check("los costes de las especiales no han cambiado (SP 3)", four == 66)
 
 
 ## --- 2. Efectos del motor -------------------------------------------------------------

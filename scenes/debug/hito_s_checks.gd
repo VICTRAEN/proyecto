@@ -1,6 +1,6 @@
 extends Node
 
-## COMPROBACIONES EN EJECUCION DE LA PRIMERA UNIDAD CON TRANSFORMACION: Asta (Union Demoniaca). SOLO pruebas.
+## COMPROBACIONES EN EJECUCION DE LA PRIMERA UNIDAD CON TRANSFORMACION: Asta & Liebe (Union Demoniaca). SOLO pruebas.
 ## Arranque:  godot --headless --path . -- --dbg33   (escribe res://dbg33_resultados.txt)
 ## Todo con los DATOS REALES de Asta (nada inyectado), combates reales con BattleManager.
 
@@ -58,12 +58,12 @@ func run(app: Node) -> void:
 
 
 func _fresh() -> void:
-	GameState.roster = ["asta", "gojo", "isagi", "frieren", "mai"]
+	GameState.roster = ["asta_liebe", "asta", "gojo", "isagi", "frieren", "mai"]
 	GameState.progress = {}
 	GameState.rarities = {}
 	GameState.duplicates = {}
 	GameState.inventory = {}
-	GameState.party = ["asta", "gojo", "isagi", "frieren"]
+	GameState.party = ["asta_liebe", "gojo", "isagi", "frieren"]
 	GameState.tower_team = ["", "", "", "", ""]
 	GameState.ensure_defaults()
 	GameState.reset_battle_context()
@@ -73,14 +73,14 @@ func _fresh() -> void:
 
 
 func _asta_data(rarity: String) -> Dictionary:
-	GameState.rarities = {} if rarity == "SSR" else { "asta": rarity }
-	return GameState.character_data("asta")
+	GameState.rarities = {} if rarity == "SSR" else { "asta_liebe": rarity }
+	return GameState.character_data("asta_liebe")
 
 
 func _check_data() -> void:
-	var d := DB.get_character("asta")
+	var d := DB.get_character("asta_liebe")
 	var t: Array = d.get("transformations", [])
-	_check("Asta declara una transformacion con id", t.size() == 1 and String(t[0].get("id", "")) == "asta_union_demoniaca")
+	_check("Asta & Liebe declara una transformacion con id", t.size() == 1 and String(t[0].get("id", "")) == "asta_liebe_union_demoniaca")
 	var def: Dictionary = t[0]
 	_check("requiere forma UR", String(def.get("min_rarity", "")) == "UR")
 	_check("trae ataque de activacion, 2 habilidades y 3 pasivas", not (def.get("attack", {}) as Dictionary).is_empty() and (def["skills"] as Array).size() == 2 and (def["passives"] as Array).size() == 3)
@@ -91,9 +91,21 @@ func _check_data() -> void:
 			var tr = (parsed as Dictionary).get("transformations", [])
 			if tr is Array and not (tr as Array).is_empty():
 				ids[String(parsed["id"])] = true
-	_check("Asta es el UNICO personaje con transformacion", ids.keys() == ["asta"])
-	_check("carpetas de arte preparadas (ur y transform)", DirAccess.dir_exists_absolute(ProjectSettings.globalize_path("res://art/characters/asta/ur")) and DirAccess.dir_exists_absolute(ProjectSettings.globalize_path("res://art/characters/asta/transform")))
-	_check("el JSON del SSR no se ha tocado (stats base)", int(d["stats"]["max_hp"]) == 1380 and int(d["stats"]["atk"]) == 232 and String(d["rarity"]) == "SSR")
+	_check("Asta & Liebe es el UNICO personaje con transformacion", ids.keys() == ["asta_liebe"])
+	_check("carpetas de arte preparadas (ur y transform)", DirAccess.dir_exists_absolute(ProjectSettings.globalize_path("res://art/characters/asta_liebe/ur")) and DirAccess.dir_exists_absolute(ProjectSettings.globalize_path("res://art/characters/asta_liebe/transform")))
+	var normal := DB.get_character("asta")
+	_check("el Asta NORMAL no se ha tocado: SSR, 1380/232 y sin transformacion", int(normal["stats"]["max_hp"]) == 1380 and int(normal["stats"]["atk"]) == 232 and String(normal["rarity"]) == "SSR" and (normal.get("transformations", []) as Array).is_empty())
+	_check("Asta & Liebe es una unidad SSR exclusiva de banner", String(d["rarity"]) == "SSR" and bool(d.get("banner_only", false)))
+	var banner := DB.get_banner("banner_asta_liebe")
+	_check("existe el banner propio con Asta & Liebe destacada y exclusiva", not banner.is_empty() and (banner["exclusive_ids"] as Array) == ["asta_liebe"] and (banner["featured"] as Array) == ["asta_liebe"] and float(banner["featured_rates"]["asta_liebe"]) == 0.03)
+	_check("el banner no tiene problemas de configuracion", GameState.banner_problems("banner_asta_liebe").is_empty())
+	var in_pool: bool = GameState.banner_pool("banner_asta_liebe").has("asta_liebe")
+	var in_other := false
+	for bid in DB.banners.keys():
+		if bid != "banner_asta_liebe" and GameState.banner_pool(String(bid)).has("asta_liebe"):
+			in_other = true
+	_check("sale en su banner y en ningun otro", in_pool and not in_other)
+	_check("el Asta normal sigue pudiendo salir donde salia (banner destacado)", GameState.banner_pool("banner_destacado").has("asta"))
 
 
 func _check_rarity_gate() -> void:
@@ -105,6 +117,10 @@ func _check_rarity_gate() -> void:
 		var u2 := CombatUnit.new()
 		u2.setup(_asta_data(r), true, 0)
 		_check("Asta %s SI puede transformarse" % r, u2.has_transformation() and u2.can_transform())
+	GameState.rarities = { "asta": "UR" }
+	var normal_ur := CombatUnit.new()
+	normal_ur.setup(GameState.character_data("asta"), true, 0)
+	_check("el Asta NORMAL, aunque sea UR, NO se transforma", not normal_ur.has_transformation() and not normal_ur.can_transform())
 	var u3 := CombatUnit.new()
 	u3.setup(_asta_data("UR"), false, 0)
 	_check("Asta como enemigo no se transforma", not u3.can_transform())
@@ -156,7 +172,7 @@ func _enemies() -> Array:
 
 ## Combate manual: el jugador transforma a Asta UR. Se congela despues para inspeccionar.
 func _check_battle() -> void:
-	GameState.rarities = { "asta": "UR" }
+	GameState.rarities = { "asta_liebe": "UR" }
 	var m := BattleManager.new()
 	add_child(m)
 	m.setup(_party(), _enemies(), [])
@@ -168,7 +184,7 @@ func _check_battle() -> void:
 	m.transformed.connect(func(u, _d): ctx["n"] += 1; ctx["who"].append(u.id))
 	m.battle_finished.connect(func(_v, _r): done[0] = true)
 	m.action_requested.connect(func(u):
-		if not ctx["did"] and u.id == "asta":
+		if not ctx["did"] and u.id == "asta_liebe":
 			var capable := []
 			for a in m.allies:
 				if m.can_transform(a):
@@ -193,14 +209,14 @@ func _check_battle() -> void:
 		await _wait(0.03)
 	var asta = null
 	for a in m.allies:
-		if a.id == "asta":
+		if a.id == "asta_liebe":
 			asta = a
-	_check("solo Asta puede transformarse en un equipo de 4", ctx["capable"] == ["asta"])
-	_check("Asta se transforma una vez", ctx["n"] == 1 and ctx["who"] == ["asta"] and asta != null and asta.transformed)
+	_check("solo Asta puede transformarse en un equipo de 4", ctx["capable"] == ["asta_liebe"])
+	_check("Asta se transforma una vez", ctx["n"] == 1 and ctx["who"] == ["asta_liebe"] and asta != null and asta.transformed)
 	_check("el ataque de activacion hizo dano a los rivales", _hp_total(m) < float(ctx["enemy_hp"]))
 	var others_blocked := true
 	for a in m.allies:
-		if a.id != "asta" and m.can_transform(a):
+		if a.id != "asta_liebe" and m.can_transform(a):
 			others_blocked = false
 	_check("ningun otro personaje puede transformarse en este combate", others_blocked and not m.can_transform(asta))
 	_check("sigue transformado (ahora mismo)", asta.transformed and asta.display_name == "Asta & Liebe: Union Demoniaca" and asta.visual_form() == "transform")
@@ -214,7 +230,7 @@ func _check_battle() -> void:
 			break
 		await _wait(0.03)
 	_check("el combate termina", done[0])
-	_check("al terminar Asta vuelve a su estado UR original", not asta.transformed and asta.display_name == "Asta" and asta.visual_form() == "")
+	_check("al terminar Asta vuelve a su estado UR original", not asta.transformed and asta.display_name == "Asta & Liebe" and asta.visual_form() == "")
 	var was: Array = JSON.parse_string(String(ctx["before"]))
 	var now: Array = JSON.parse_string(_snap(asta))
 	var same := true
@@ -243,7 +259,7 @@ func _check_battle() -> void:
 	_check("con Asta SSR el combate es el de siempre (sin transformaciones)", d2[0] and st["n"] == 0)
 	m2.queue_free()
 	# Auto con Asta UR: se transforma solo una vez
-	GameState.rarities = { "asta": "UR" }
+	GameState.rarities = { "asta_liebe": "UR" }
 	var m3 := BattleManager.new()
 	add_child(m3)
 	m3.setup(_party(), _enemies(), [])
@@ -261,7 +277,7 @@ func _check_battle() -> void:
 	_check("modo auto: Asta UR se transforma una vez y el combate termina", d3[0] and st3["n"] == 1)
 	m3.queue_free()
 	# La muerte de Asta transformado: la forma dura hasta morir
-	GameState.rarities = { "asta": "UR" }
+	GameState.rarities = { "asta_liebe": "UR" }
 	var m4 := BattleManager.new()
 	add_child(m4)
 	m4.setup(_party(), _enemies(), [])
@@ -293,7 +309,7 @@ func _hp_total(m) -> float:
 
 ## UI real con datos reales: el boton solo aparece en el turno de Asta UR.
 func _check_ui() -> void:
-	GameState.rarities = { "asta": "UR" }
+	GameState.rarities = { "asta_liebe": "UR" }
 	GameState.prepare_battle(GameState.BATTLE_STORY, { "level": "world_004_01", "difficulty": "normal" })
 	var scene: PackedScene = load("res://scenes/battle/battle.tscn")
 	var ui: Control = scene.instantiate()
@@ -309,7 +325,7 @@ func _check_ui() -> void:
 		for i in 400:
 			var actor = ui.get("current_actor")
 			if ui.get("awaiting_input") and actor != null:
-				if actor.id == "asta":
+				if actor.id == "asta_liebe":
 					break
 				if btn != null and btn.visible:
 					saw_on_other = true
@@ -325,7 +341,7 @@ func _check_ui() -> void:
 		if btn != null and btn.visible:
 			btn.emit_signal("pressed")
 			await _wait(0.5)
-			_check("UI: pulsarlo transforma a Asta", mgr.transformed_unit != null and mgr.transformed_unit.id == "asta" and mgr.transformed_unit.transformed)
+			_check("UI: pulsarlo transforma a Asta", mgr.transformed_unit != null and mgr.transformed_unit.id == "asta_liebe" and mgr.transformed_unit.transformed)
 			var card_ok := false
 			for c in ui.get("cards").values():
 				if is_instance_valid(c) and c.unit == mgr.transformed_unit:
@@ -363,7 +379,7 @@ func _check_ui() -> void:
 
 
 func _check_save_compat() -> void:
-	GameState.rarities = { "asta": "UR" }
+	GameState.rarities = { "asta_liebe": "UR" }
 	GameState.save_game()
 	var text := FileAccess.get_file_as_string(GameState.SAVE_PATH)
 	_check("el guardado no contiene la transformacion ni sus habilidades", text.find("union_demoniaca") == -1 and text.find("Divisor Negro") == -1 and text.find("transform") == -1)

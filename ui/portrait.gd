@@ -155,7 +155,7 @@ var provisional := false
 static var _composite_cache := {}
 
 
-## Si una unidad (el duo) declara "art_fallback_ids" y aun no tiene PNG propio, se
+## Si una unidad (el duo, o Asta & Liebe con un solo id) declara "art_fallback_ids" y aun no tiene PNG propio, se
 ## compone una imagen provisional con el arte de esos personajes lado a lado. NO
 ## escribe nada en disco ni toca los PNG: es solo una textura en memoria. Los
 ## retratos definitivos van en res://art/characters/david_lucy_duo/<forma>/<ranura>.png.
@@ -164,7 +164,7 @@ static func _fallback_composite(character_id: String, slot_name: String) -> Text
 	if _composite_cache.has(key):
 		return _composite_cache[key]
 	var ids = (DB.characters.get(character_id, {}) as Dictionary).get("art_fallback_ids", [])
-	if not (ids is Array) or (ids as Array).size() < 2:
+	if not (ids is Array) or (ids as Array).size() < 1:
 		return null
 	var images: Array = []
 	for raw in ids:

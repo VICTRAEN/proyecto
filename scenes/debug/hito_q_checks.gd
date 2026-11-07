@@ -126,13 +126,13 @@ func _check_data() -> void:
 			var t = (parsed as Dictionary).get("transformations", [])
 			if t is Array and not (t as Array).is_empty():
 				with_t.append(String(parsed.get("id", f)))
-	_check("solo Asta tiene transformacion en los datos reales (%d personajes revisados: %s)" % [total, str(with_t)], with_t == ["asta"] and total > 0)
+	_check("solo Asta & Liebe tiene transformacion en los datos reales (%d personajes revisados: %s)" % [total, str(with_t)], with_t == ["asta_liebe"] and total > 0)
 	var any_can := false
 	for id in GameState.roster:
 		var u := CombatUnit.new()
 		u.setup(GameState.character_data(String(id)), true, 0)
 		any_can = any_can or u.can_transform()
-	_check("con los datos reales y el equipo inicial (Asta es SSR) nadie puede transformarse", not any_can)
+	_check("con los datos reales y el equipo inicial (Asta & Liebe es SSR) nadie puede transformarse", not any_can)
 
 
 func _check_unit_level() -> void:

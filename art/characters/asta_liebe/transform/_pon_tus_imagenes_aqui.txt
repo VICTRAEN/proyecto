@@ -1,4 +1,4 @@
-ASTA - FORMA TRANSFORMADA (Union Demoniaca: Asta & Liebe)
+ASTA & LIEBE - FORMA TRANSFORMADA (Union Demoniaca: Asta & Liebe)
 
 Se usa SOLO durante el combate, mientras Asta esta transformado. Mete aqui:
 
@@ -6,5 +6,5 @@ Se usa SOLO durante el combate, mientras Asta esta transformado. Mete aqui:
   back.png   ->  de espaldas (barra inferior cuando le toca actuar)
   icon.png   ->  la cara     (colecciones, orden de turnos)
 
-PNG con fondo transparente. Mientras no existan, el juego muestra el arte base de Asta con un tinte
+PNG con fondo transparente. Mientras no existan, el juego muestra el arte de Asta con un tinte
 de energia rosado (provisional). Al terminar el combate Asta vuelve a su arte de siempre.
